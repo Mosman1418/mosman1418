@@ -1,14 +1,21 @@
 # Create your views here.
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, render
 from django.http import HttpResponse
 from rdflib import ConjunctiveGraph
 from rdflib import Namespace, BNode, Literal, RDF, URIRef
 
-from mosman1418.memorials.models import *
+from app.memorials.models import *
+
 
 def show_memorial(request, id):
     memorial = Memorial.objects.get(id=id)
-    return render_to_response('memorial.html', {'memorial': memorial})
+    return render(request, 'memorials/memorial.html', {'memorial': memorial})
+
+
+def show_memorials(request):
+    memorials = Memorial.objects.all().order_by('name')
+    return render(request, 'memorials/memorials.html', {'memorials': memorials})
+
 
 def show_memorial_rdf(request, id):
     schemas = {}
@@ -24,10 +31,10 @@ def show_memorial_rdf(request, id):
         graph.add((this_memorial, schemas['graves']['monument_name'], Literal(memorial_name.name)))
     return HttpResponse(
         graph.serialize(format='pretty-xml'),
-        content_type = 'application/rdf+xml'
+        content_type='application/rdf+xml'
     )
-        
-    
+
+
 def create_series_rdf(request, series_id):
     series = Series.objects.get(id=series_id)
     graph = ConjunctiveGraph()
@@ -39,9 +46,10 @@ def create_series_rdf(request, series_id):
     add_rdf_attribute(graph, NS, this_series, series, 'Series', 'information_link', 'uri')
     response = HttpResponse(
         graph.serialize(format='pretty-xml'),
-        content_type = 'application/rdf+xml'
+        content_type='application/rdf+xml'
     )
     return response
+
 
 def add_namespaces(graph, class_name):
     schemas = Schema.objects.filter(attribute__mapping__class_name=class_name).distinct()
@@ -51,7 +59,8 @@ def add_namespaces(graph, class_name):
         graph.bind(schema.prefix, NS[schema.prefix.upper()])
     return NS
 
-def add_rdf_attribute(graph, NS, rdf_subject, class_object, class_name, field_name, field_type):    
+
+def add_rdf_attribute(graph, NS, rdf_subject, class_object, class_name, field_name, field_type):
     attrs = Attribute.objects.filter(mapping__class_name=class_name, mapping__field_name=field_name)
     if field_type == 'literal':
         rdf_object = Literal(getattr(class_object, field_name))
@@ -59,4 +68,3 @@ def add_rdf_attribute(graph, NS, rdf_subject, class_object, class_name, field_na
         rdf_object = URIRef(getattr(class_object, field_name))
     for attr in attrs:
         graph.add((rdf_subject, NS[attr.schema.prefix.upper()][attr.name], rdf_object))
-        
