@@ -5,6 +5,7 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponse
 from django.template import RequestContext
 from django.utils.cache import patch_vary_headers
+from django.contrib.sites.models import Site
 from rdflib import Graph
 from rdflib import Namespace, BNode, Literal, RDF, URIRef
 from django_conneg.views import ContentNegotiatedView
@@ -32,7 +33,7 @@ class LinkedDataView(ContentNegotiatedView):
     def get(self, request, id=None, format=None):
         context = {}
         if format:
-            context['entity'] = self.model.objects.get(id=id)
+            context['entity'] = self.model.objects.select_related().get(id=id)
             return self.render_to_format(request, context, self.template_name, format)
         else:
             context['status_code'] = 303
@@ -84,6 +85,9 @@ class LinkedDataView(ContentNegotiatedView):
     def render_html(self, request, context, template_name):
         if context['entity']:
             template_name = self.join_template_name(template_name, 'html')
+            identifier = 'http://%s%s' % (Site.objects.get_current().domain, context['entity'].get_absolute_url())
+            context['identifier'] = identifier
+            context['id_path'] = identifier[:-1]
             return render_to_response(template_name, context, context_instance=RequestContext(request), mimetype='text/html')
         else:
             return HttpResponse(content='')

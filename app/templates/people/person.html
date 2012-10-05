@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+        <div class="row">
+            <div class="span2">
+                <ul class="nav nav-list">
+                    <li><a href="/memorials/">Memorials</a></li>
+                    <li class="active"><a href="/people/">People</a></li>
+                </ul>
+            </div>
+            <div class="span10">
+                <h1>{{ entity }}</h1>
+                {% if entity.memorialname_set.all %}
+                <h4>Commemorations</h4>
+                <ul>
+                    {% for memorialname in entity.memorialname_set.all %}
+                        <li>{{ memorialname.name }} on the {% if memorialname.memorial_part %}<a href="{{ memorialname.memorial.get_absolute_url }}#part-{{ memorialname.memorial_part.id }}">{{ memorialname.memorial_part.label }}</a> of the {% endif %}<a href="{{ memorialname.memorial.get_absolute_url }}">{{ memorialname.memorial }}</a></li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                <p>Identifer: <a href="{{ identifier }}">{{ identifier }}</a> |
+                    <a href="{{ id_path }}.html/">HTML</a> |
+                    <a href="{{ id_path }}.rdf/">RDF+XML</a> |
+                    <a href="{{ id_path }}.ttl/">Turtle</a> |
+                    <a href="{{ id_path }}.json/">JSON</a>
+                </p>
+            </div>
+        </div>
+{% endblock %}

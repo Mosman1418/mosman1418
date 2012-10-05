@@ -50,6 +50,12 @@
                         </div>
                         {% endfor %}
                 {% endif %}
+                <p>Identifer: <a href="{{ identifier }}">{{ identifier }}</a> |
+                    <a href="{{ id_path }}.html/">HTML</a> |
+                    <a href="{{ id_path }}.rdf/">RDF+XML</a> |
+                    <a href="{{ id_path }}.ttl/">Turtle</a> |
+                    <a href="{{ id_path }}.json/">JSON</a>
+                </p>
             </div>
         </div>
 {% endblock %}
