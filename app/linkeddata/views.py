@@ -49,13 +49,14 @@ class LinkedDataView(ContentNegotiatedView):
         template_name should lack a file-type suffix (e.g. '.html', as
         renderers will append this as necessary.
         """
+        request, context, template_name = self.get_render_params(request, context, template_name)
+        self.set_renderers()
+
         status_code = context.pop('status_code', httplib.OK)
         additional_headers = context.pop('additional_headers', {})
 
-        self.set_renderers(request)
-
         for renderer in request.renderers:
-            response = renderer(self, request, context, template_name)
+            response = renderer(request, context, template_name)
             if response is NotImplemented:
                 continue
             response.status_code = status_code
@@ -65,6 +66,7 @@ class LinkedDataView(ContentNegotiatedView):
             tried_mimetypes = list(itertools.chain(*[r.mimetypes for r in request.renderers]))
             response = self.http_not_acceptable(request, tried_mimetypes)
             response.renderer = None
+
         for key, value in additional_headers.iteritems():
             # My changes -- Modify location for 303 redirect
             if key == 'location' and response.renderer:
@@ -110,5 +112,4 @@ class LinkedDataView(ContentNegotiatedView):
             return HttpResponse(graph.serialize(format='turtle'), mimetype='text/turtle')
         else:
             return HttpResponse(content='')
-
 
