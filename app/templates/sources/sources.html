@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+        <div class="row">
+            <div class="span2">
+                <ul class="nav nav-list">
+                    <li><a href="/memorials/">Memorials</a></li>
+                    <li><a href="/people/">People</a></li>
+                    <li class="active"><a href="/sources/">Sources</a></li>
+                </ul>
+            </div>
+            <div class="span10">
+                <h1>Sources</h1>
+                <ul>
+                {% for source in sources %}
+                    <li>
+                        <a href="{{ source.get_absolute_url }}">
+                            {{ source }}
+                        </a>
+                    </li>
+                {% endfor %}
+                </ul>
+                <ul class="pager">
+                    <li>
+                        {% if source.has_previous %}
+                            <a href="/sources/?page={{ source.previous_page_number }}">Previous</a>
+                        {% else %}
+                            Previous
+                        {% endif %}
+                    </li>                    <li>
+                        {% if source.has_next %}
+                            <a href="/sources/?page={{ source.next_page_number }}">Next</a>
+                        {% else %}
+                            Next
+                        {% endif %}
+                    </li>
+                </ul>
+            </div>
+        </div>
+{% endblock %}

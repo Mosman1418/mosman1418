@@ -42,7 +42,7 @@ def show_person(request, id):
 
 
 def show_people(request):
-    results = People.objects.all().order_by('family_name', 'other_names')
+    results = Person.objects.all().order_by('family_name', 'other_names')
     paginator = Paginator(results, 25)
     page = request.GET.get('page')
     try:

@@ -16,8 +16,10 @@ urlpatterns = patterns('',
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
     # Uncomment the next line to enable the admin:
+    url(r'^sources/$', show_sources),
     url(r'^sources/(?P<id>\d+)\.(?P<format>(html|rdf|json|ttl))/$', SourceView.as_view()),
     url(r'^sources/(?P<id>\d+)/$', SourceView.as_view(), name='source_view'),
+    url(r'^people/$', show_people),
     url(r'^people/(?P<id>\d+)\.(?P<format>(html|rdf|json|ttl))/$', PersonView.as_view()),
     url(r'^people/(?P<id>\d+)/$', PersonView.as_view(), name='person_view'),
     url(r'^memorials/$', show_memorials),

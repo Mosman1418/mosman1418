@@ -30,3 +30,15 @@ class SourceView(LinkedDataView):
         graph.add((person, namespaces['rdfs']['label'], Literal(str(entity))))
         return graph
 
+
+def show_sources(request):
+    results = Source.objects.all().order_by('title')
+    paginator = Paginator(results, 25)
+    page = request.GET.get('page')
+    try:
+        sources = paginator.page(page)
+    except PageNotAnInteger:
+        sources = paginator.page(1)
+    except EmptyPage:
+        sources = paginator.page(paginator.num_pages)
+    return render(request, 'sources/sources.html', {'sources': sources})

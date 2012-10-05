@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+        <div class="row">
+            <div class="span2">
+                <ul class="nav nav-list">
+                    <li><a href="/memorials/">Memorials</a></li>
+                    <li class="active"><a href="/people/">People</a></li>
+                    <li><a href="/sources/">Sources</a></li>
+                </ul>
+            </div>
+            <div class="span10">
+                <h1>People</h1>
+                <ul>
+                {% for person in people %}
+                    <li>
+                        <a href="{{ person.get_absolute_url }}">
+                            {{ person }}
+                        </a>
+                    </li>
+                {% endfor %}
+                </ul>
+                <ul class="pager">
+                    <li>
+                        {% if people.has_previous %}
+                            <a href="/people/?page={{ people.previous_page_number }}">Previous</a>
+                        {% else %}
+                            Previous
+                        {% endif %}
+                    </li>                    <li>
+                        {% if people.has_next %}
+                            <a href="/people/?page={{ people.next_page_number }}">Next</a>
+                        {% else %}
+                            Next
+                        {% endif %}
+                    </li>
+                </ul>
+            </div>
+        </div>
+{% endblock %}
