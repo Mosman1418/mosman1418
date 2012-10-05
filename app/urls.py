@@ -2,6 +2,8 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.conf import settings
 from app.memorials.views import *
+from app.people.views import *
+from app.sources.views import *
 
 admin.autodiscover()
 
@@ -14,12 +16,16 @@ urlpatterns = patterns('',
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
     # Uncomment the next line to enable the admin:
+    url(r'^sources/(?P<id>\d+)\.(?P<format>(html|rdf|json|ttl))/$', SourceView.as_view()),
+    url(r'^sources/(?P<id>\d+)/$', SourceView.as_view(), name='source_view'),
+    url(r'^people/(?P<id>\d+)\.(?P<format>(html|rdf|json|ttl))/$', PersonView.as_view()),
+    url(r'^people/(?P<id>\d+)/$', PersonView.as_view(), name='person_view'),
     url(r'^memorials/$', show_memorials),
-    url(r'^memorials/(?P<id>\d+)/$', show_memorial),
-    url(r'^memorials/(?P<id>\d+)\.rdf/$', show_memorial_rdf),
+    url(r'^memorials/(?P<id>\d+)\.(?P<format>(html|rdf|json|ttl))/$', MemorialView.as_view()),
+    url(r'^memorials/(?P<id>\d+)/$', MemorialView.as_view(), name='memorial_view'),
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^', include('cms.urls')),
-    url(r'^', include('filer.server.urls')),
+    #url(r'^', include('cms.urls')),
+    #url(r'^', include('filer.server.urls')),
 )
 
 if settings.DEBUG:

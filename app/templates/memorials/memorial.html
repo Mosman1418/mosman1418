@@ -8,7 +8,48 @@
                 </ul>
             </div>
             <div class="span10">
-                <h1>{{ memorial.name }}</h1>
+                <h1>{{ entity.name }}</h1>
+                {% if entity.memorialpart_set.all %}
+                    <ul class="nav nav-pills">
+                        {% for part in entity.memorialpart_set.all %}
+                            <li><a href="#part-{{ part.id }}">{{ part.label }}</a></li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                {% if entity.associated_sources.all %}
+                    <h4>Sources</h4>
+                    <ul>
+                        {% for source in entity.associated_sources.all %}
+                            <li><a href="/sources/{{ source.id }}.html/">{{ source }}</a>{% if source.collection %} ({{ source.collection }}){% endif %}</li>
+
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                {% if entity.memorialpart_set.all %}
+                    {% for part in entity.memorialpart_set.all %}
+                        <h2 id="part-{{ part.id }}">{{ part.label }}</h2>
+                        <div class="inscription">
+                            {{ part.inscription|safe }}
+                        </div>
+                        {% regroup part.memorialname_set.all  by row as rows %}
+                        {% for row in rows %}
+                        <div class="row">
+                            {% for name in row.list %}
+                                <span class="span2"><a href="/people/{{ name.person.id }}.html/">{{ name.name }}</a></span>
+                            {% endfor %}
+                        </div>
+                        {% endfor %}
+                    {% endfor %}
+                {% elif entity.memorialname_set.all %}
+                    {% regroup entity.memorialname_set.all  by row as rows %}
+                        {% for row in rows %}
+                        <div class="row">
+                            {% for name in row.list %}
+                                <span class="span2"><a href="/people/{{ name.person.id }}.html/">{{ name.name }}</a></span>
+                            {% endfor %}
+                        </div>
+                        {% endfor %}
+                {% endif %}
             </div>
         </div>
 {% endblock %}
