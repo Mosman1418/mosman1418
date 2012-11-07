@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Create an account{% endblock %}
+{% block content %}
+<div class="row">
+            {% with current='none' %}{% include '_sidenav.html' %}{% endwith %}
+            <div class="span10">
+                <h2>Create an account</h2>
+                <form action="" method="post">{% csrf_token %}
+                {{ form.as_p }}
+                <input type="submit" value="Send activation email" />
+                </form>
+            </div>
+{% endblock %}

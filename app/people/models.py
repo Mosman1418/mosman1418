@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.contrib.auth.models import User
 from app.linkeddata.models import RDFProperty
 
 
@@ -16,6 +16,8 @@ class Person(models.Model):
     associated_events = models.ManyToManyField('events.Event', blank=True, null=True, through='PersonAssociatedEvent')
     associated_objects = models.ManyToManyField('objects.Object', blank=True, null=True, through='PersonAssociatedObject')
     associated_sources = models.ManyToManyField('sources.Source', blank=True, null=True, through='PersonAssociatedSource')
+    images = models.ManyToManyField('PeopleImage', blank=True, null=True)
+    stories = models.ManyToManyField('PeopleStory', blank=True, null=True)
     public = models.BooleanField(default=False)  # Display on website
     mosman_related = models.BooleanField(default=True)  # Appear in main people lists (not just authors)
 
@@ -28,6 +30,9 @@ class Person(models.Model):
             else:
                 display = self.family_name
         return display
+
+    def alpha_name(self):
+        return '%s, %s' % (self.family_name, self.other_names)
 
     @models.permalink
     def get_absolute_url(self):
@@ -62,6 +67,28 @@ class Organisation(models.Model):
     public = models.BooleanField(default=False)  # Display on website
     mosman_related = models.BooleanField(default=True)  # Appear in main people lists (not just authors)
     associated_sources = models.ManyToManyField('sources.Source', blank=True, null=True, through='OrganisationAssociatedSource')
+
+
+class PeopleImage(models.Model):
+    title = models.CharField(max_length=200)
+    image = models.ImageField(upload_to='images/people')
+    caption = models.TextField(null=True, blank=True)
+
+
+class PeopleStory(models.Model):
+    title = models.CharField(max_length=200)
+    text = models.TextField()
+    created_by = models.ForeignKey(User)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_modified = models.DateTimeField(auto_now=True)
+
+    def __unicode__(self):
+        return self.title
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('story_view', [str(self.id)])
+
 
 class PersonRole(models.Model):
     label = models.CharField(max_length=50)

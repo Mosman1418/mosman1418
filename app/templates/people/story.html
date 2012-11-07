@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load guardian_tags %}
+{% block content %}
+{% get_obj_perms user for entity as 'entity_perms' %}
+        <div class="row">
+            {% with current='none' %}{% include '_sidenav.html' %}{% endwith %}
+            <div class="span8">
+                <h1>{{ entity }}</h1>
+                {{ entity.text|linebreaks }}
+                <h5>Related people</h5>
+                <ul>
+                {% for person in entity.person_set.all %}
+                    <li><a href="{% url person_view person.id %}">{{ person }}</a></li>
+                {% endfor %}
+                </ul>
+                <p>Contributed by: {{ entity.created_by.username }}</p>
+                <section class="identifier">
+                    <p>Identifer: <a href="{{ identifier }}">{{ identifier }}</a> |
+                        <a href="{{ id_path }}.html/">HTML</a> |
+                        <a href="{{ id_path }}.rdf/">RDF+XML</a> |
+                        <a href="{{ id_path }}.ttl/">Turtle</a> |
+                        <a href="{{ id_path }}.json/">JSON</a>
+                    </p>
+                </section>
+            </div>
+            <div class="span2">
+                {% if 'change_peoplestory' in entity_perms %}
+                <a class="btn btn-primary btn-medium" href="{% url people_edit_story entity.id%}">Edit</a>
+                {% endif %}
+            </div>
+        </div>
+{% endblock %}

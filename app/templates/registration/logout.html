@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Logged out{% endblock %}
+{% block content %}
+    <div class="row">
+        {% with current='none' %}{% include '_sidenav.html' %}{% endwith %}
+        <div class="span10">
+            <h2>Logged out</h2>
+            <p>You've successfully logged out.</p>
+        </div>
+    </div>
+{% endblock %}

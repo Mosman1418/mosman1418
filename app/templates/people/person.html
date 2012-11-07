@@ -1,14 +1,20 @@
 {% extends 'base.html' %}
 {% block content %}
         <div class="row">
-            <div class="span2">
-                <ul class="nav nav-list">
-                    <li><a href="/memorials/">Memorials</a></li>
-                    <li class="active"><a href="/people/">People</a></li>
-                </ul>
-            </div>
-            <div class="span10">
+            {% with current='none' %}{% include '_sidenav.html' %}{% endwith %}
+            <div class="span8">
                 <h1>{{ entity }}</h1>
+                {% if entity.stories.all %}
+                    <h4>Stories</h4>
+                    {% for story in entity.stories.all %}
+                    <article>
+                        <h5>{{ story.title }}</h5>
+                        {{ story.text|linebreaks|truncatewords_html:100 }}
+                        <p><a href="{% url story_view story.id %}">More</a></p>
+                    </article>
+                    {% endfor %}
+                {% endif %}
+
                 {% if entity.memorialname_set.all %}
                 <h4>Commemorations</h4>
                 <ul>
@@ -23,6 +29,10 @@
                     <a href="{{ id_path }}.ttl/">Turtle</a> |
                     <a href="{{ id_path }}.json/">JSON</a>
                 </p>
+            </div>
+            <div class="span2">
+                <h5>Contribute</h5>
+                <a class="btn btn-primary btn-medium" href="{% url people_add_story entity.id%}">Add a story</a>
             </div>
         </div>
 {% endblock %}

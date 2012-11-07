@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Create an account{% endblock %}
+{% block content %}
+    <div class="row">
+        {% with current='none' %}{% include '_sidenav.html' %}{% endwith %}
+        <div class="span10">
+            <h2>Your registration is nearly complete</h2>
+            <p>Thanks for creating an account!</p>
+            <p>An email has been sent to you with an activation code and instructions on how to complete your registration.</p>
+        </div>
+    </div>
+
+{% endblock %}
