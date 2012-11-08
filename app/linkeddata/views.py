@@ -149,7 +149,7 @@ class LinkedDataListView(LinkedDataView):
 
     @renderer(format='html', mimetypes=('text/html', 'application/xhtml+xml'), name='HTML', priority=1)
     def render_html(self, request, context, template_name):
-        if context['content']:
+        if context['content'] != None:
             template_name = self.join_template_name(template_name, 'html')
             identifier = 'http://%s%s/' % (Site.objects.get_current().domain, self.path)
             context['identifier'] = identifier
