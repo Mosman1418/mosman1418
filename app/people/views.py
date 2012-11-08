@@ -344,12 +344,12 @@ def edit_image(request, id):
             organisations_ids = [organisation.id for organisation in organisations]
             form.initial['organisations'] = organisations_ids
     else:
-        people = story.person_set.all()
+        people = image.person_set.all()
         people_ids = [person.id for person in people]
-        form = AddStoryForm(instance=story, initial={'people': people_ids})
-        organisations = story.organisation_set.all()
+        form = AddImageForm(instance=image, initial={'people': people_ids})
+        organisations = image.organisation_set.all()
         organisations_ids = [organisation.id for organisation in organisations]
-        form = AddStoryForm(instance=story, initial={'people': people_ids, 'organisations': organisations_ids})
+        form = AddImageForm(instance=image, initial={'people': people_ids, 'organisations': organisations_ids})
     return render(request, 'people/add_image.html', {
         'form': form, 'people': people, 'organisations': organisations, 'image_id': id
     })

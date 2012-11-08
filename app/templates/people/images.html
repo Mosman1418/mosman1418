@@ -8,9 +8,7 @@
                 <ul>
                 {% for image in content %}
                     <li>
-                        <a href="{{ image.get_absolute_url }}">
-                            <img src="{{ image.title }}">
-                        </a>
+                        <a href="{{ image.get_absolute_url }}">{{ image.title }}</a>
                     </li>
                 {% endfor %}
                 </ul>
