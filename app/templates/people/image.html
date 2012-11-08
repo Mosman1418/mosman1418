@@ -17,7 +17,7 @@
                     <li><a href="{% url person_view person.id %}">{{ person }}</a></li>
                 {% endfor %}
                 </ul>
-                <p>Contributed by: {{ content.created_by.username }}</p>
+                <p>Contributed by: {{ content.added_by.username }}</p>
                 <section class="identifier">
                     <p>Identifer: <a href="{{ identifier }}">{{ identifier }}</a> |
                         <a href="{{ id_path }}.html/">HTML</a> |

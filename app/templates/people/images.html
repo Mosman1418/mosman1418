@@ -1,18 +1,19 @@
 {% extends 'base.html' %}
+{% load thumbnail %}
 {% block content %}
         <div class="row">
             {% with current='images' %}{% include '_sidenav.html' %}{% endwith %}
             <div class="span8">
                 <h1>Images</h1>
-                <ul>
+                <div class="row">
                 {% for image in content %}
-                    <li>
+                    <div class="span2">
                         <a href="{{ image.get_absolute_url }}">
-                            {{ image }}
+                            <img src="{% thumbnail image.image 140x140 crop=scale %}">
                         </a>
-                    </li>
+                    </div>
                 {% endfor %}
-                </ul>
+                </div>
                 <ul class="pager">
                     <li>
                         {% if content.has_previous %}
@@ -28,6 +29,9 @@
                         {% endif %}
                     </li>
                 </ul>
+            </div>
+            <div class="span2">
+
             </div>
         </div>
 {% endblock %}
