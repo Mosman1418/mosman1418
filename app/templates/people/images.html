@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 {% block content %}
         <div class="row">
-            {% with current='people' %}{% include '_sidenav.html' %}{% endwith %}
+            {% with current='images' %}{% include '_sidenav.html' %}{% endwith %}
             <div class="span8">
-                <h1>People</h1>
+                <h1>Images</h1>
                 <ul>
-                {% for person in content %}
+                {% for image in content %}
                     <li>
-                        <a href="{{ person.get_absolute_url }}">
-                            {{ person }}
+                        <a href="{{ image.get_absolute_url }}">
+                            {{ image }}
                         </a>
                     </li>
                 {% endfor %}
@@ -16,13 +16,13 @@
                 <ul class="pager">
                     <li>
                         {% if content.has_previous %}
-                            <a href="/people/?page={{ content.previous_page_number }}">Previous</a>
+                            <a href="/images/?page={{ content.previous_page_number }}">Previous</a>
                         {% else %}
                             Previous
                         {% endif %}
                     </li>                    <li>
                         {% if content.has_next %}
-                            <a href="/people/?page={{ content.next_page_number }}">Next</a>
+                            <a href="/images/?page={{ content.next_page_number }}">Next</a>
                         {% else %}
                             Next
                         {% endif %}

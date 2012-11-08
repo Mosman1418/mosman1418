@@ -1,20 +1,22 @@
 {% extends 'base.html' %}
 {% load guardian_tags %}
+{% load thumbnail %}
 {% block content %}
-{% get_obj_perms user for content as 'entity_perms' %}
+{% get_obj_perms user for content as 'content_perms' %}
         <div class="row">
-            {% with current='stories' %}{% include '_sidenav.html' %}{% endwith %}
+            {% with current='images' %}{% include '_sidenav.html' %}{% endwith %}
             <div class="span8">
                 <h1>{{ content }}</h1>
-                {{ content.text|linebreaks }}
-                {% if content.person_set.all %}
-                    <h5>Related people</h5>
-                    <ul>
-                    {% for person in content.person_set.all %}
-                        <li><a href="{% url person_view person.id %}">{{ person }}</a></li>
-                    {% endfor %}
-                    </ul>
-                {% endif %}
+                <div>
+                    <a href="{{ content.image.url }}"><img src="{% thumbnail content.image 400x400 crop=scale %}"></a>
+                </div>
+                {{ content.caption|linebreaks }}
+                <h5>Related people</h5>
+                <ul>
+                {% for person in content.person_set.all %}
+                    <li><a href="{% url person_view person.id %}">{{ person }}</a></li>
+                {% endfor %}
+                </ul>
                 <p>Contributed by: {{ content.created_by.username }}</p>
                 <section class="identifier">
                     <p>Identifer: <a href="{{ identifier }}">{{ identifier }}</a> |
@@ -27,7 +29,7 @@
             </div>
             <div class="span2">
                 {% if 'change_peoplestory' in entity_perms %}
-                <a class="btn btn-primary btn-medium" href="{% url edit_story content.id%}">Edit</a>
+                <a class="btn btn-primary btn-medium" href="{% url people_edit_story content.id%}">Edit</a>
                 {% endif %}
             </div>
         </div>

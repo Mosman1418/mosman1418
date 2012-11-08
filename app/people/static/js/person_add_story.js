@@ -21,7 +21,7 @@ $(function(){
     $('#add_person').click(function(event) {
         event.preventDefault();
         var data = $('#person_select').select2('data');
-        $person = $('<li data-id="' + data.id + '" class="btn btn-info person-info">' + data.text + ' <i class="icon-white icon-remove-sign"></li>')
+        $person = $('<li data-id="' + data.id + '" class="btn btn-info person-info btn-mini">' + data.text + ' <i class="icon-white icon-remove-sign"></li>')
             .click(function() {
                 remove_person($(this));
             });

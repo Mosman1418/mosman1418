@@ -6,6 +6,7 @@ from django.http import HttpResponse
 from django.template import RequestContext
 from django.utils.cache import patch_vary_headers
 from django.contrib.sites.models import Site
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from rdflib import Graph
 from rdflib import Namespace, BNode, Literal, RDF, URIRef
 from django_conneg.views import ContentNegotiatedView
@@ -33,12 +34,12 @@ class LinkedDataView(ContentNegotiatedView):
     def get(self, request, id=None, format=None):
         context = {}
         if format:
-            context['entity'] = self.model.objects.select_related().get(id=id)
+            context['content'] = self.model.objects.select_related().get(id=id)
             return self.render_to_format(request, context, self.template_name, format)
         else:
             context['status_code'] = 303
             context['additional_headers'] = {'location': self.path % id}
-            context['entity'] = None
+            context['content'] = None
             return self.render(request, context, self.template_name)
 
     def render(self, request, context, template_name):
@@ -71,7 +72,12 @@ class LinkedDataView(ContentNegotiatedView):
         for key, value in additional_headers.iteritems():
             # My changes -- Modify location for 303 redirect
             if key == 'location' and response.renderer:
-                response[key] = '%s.%s/' % (value, response.renderer.format)
+                location = '%s.%s/' % (value, response.renderer.format)
+                try:
+                    location += '?page=%s' % context['page']
+                except KeyError:
+                    pass
+                response[key] = location
             else:
                 response[key] = value
             # End my changes
@@ -83,9 +89,9 @@ class LinkedDataView(ContentNegotiatedView):
 
     @renderer(format='html', mimetypes=('text/html', 'application/xhtml+xml'), name='HTML', priority=1)
     def render_html(self, request, context, template_name):
-        if context['entity']:
+        if context['content']:
             template_name = self.join_template_name(template_name, 'html')
-            identifier = 'http://%s%s' % (Site.objects.get_current().domain, context['entity'].get_absolute_url())
+            identifier = 'http://%s%s' % (Site.objects.get_current().domain, context['content'].get_absolute_url())
             context['identifier'] = identifier
             context['id_path'] = identifier[:-1]
             return render_to_response(template_name, context, context_instance=RequestContext(request), mimetype='text/html')
@@ -94,26 +100,62 @@ class LinkedDataView(ContentNegotiatedView):
 
     @renderer(format='json', mimetypes=('application/json',), name='JSON')
     def render_json(self, request, context, template_name):
-        if context['entity']:
+        if context['content']:
             #data = {'name': context['memorial'].name}
-            graph = self.make_graph(context['entity'])
+            graph = self.make_graph(context['content'])
             return HttpResponse(graph.serialize(format='json-ld', indent=4), mimetype='application/json')
         else:
             return HttpResponse(content='')
 
     @renderer(format='rdf', mimetypes=('application/rdf+xml',), name='RDF')
     def render_rdf(self, request, context, template_name):
-        if context['entity']:
-            graph = self.make_graph(context['entity'])
+        if context['content']:
+            graph = self.make_graph(context['content'])
             return HttpResponse(graph.serialize(format='pretty-xml'), mimetype='application/rdf+xml')
         else:
             return HttpResponse(content='')
 
     @renderer(format='ttl', mimetypes=('text/turtle',), name='TURTLE')
     def render_ttl(self, request, context, template_name):
-        if context['entity']:
-            graph = self.make_graph(context['entity'])
+        if context['content']:
+            graph = self.make_graph(context['content'])
             return HttpResponse(graph.serialize(format='turtle'), mimetype='text/turtle')
         else:
             return HttpResponse(content='')
+
+
+class LinkedDataListView(LinkedDataView):
+
+    def get(self, request, format=None):
+        context = {}
+        if format:
+            results = self.model.objects.select_related().all()
+            paginator = Paginator(results, 25)
+            page = request.GET.get('page', '1')
+            try:
+                content = paginator.page(page)
+            except PageNotAnInteger:
+                content = paginator.page(1)
+            except EmptyPage:
+                content = paginator.page(paginator.num_pages)
+            context['content'] = content
+            return self.render_to_format(request, context, self.template_name, format)
+        else:
+            context['page'] = request.GET.get('page', '1')
+            context['status_code'] = 303
+            context['additional_headers'] = {'location': self.path}
+            context['content'] = None
+            return self.render(request, context, self.template_name)
+
+    @renderer(format='html', mimetypes=('text/html', 'application/xhtml+xml'), name='HTML', priority=1)
+    def render_html(self, request, context, template_name):
+        if context['content']:
+            template_name = self.join_template_name(template_name, 'html')
+            identifier = 'http://%s%s/' % (Site.objects.get_current().domain, self.path)
+            context['identifier'] = identifier
+            context['id_path'] = identifier[:-1]
+            return render_to_response(template_name, context, context_instance=RequestContext(request), mimetype='text/html')
+        else:
+            return HttpResponse(content='')
+
 

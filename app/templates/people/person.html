@@ -1,24 +1,24 @@
 {% extends 'base.html' %}
 {% block content %}
         <div class="row">
-            {% with current='none' %}{% include '_sidenav.html' %}{% endwith %}
+            {% with current='people' %}{% include '_sidenav.html' %}{% endwith %}
             <div class="span8">
-                <h1>{{ entity }}</h1>
-                {% if entity.stories.all %}
+                <h1>{{ content }}</h1>
+                {% if content.stories.all %}
                     <h4>Stories</h4>
-                    {% for story in entity.stories.all %}
+                    {% for story in content.stories.all %}
                     <article>
                         <h5>{{ story.title }}</h5>
                         {{ story.text|linebreaks|truncatewords_html:100 }}
-                        <p><a href="{% url story_view story.id %}">More</a></p>
+                        <p><a href="{% url view_story story.id %}">More</a></p>
                     </article>
                     {% endfor %}
                 {% endif %}
 
-                {% if entity.memorialname_set.all %}
+                {% if content.memorialname_set.all %}
                 <h4>Commemorations</h4>
                 <ul>
-                    {% for memorialname in entity.memorialname_set.all %}
+                    {% for memorialname in content.memorialname_set.all %}
                         <li>{{ memorialname.name }} on the {% if memorialname.memorial_part %}<a href="{{ memorialname.memorial.get_absolute_url }}#part-{{ memorialname.memorial_part.id }}">{{ memorialname.memorial_part.label }}</a> of the {% endif %}<a href="{{ memorialname.memorial.get_absolute_url }}">{{ memorialname.memorial }}</a></li>
                     {% endfor %}
                 </ul>
@@ -32,7 +32,12 @@
             </div>
             <div class="span2">
                 <h5>Contribute</h5>
-                <a class="btn btn-primary btn-medium" href="{% url people_add_story entity.id%}">Add a story</a>
+                <p>
+                    <a class="btn btn-primary btn-medium" href="{% url person_add_story 'person' content.id%}">Add a story</a>
+                </p>
+                <p>
+                    <a class="btn btn-primary btn-medium" href="{% url person_add_image 'person' content.id%}">Add an image</a>
+                </p>
             </div>
         </div>
 {% endblock %}

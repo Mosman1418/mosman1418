@@ -9,11 +9,12 @@
 {% endblock %}
 {% block content %}
     <div class="row">
-        {% with current='none' %}{% include '_sidenav.html' %}{% endwith %}
+        {% with current='images' %}{% include '_sidenav.html' %}{% endwith %}
         <div class="span10">
-            <h2>{% if story_id %}Edit{% else %}Add{% endif %} a story</h2>
-            <form action="" method="post">{% csrf_token %}
+            <h2>{% if image_id %}Edit{% else %}Add{% endif %} an image</h2>
+            <form action="" method="post" enctype="multipart/form-data">{% csrf_token %}
                 {{ form.as_p }}
+
                 <h4>Related people</h4>
                 <ul id="related_people" class="related-list">
                     {% for person in people %}
@@ -25,7 +26,7 @@
                 <button id="add_person" class="btn btn-info btn-mini">Add</button></p>
                 <p class="form-buttons">
                     <input class="btn btn-primary" type="submit" value="Save">
-                    {% if story_id %}<a href="{% url delete_story story_id %}" class="btn btn-danger">Delete</a>{% endif %}
+                    {% if image_id %}<a href="{% url delete_image story_id %}" class="btn btn-danger">Delete</a>{% endif %}
                 </p>
             </form>
         </div>

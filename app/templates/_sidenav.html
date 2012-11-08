@@ -1,7 +1,9 @@
 <div class="span2">
     <ul class="nav nav-list">
-        <li><a {% if current == 'memorials' %}class="active" {% endif %}href="/memorials/">Memorials</a></li>
-        <li><a {% if current == 'people' %}class="active" {% endif %}href="/people/">People</a></li>
-        <li><a {% if current == 'sources' %}class="active" {% endif %}href="/sources/">Sources</a></li>
+        <li {% if current == 'memorials' %}class="active" {% endif %}><a href="/memorials/">Memorials</a></li>
+        <li {% if current == 'people' %}class="active" {% endif %}><a href="/people/">People</a></li>
+        <li {% if current == 'sources' %}class="active" {% endif %}><a href="/sources/">Sources</a></li>
+        <li {% if current == 'images' %}class="active" {% endif %}><a href="/images/">Images</a></li>
+        <li {% if current == 'stories' %}class="active" {% endif %}><a href="/stories/">Stories</a></li>
     </ul>
 </div>

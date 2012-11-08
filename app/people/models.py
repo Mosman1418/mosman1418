@@ -34,6 +34,9 @@ class Person(models.Model):
     def alpha_name(self):
         return '%s, %s' % (self.family_name, self.other_names)
 
+    class Meta:
+        ordering = ['family_name', 'other_names']
+
     @models.permalink
     def get_absolute_url(self):
         return ('person_view', [str(self.id)])
@@ -67,12 +70,27 @@ class Organisation(models.Model):
     public = models.BooleanField(default=False)  # Display on website
     mosman_related = models.BooleanField(default=True)  # Appear in main people lists (not just authors)
     associated_sources = models.ManyToManyField('sources.Source', blank=True, null=True, through='OrganisationAssociatedSource')
+    images = models.ManyToManyField('PeopleImage', blank=True, null=True)
+    stories = models.ManyToManyField('PeopleStory', blank=True, null=True)
+
+    def __unicode__(self):
+        return self.name
 
 
 class PeopleImage(models.Model):
     title = models.CharField(max_length=200)
     image = models.ImageField(upload_to='images/people')
     caption = models.TextField(null=True, blank=True)
+    added_by = models.ForeignKey(User)
+    date_added = models.DateTimeField(auto_now_add=True)
+    date_modified = models.DateTimeField(auto_now=True)
+
+    def __unicode__(self):
+        return self.title
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('view_image', [str(self.id)])
 
 
 class PeopleStory(models.Model):
@@ -87,7 +105,7 @@ class PeopleStory(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('story_view', [str(self.id)])
+        return ('view_story', [str(self.id)])
 
 
 class PersonRole(models.Model):
