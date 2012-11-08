@@ -8,7 +8,7 @@
             <div class="span8">
                 <h1>{{ content }}</h1>
                 <div>
-                    <a href="{{ content.image.url }}"><img src="{% thumbnail content.image 400x400 crop=scale %}"></a>
+                    <a href="{{ content.image.url }}"><img src="{{ content.image.url }}" width="400px"></a>
                 </div>
                 {{ content.caption|linebreaks }}
                 <h5>Related people</h5>

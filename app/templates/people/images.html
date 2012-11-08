@@ -5,15 +5,15 @@
             {% with current='images' %}{% include '_sidenav.html' %}{% endwith %}
             <div class="span8">
                 <h1>Images</h1>
-                <div class="row">
+                <ul>
                 {% for image in content %}
-                    <div class="span2">
+                    <li>
                         <a href="{{ image.get_absolute_url }}">
-                            <img src="{% thumbnail image.image 140x140 crop=scale %}">
+                            <img src="{{ image.title }}">
                         </a>
-                    </div>
+                    </li>
                 {% endfor %}
-                </div>
+                </ul>
                 <ul class="pager">
                     <li>
                         {% if content.has_previous %}
