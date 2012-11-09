@@ -7,6 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from guardian.decorators import permission_required
 from django.core.urlresolvers import reverse
 from django.contrib.contenttypes.models import ContentType
+from calendar import monthrange
 
 from rdflib import Graph
 from rdflib import Namespace, BNode, Literal, RDF, URIRef
@@ -16,6 +17,38 @@ from guardian.shortcuts import assign
 from app.linkeddata.views import LinkedDataView, LinkedDataListView, RDFSchema
 from app.people.models import *
 from app.people.forms import *
+
+
+def check_date(date, type):
+    month_known = True
+    day_known = True
+    year, month, day = date.split('-')
+    if int(month) == 0:
+        month_known = False
+        day_known = False
+        if type == 'start':
+            month = '01'
+            day = '01'
+        elif type == 'end':
+            month = '12'
+            day = '31'
+    else:
+        if int(day) == 0:
+            day_known = False
+            if type == 'start':
+                day = '01'
+            elif type == 'end':
+                day = monthrange(int(year), int(month))[1]
+    return {'date': '%s-%s-%s' % (year, month, day), 'month_known': month_known, 'day_known': day_known}
+
+
+def prepare_date(date, month_known, day_known):
+    year, month, day = date.isoformat().split('-')
+    if month_known == False:
+        month = '0'
+    if day_known == False:
+        day = '0'
+    return '%s-%s-%s' % (year, month, day)
 
 
 class PersonView(LinkedDataView):
@@ -158,7 +191,6 @@ class ImageListView(LinkedDataListView):
         return graph
 
 
-
 def show_person(request, id):
     person = People.objects.get(id=id)
     return render(request, 'people/person.html', {'person': person})
@@ -249,10 +281,21 @@ def edit_story(request, id):
     else:
         people = story.person_set.all()
         people_ids = [person.id for person in people]
-        form = AddStoryForm(instance=story, initial={'people': people_ids})
         organisations = story.organisation_set.all()
         organisations_ids = [organisation.id for organisation in organisations]
-        form = AddStoryForm(instance=story, initial={'people': people_ids, 'organisations': organisations_ids})
+        if story.earliest_date:
+            earliest_date = prepare_date(story.earliest_date, story.earliest_month_known, story.earliest_day_known)
+        else:
+            earliest_date = None
+        if story.latest_date:
+            latest_date = prepare_date(story.latest_date, story.latest_month_known, story.latest_day_known)
+        else:
+            latest_date = None
+        form = AddStoryForm(instance=story, initial={
+            'people': people_ids,
+            'organisations': organisations_ids,
+            'earliest_date': earliest_date,
+            'latest_date': latest_date})
     return render(request, 'people/add_story.html', {
         'form': form, 'people': people, 'organisations': organisations, 'story_id': id
     })
@@ -346,10 +389,21 @@ def edit_image(request, id):
     else:
         people = image.person_set.all()
         people_ids = [person.id for person in people]
-        form = AddImageForm(instance=image, initial={'people': people_ids})
         organisations = image.organisation_set.all()
         organisations_ids = [organisation.id for organisation in organisations]
-        form = AddImageForm(instance=image, initial={'people': people_ids, 'organisations': organisations_ids})
+        if image.earliest_date:
+            earliest_date = prepare_date(image.earliest_date, image.earliest_month_known, image.earliest_day_known)
+        else:
+            earliest_date = None
+        if image.latest_date:
+            latest_date = prepare_date(image.latest_date, image.latest_month_known, image.latest_day_known)
+        else:
+            latest_date = None
+        form = AddImageForm(instance=image, initial={
+            'people': people_ids,
+            'organisations': organisations_ids,
+            'earliest_date': earliest_date,
+            'latest_date': latest_date})
     return render(request, 'people/add_image.html', {
         'form': form, 'people': people, 'organisations': organisations, 'image_id': id
     })
