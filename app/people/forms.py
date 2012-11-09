@@ -4,13 +4,16 @@ from app.people.models import *
 from django.forms.extras.widgets import SelectDateWidget
 from calendar import monthrange
 
+
 class NewSelectDateWidget(SelectDateWidget):
     none_value = (0, 'unknown')
 
 
 class AddResourceForm(ModelForm):
-    earliest_date = forms.CharField(widget=NewSelectDateWidget(attrs={'class': 'input-small'}), required=False)
-    latest_date = forms.CharField(widget=NewSelectDateWidget(attrs={'class': 'input-small'}), required=False)
+    years = [year for year in range(1850, 2013)]
+
+    earliest_date = forms.CharField(widget=NewSelectDateWidget(attrs={'class': 'input-small'}, years=years), required=False)
+    latest_date = forms.CharField(widget=NewSelectDateWidget(attrs={'class': 'input-small'}, years=years), required=False)
     earliest_month_known = forms.BooleanField(widget=forms.HiddenInput, required=False)
     earliest_day_known = forms.BooleanField(widget=forms.HiddenInput, required=False)
     latest_month_known = forms.BooleanField(widget=forms.HiddenInput, required=False)
