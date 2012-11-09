@@ -68,6 +68,8 @@ class AddResourceForm(ModelForm):
 
 
 class AddStoryForm(AddResourceForm):
+    title = forms.CharField(widget=forms.TextInput(attrs={'class': 'input-xxlarge'}))
+    text = forms.CharField(widget=forms.Textarea(attrs={'class': 'input-xxlarge'}))
 
     class Meta:
         model = PeopleStory
@@ -79,6 +81,8 @@ class DeleteStoryForm(forms.Form):
 
 
 class AddImageForm(AddResourceForm):
+    title = forms.CharField(widget=forms.TextInput(attrs={'class': 'input-xxlarge'}))
+    caption = forms.CharField(widget=forms.Textarea(attrs={'class': 'input-xxlarge'}))
 
     class Meta:
         model = PeopleImage
