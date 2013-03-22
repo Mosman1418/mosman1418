@@ -1,15 +1,210 @@
 from django import forms
 from django.forms import ModelForm
 from app.people.models import *
+from app.places.models import *
+from app.sources.models import *
 from django.forms.extras.widgets import SelectDateWidget
 from calendar import monthrange
+from django.conf import settings
+from django_select2 import *
+
+from app.generic.forms import AddEventForm
+
+
+YEARS = [year for year in range(1850, 2013)]
 
 
 class NewSelectDateWidget(SelectDateWidget):
     none_value = (0, 'unknown')
 
 
-class AddResourceForm(ModelForm):
+class PeopleMultiChoice(AutoModelSelect2MultipleField):
+    queryset = Person.objects
+    search_fields = ['family_name__istartswith', ]
+
+
+class PersonChoice(AutoModelSelect2Field):
+    queryset = Person.objects
+    search_fields = ['family_name__istartswith', ]
+
+
+class PlaceChoice(AutoModelSelect2Field):
+    queryset = Place.objects
+    search_fields = ['display_name__istartswith', ]
+
+
+class LifeEventChoice(AutoModelSelect2Field):
+    queryset = LifeEvent.objects
+
+
+class SourcesMultiChoice(AutoModelSelect2MultipleField):
+    queryset = Source.objects
+    search_fields = ['title__icontains', ]
+
+
+class EventLocationsMultiChoice(AutoModelSelect2MultipleField):
+    queryset = EventLocation.objects
+    search_fields = ['label__icontains', ]
+
+
+class DateSelectMixin(object):
+    def clean_date(self, date, type):
+        if date:
+            year, month, day = date.split('-')
+            if int(month) == 0:
+                if type == 'start':
+                    month = '1'
+                    day = '1'
+                elif type == 'end':
+                    month = '12'
+                    day = '31'
+            else:
+                if int(day) == 0:
+                    if type == 'start':
+                        day = '1'
+                    elif type == 'end':
+                        day = monthrange(int(year), int(month))[1]
+            date = '%s-%s-%s' % (year, month, day)
+        else:
+            date = None
+        return date
+
+    def clean_month(self, date, type):
+        print date
+        if date:
+            year, month, day = date.split('-')
+            status = False if int(month) == 0 else True
+        else:
+            status = False
+        print status
+        return status
+
+    def clean_day(self, date, type):
+        if date:
+            year, month, day = date.split('-')
+            status = False if int(day) == 0 else True
+        else:
+            status = False
+        return status
+
+
+class AddPersonForm(ModelForm, DateSelectMixin):
+    # These are CharFields so they don't get vaildated as dates
+    birth_earliest_date = forms.CharField(widget=NewSelectDateWidget(
+                                attrs={'class': 'input-small'},
+                                years=YEARS), required=False)
+    birth_latest_date = forms.CharField(widget=NewSelectDateWidget(
+                                attrs={'class': 'input-small'},
+                                years=YEARS), required=False)
+    death_earliest_date = forms.CharField(widget=NewSelectDateWidget(
+                                attrs={'class': 'input-small'},
+                                years=YEARS), required=False)
+    death_latest_date = forms.CharField(widget=NewSelectDateWidget(
+                                attrs={'class': 'input-small'},
+                                years=YEARS), required=False)
+
+    def clean(self):
+        cleaned_data = super(AddPersonForm, self).clean()
+        birth_earliest_date = cleaned_data['birth_earliest_date']
+        birth_latest_date = cleaned_data['birth_latest_date']
+        cleaned_data['birth_earliest_month_known'] = self.clean_month(birth_earliest_date, 'start')
+        cleaned_data['birth_earliest_day_known'] = self.clean_day(birth_earliest_date, 'start')
+        cleaned_data['birth_latest_month_known'] = self.clean_month(birth_latest_date, 'end')
+        cleaned_data['birth_latest_day_known'] = self.clean_day(birth_latest_date, 'end')
+        cleaned_data['birth_earliest_date'] = self.clean_date(birth_earliest_date, 'start')
+        cleaned_data['birth_latest_date'] = self.clean_date(birth_latest_date, 'end')
+        death_earliest_date = cleaned_data['death_earliest_date']
+        death_latest_date = cleaned_data['death_latest_date']
+        cleaned_data['death_earliest_month_known'] = self.clean_month(death_earliest_date, 'start')
+        cleaned_data['death_earliest_day_known'] = self.clean_day(death_earliest_date, 'start')
+        cleaned_data['death_latest_month_known'] = self.clean_month(death_latest_date, 'end')
+        cleaned_data['death_latest_day_known'] = self.clean_day(death_latest_date, 'end')
+        cleaned_data['death_earliest_date'] = self.clean_date(death_earliest_date, 'start')
+        cleaned_data['death_latest_date'] = self.clean_date(death_latest_date, 'end')
+        return cleaned_data
+
+    class Meta:
+        model = Person
+        exclude = ('added_by',)
+        widgets = {
+                    'birth_earliest_month_known': forms.HiddenInput,
+                    'birth_earliest_day_known': forms.HiddenInput,
+                    'birth_latest_month_known': forms.HiddenInput,
+                    'birth_latest_day_known': forms.HiddenInput,
+                    'death_earliest_month_known': forms.HiddenInput,
+                    'death_earliest_day_known': forms.HiddenInput,
+                    'death_latest_month_known': forms.HiddenInput,
+                    'death_latest_day_known': forms.HiddenInput,
+                    'biography': forms.Textarea(attrs={
+                                                'class': 'input-xxlarge',
+                                                'rows': '4'})
+                }
+
+
+class UpdatePersonForm(AddPersonForm):
+    pass
+
+
+class AddAltNameForm(ModelForm):
+    person = PersonChoice()
+    sources = SourcesMultiChoice(required=False)
+
+    class Meta:
+        model = AlternativePersonName
+        exclude = ('added_by',)
+
+
+class AddLifeEventForm(AddEventForm):
+    person = PersonChoice()
+    sources = SourcesMultiChoice(required=False)
+
+    class Meta:
+        model = LifeEvent
+        exclude = ('added_by',)
+        widgets = {
+                    'start_earliest_month_known': forms.HiddenInput,
+                    'start_earliest_day_known': forms.HiddenInput,
+                    'start_latest_month_known': forms.HiddenInput,
+                    'start_latest_day_known': forms.HiddenInput,
+                    'end_earliest_month_known': forms.HiddenInput,
+                    'end_earliest_day_known': forms.HiddenInput,
+                    'end_latest_month_known': forms.HiddenInput,
+                    'end_latest_day_known': forms.HiddenInput,
+                    'description': forms.Textarea(attrs={
+                                                'class': 'input-large',
+                                                'rows': '4'})
+                }
+
+
+class AddEventLocationForm(forms.ModelForm):
+    lifeevent = LifeEventChoice()
+    location = PlaceChoice(required=False)
+
+    class Meta:
+        model = EventLocation
+
+
+class AddBirthForm(AddEventForm):
+    person = PersonChoice()
+    location = PlaceChoice(required=False)
+    sources = SourcesMultiChoice(required=False)
+
+    class Meta:
+        model = Birth
+        exclude = ('added_by',)
+
+
+class AddDeathForm(AddEventForm):
+    person = PersonChoice()
+    location = PlaceChoice(required=False)
+    sources = SourcesMultiChoice(required=False)
+
+    class Meta:
+        model = Death
+        exclude = ('added_by',)
+
+
+class AddResourceForm(ModelForm, DateSelectMixin):
     years = [year for year in range(1850, 2013)]
 
     earliest_date = forms.CharField(widget=NewSelectDateWidget(attrs={'class': 'input-small'}, years=years), required=False)
@@ -41,31 +236,6 @@ class AddResourceForm(ModelForm):
     def clean_latest_day_known(self):
         return self.clean_day(self.cleaned_data['latest_date'], 'end')
 
-    def clean_date(self, date, type):
-        year, month, day = date.split('-')
-        if int(month) == 0:
-            if type == 'start':
-                month = '1'
-                day = '1'
-            elif type == 'end':
-                month = '12'
-                day = '31'
-        else:
-            if int(day) == 0:
-                if type == 'start':
-                    day = '1'
-                elif type == 'end':
-                    day = monthrange(int(year), int(month))[1]
-        return '%s-%s-%s' % (year, month, day)
-
-    def clean_month(self, date, type):
-        year, month, day = date.split('-')
-        return False if int(month) == 0 else True
-
-    def clean_day(self, date, type):
-        year, month, day = date.split('-')
-        return False if int(day) == 0 else True
-
 
 class AddStoryForm(AddResourceForm):
     title = forms.CharField(widget=forms.TextInput(attrs={'class': 'input-xxlarge'}))
@@ -91,4 +261,5 @@ class AddImageForm(AddResourceForm):
 
 class DeleteImageForm(forms.Form):
     id = forms.CharField(widget=forms.HiddenInput)
+
 

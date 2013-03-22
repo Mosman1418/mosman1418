@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load django_select2_tags %}
+{% block title %}Log in{% endblock %}
+{% block extra_scripts %}
+{% import_django_select2_js %}
+<script src="{{ STATIC_URL }}js/add-birth.js"></script>
+{% endblock %}
+{% block extra_styles %}
+{% import_django_select2_css %}
+{% endblock %}
+{% block content %}
+    <div class="row">
+        {% with current='none' %}{% include '_sidenav.html' %}{% endwith %}
+        <div class="span10">
+            <h2>{% if birth.id %}Update{% else %}Add{% endif %} a life event</h2>
+            <form action="" method="post" class="form-horizontal">{% csrf_token %}
+                {% with label='Person' field=form.person %}
+                    {% include '_form_field.html' %}
+                {% endwith %}
+                {% with label='Label' field=form.label %}
+                    {% include '_form_field.html' %}
+                {% endwith %}
+                {% with label='Description' field=form.description %}
+                    {% include '_form_field.html' %}
+                {% endwith %}
+                <fieldset>
+                    <legend>Dates</legend>
+                    {% with label='Start date' field=form.start_earliest_date %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                    {{ form.start_earliest_month_known }}
+                    {{ form.start_earliest_day_known }}
+                    {% with label='Latest possible start' field=form.start_latest_date %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                    {{ form.start_latest_month_known }}
+                    {{ form.start_latest_day_known }}
+                    <div class="form-field date_type control-group">
+                        <div class="controls">
+                            <label class="radio inline">
+                               <input type="radio" name="start_date_type" checked="checked" value="single"> Single date
+                            </label>
+                            <label class="radio inline">
+                               <input type="radio" name="start_date_type" value="range"> Date range
+                            </label>
+                        </div>
+                    </div>
+                    {% with label='End date' field=form.end_earliest_date %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                    {{ form.end_earliest_month_known }}
+                    {{ form.end_earliest_day_known }}
+                    {% with label='Latest possible end' field=form.end_latest_date %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                    {{ form.end_latest_month_known }}
+                    {{ form.end_latest_day_known }}
+                    <div class="form-field date_type control-group">
+                        <div class="controls">
+                            <label class="radio inline">
+                               <input type="radio" name="end_date_type" checked="checked" value="single"> Single date
+                            </label>
+                            <label class="radio inline">
+                               <input type="radio" name="end_date_type" value="range"> Date range
+                            </label>
+                        </div>
+                    </div>
+                </fieldset>
+                {% if lifeevent.id %}
+                    <div class="form-field control-group">
+                        <label class="control-label">Associated locations</label>
+                        <div class="controls">
+                            <ul>
+                            {% for location in person.eventlocation_set.all %}
+                                <li>
+                                    <a href="{{ location.get_absolute_url }}">
+                                        {{ location }}
+                                    </a>
+                                    <a class="btn btn-mini" href="{% url eventlocation-update location.id %}">Update</a>
+                                </li>
+                            {% empty %}
+                                <li>No name records</li>
+                            {% endfor %}
+                            </ul>
+                            <a class="btn btn-small btn-primary" href="{% url eventlocation-add lifeevent.id %}">Add name record</a>
+                        </div>
+                    </div>
+                    <div class="form-field control-group">
+                        <label class="control-label" for="id_sources">Sources</label>
+                        {% if form.sources.errors %}
+                            <div class="alert alert-error">
+                                {{ form.sources.errors }}
+                            </div>
+                        {% endif %}
+                        <div class="controls">
+                            {{ form.sources }} <a href="{% url source-add-event event_id=lifeevent.id event_type='lifeevents' %}" class="btn btn-mini">Create a new source</a>
+                        </div>
+                    </div>
+                {% endif %}
+                <div class="form-actions">
+                    {% if birth.id %}
+                        <input class="btn btn-primary" name="continue" type="submit" value="Save &amp; continue editing">
+                        <input class="btn btn-primary" name="finished" type="submit" value="Finished">
+                    {% else %}
+                        <input class="btn btn-primary" name="next" type="submit" value="Next">
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

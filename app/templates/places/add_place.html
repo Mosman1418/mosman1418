@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load django_select2_tags %}
+{% block title %}Log in{% endblock %}
+{% block extra_scripts %}
+{% import_django_select2_js %}
+<script src="{{ STATIC_URL }}js/add-place.js"></script>
+{% endblock %}
+{% block extra_styles %}
+{% import_django_select2_css %}
+{% endblock %}
+{% block content %}
+    <div class="row">
+        {% with current='none' %}{% include '_sidenav.html' %}{% endwith %}
+        <div class="span10">
+            <h2>{% if place.id %}Update{% else %}Add{% endif %} a place</h2>
+            <form action="" method="post" class="form-horizontal">{% csrf_token %}
+                {% if 'birth_record' in form.initial.keys %}
+                    {% with label='Birth record' field=form.birth_record %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                {% endif %}
+                {% if 'death_record' in form.initial.keys %}
+                    {% with label='Death record' field=form.death_record %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                {% endif %}
+                {% with label='Display name' field=form.display_name %}
+                    {% include '_form_field.html' %}
+                {% endwith %}
+                {% with label='Place name' field=form.place_name %}
+                    {% include '_form_field.html' %}
+                {% endwith %}
+                {% with label='State/county' field=form.state %}
+                    {% include '_form_field.html' %}
+                {% endwith %}
+                {% with label='Country' field=form.country %}
+                    {% include '_form_field.html' %}
+                {% endwith %}
+                {% with label='Note' field=form.description %}
+                    {% include '_form_field.html' %}
+                {% endwith %}
+                {% with label='Latitude' field=form.lat %}
+                    {% include '_form_field.html' %}
+                {% endwith %}
+                {% with label='Longitude' field=form.lon %}
+                    {% include '_form_field.html' %}
+                {% endwith %}
+                {% with label='Geonames ID' field=form.geonames_id %}
+                    {% include '_form_field.html' %}
+                {% endwith %}
+                <div class="form-actions">
+                    <input class="btn btn-primary" name="continue" type="submit" value="Save &amp; continue editing">
+                    <input class="btn btn-primary" name="finished" type="submit" value="Finished">
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

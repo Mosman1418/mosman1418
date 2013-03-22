@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block content %}
+        <div class="row">
+            {% with current='people' %}{% include '_sidenav.html' %}{% endwith %}
+            <div class="span8">
+                <h1>Name record</h1>
+                <p>Details for <a href="{% url person-view content.person.id %}">{{ content.person }}</a></p>
+                <h4>Display name</h4>
+                <p>{{ content.display_name}}</p>
+                {% if content.family_name %}
+                    <h4>Family name</h4>
+                    <p>{{ content.family_name}}</p>
+                {% endif %}
+                {% if content.other_names %}
+                    <h4>Other names</h4>
+                    <p>{{ content.other_names}}</p>
+                {% endif %}
+                {% if content.nickname %}
+                    <h4>Known as (nickname)</h4>
+                    <p>{{ content.nickname}}</p>
+                {% endif %}
+
+                {% if content.sources %}
+                    <h4>Documented by</h4>
+                    <ul>
+                        {% for source in content.sources.all %}
+                            <li>
+                                {{ source.title }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+            </div>
+        </div>
+
+{% endblock %}
+{% block footer %}
+<div class="row">
+    <div class="span8 offset2">
+        Identifer: <a href="{{ identifier }}">{{ identifier }}</a> |
+        <a href="{{ id_path }}.html/">HTML</a> |
+        <a href="{{ id_path }}.rdf/">RDF+XML</a> |
+        <a href="{{ id_path }}.ttl/">Turtle</a> |
+        <a href="{{ id_path }}.json/">JSON</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,3 +1,5 @@
 body {padding-top: 80px;}
 .related-list { margin-left: 0; }
 .form-buttons { margin-top: 40px; }
+.radio.inline { white-space: nowrap; }
+.date_type { margin-top: -20px;}

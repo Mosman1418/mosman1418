@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load django_select2_tags %}
+{% block title %}Log in{% endblock %}
+{% block extra_scripts %}
+{% import_django_select2_js %}
+<script src="{{ STATIC_URL }}js/add-birth.js"></script>
+{% endblock %}
+{% block extra_styles %}
+{% import_django_select2_css %}
+{% endblock %}
+{% block content %}
+    <div class="row">
+        {% with current='none' %}{% include '_sidenav.html' %}{% endwith %}
+        <div class="span10">
+            <h2>{% if birth.id %}Update{% else %}Add{% endif %} an associated place</h2>
+            <form action="" method="post" class="form-horizontal">{% csrf_token %}
+                {% if form.errors %}
+    <!-- Error messaging -->
+    <div id="errors">
+        <div class="inner">
+            <p>There were some errors in the information you entered. Please correct the following:</p>
+            {{ form.non_field_errors }}
+            <ul>
+                {% for field in form %}
+                    {% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <!-- /Error messaging -->
+{% endif %}
+
+                {% with label='Life event' field=form.lifeevent %}
+                    {% include '_form_field.html' %}
+                {% endwith %}
+                {% with label='Association' field=form.association %}
+                    {% include '_form_field.html' %}
+                {% endwith %}
+                {% if eventlocation.id %}
+                    {% url place-add-event 'lifeevents' eventlocation.id as addlocation %}
+                    {% with label='Location' field=form.location create_url=addlocation create_type='location' %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                {% endif %}
+                <div class="form-actions">
+                    {% if eventlocation.id %}
+                        <input class="btn btn-primary" name="continue" type="submit" value="Save &amp; continue editing">
+                        <input class="btn btn-primary" name="finished" type="submit" value="Finished">
+                    {% else %}
+                        <input class="btn btn-primary" name="next" type="submit" value="Next">
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

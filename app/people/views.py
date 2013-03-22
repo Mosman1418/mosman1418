@@ -2,12 +2,18 @@
 from django.shortcuts import render_to_response, render, get_object_or_404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.sites.models import Site
+from django.views.generic.edit import FormView
 import json
 from django.http import HttpResponse, HttpResponseRedirect
 from guardian.decorators import permission_required
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.contrib.contenttypes.models import ContentType
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from calendar import monthrange
+import re
+from urllib2 import Request, urlopen, URLError, HTTPError
+from bs4 import BeautifulSoup
+import mechanize
 
 from rdflib import Graph
 from rdflib import Namespace, BNode, Literal, RDF, URIRef
@@ -17,6 +23,9 @@ from guardian.shortcuts import assign
 from app.linkeddata.views import LinkedDataView, LinkedDataListView, RDFSchema
 from app.people.models import *
 from app.people.forms import *
+
+
+TROVE_API_KEY = 'ierj9cpsh7f5u7kg'
 
 
 def check_date(date, type):
@@ -40,6 +49,31 @@ def check_date(date, type):
             elif type == 'end':
                 day = monthrange(int(year), int(month))[1]
     return {'date': '%s-%s-%s' % (year, month, day), 'month_known': month_known, 'day_known': day_known}
+
+
+def get_naa_details(barcode):
+    br = mechanize.Browser()
+    br.addheaders = [('User-agent', 'Mozilla/5.0 (Windows; U; Windows NT 6.0; en-US; rv:1.9.0.6')]
+    br.set_handle_robots(False)
+    url = 'http://www.naa.gov.au/cgi-bin/Search?O=I&Number=%s' % barcode
+    response1 = br.open(url)
+    # Recordsearch returns a page with a form that submits on page load.
+    # Have to make sure the session id is submitted with the form.
+    # Extract the session id.
+    session_id = re.search(r"value={(.*)}", response1.read()).group(1)
+    br.select_form(name="t")
+    br.form.set_all_readonly(False)
+    # Add session id to the form.
+    br.form['NAASessionID'] = '{%s}' % session_id
+    response2 = br.submit()
+    soup = BeautifulSoup(response2.read())
+    try:
+        series = unicode(soup.find('div', text='Series number').parent.next_sibling.next_sibling.a.string)
+        control = unicode(soup.find('div', text='Control symbol').parent.next_sibling.next_sibling.string)
+        title = unicode(soup.find('div', text='Title').parent.next_sibling.next_sibling.string)
+    except AttributeError:
+        raise Http404
+    return {'series': series, 'control': control, 'title': title}
 
 
 def prepare_date(date, month_known, day_known):
@@ -98,6 +132,86 @@ class PersonListView(LinkedDataListView):
             this_person = URIRef(host_ns[entity.get_absolute_url()])
             graph.add((this_person, namespaces['rdf']['type'], namespaces['foaf']['Person']))
             graph.add((this_person, namespaces['rdfs']['label'], Literal(str(entity))))
+        return graph
+
+
+class AltNameView(LinkedDataView):
+    model = AlternativePersonName
+    path = '/people/names/%s'
+    template_name = 'people/altname'
+
+    def make_graph(self, entity):
+        namespaces = {}
+        graph = Graph()
+        schemas = RDFSchema.objects.all()
+        for schema in schemas:
+            namespace = Namespace(schema.uri)
+            graph.bind(schema.prefix, namespace)
+            namespaces[schema.prefix] = namespace
+        host_ns = Namespace('http://%s' % (Site.objects.get_current().domain))
+        this_person = URIRef(host_ns[entity.get_absolute_url()])
+        graph.add((this_person, namespaces['rdf']['type'], namespaces['foaf']['Person']))
+        graph.add((this_person, namespaces['rdfs']['label'], Literal(str(entity))))
+        return graph
+
+
+class BirthView(LinkedDataView):
+    model = Birth
+    path = '/people/births/%s'
+    template_name = 'people/birth'
+
+    def make_graph(self, entity):
+        namespaces = {}
+        graph = Graph()
+        schemas = RDFSchema.objects.all()
+        for schema in schemas:
+            namespace = Namespace(schema.uri)
+            graph.bind(schema.prefix, namespace)
+            namespaces[schema.prefix] = namespace
+        host_ns = Namespace('http://%s' % (Site.objects.get_current().domain))
+        this_person = URIRef(host_ns[entity.get_absolute_url()])
+        graph.add((this_person, namespaces['rdf']['type'], namespaces['foaf']['Person']))
+        graph.add((this_person, namespaces['rdfs']['label'], Literal(str(entity))))
+        return graph
+
+
+class DeathView(LinkedDataView):
+    model = Death
+    path = '/people/deaths/%s'
+    template_name = 'people/death'
+
+    def make_graph(self, entity):
+        namespaces = {}
+        graph = Graph()
+        schemas = RDFSchema.objects.all()
+        for schema in schemas:
+            namespace = Namespace(schema.uri)
+            graph.bind(schema.prefix, namespace)
+            namespaces[schema.prefix] = namespace
+        host_ns = Namespace('http://%s' % (Site.objects.get_current().domain))
+        this_person = URIRef(host_ns[entity.get_absolute_url()])
+        graph.add((this_person, namespaces['rdf']['type'], namespaces['foaf']['Person']))
+        graph.add((this_person, namespaces['rdfs']['label'], Literal(str(entity))))
+        return graph
+
+
+class LifeEventView(LinkedDataView):
+    model = LifeEvent
+    path = '/people/events/%s'
+    template_name = 'people/life_event'
+
+    def make_graph(self, entity):
+        namespaces = {}
+        graph = Graph()
+        schemas = RDFSchema.objects.all()
+        for schema in schemas:
+            namespace = Namespace(schema.uri)
+            graph.bind(schema.prefix, namespace)
+            namespaces[schema.prefix] = namespace
+        host_ns = Namespace('http://%s' % (Site.objects.get_current().domain))
+        this_person = URIRef(host_ns[entity.get_absolute_url()])
+        graph.add((this_person, namespaces['rdf']['type'], namespaces['foaf']['Person']))
+        graph.add((this_person, namespaces['rdfs']['label'], Literal(str(entity))))
         return graph
 
 
@@ -191,22 +305,306 @@ class ImageListView(LinkedDataListView):
         return graph
 
 
-def show_person(request, id):
-    person = People.objects.get(id=id)
-    return render(request, 'people/person.html', {'person': person})
+class AddPerson(CreateView):
+    form_class = AddPersonForm
+    model = Person
+
+    def form_valid(self, form):
+        person = form.save(commit=False)
+        person.added_by = self.request.user
+        person.save()
+        return HttpResponseRedirect(reverse('person-update', args=[person.id]))
 
 
-def show_people(request):
-    results = Person.objects.all().order_by('family_name', 'other_names')
-    paginator = Paginator(results, 25)
-    page = request.GET.get('page')
-    try:
-        people = paginator.page(page)
-    except PageNotAnInteger:
-        people = paginator.page(1)
-    except EmptyPage:
-        people = paginator.page(paginator.num_pages)
-    return render(request, 'people/people.html', {'people': people})
+class UpdatePerson(UpdateView):
+    form_class = UpdatePersonForm
+    model = Person
+
+    def prepare_date(self, name):
+        date = getattr(self.object, name)
+        name = name[:-5]
+        if date:
+            year = date.year
+            month = date.month
+            day = date.day
+            if getattr(self.object, '{}_month_known'.format(name)) is False:
+                month = 0
+            if getattr(self.object, '{}_day_known'.format(name)) is False:
+                day = 0
+            date = '{}-{}-{}'.format(year, month, day)
+        return date
+
+    def get_initial(self):
+        initial = {}
+        initial['birth_earliest_date'] = self.prepare_date('birth_earliest_date')
+        initial['birth_latest_date'] = self.prepare_date('birth_latest_date')
+        initial['death_earliest_date'] = self.prepare_date('death_earliest_date')
+        initial['death_latest_date'] = self.prepare_date('death_latest_date')
+        return initial
+
+    def form_valid(self, form):
+        person = form.save(commit=False)
+        person.save()
+        return HttpResponseRedirect(reverse('person-view', args=[person.id]))
+
+
+class DeletePerson(DeleteView):
+    model = Person
+    success_url = reverse_lazy('people-list')
+
+
+class AddAltName(CreateView):
+    model = AlternativePersonName
+    form_class = AddAltNameForm
+
+    def get_initial(self):
+        person_id = self.kwargs.get('person_id', None)
+        initial = {'person': person_id}
+        return initial
+
+    def form_valid(self, form):
+        altname = form.save(commit=False)
+        altname.added_by = self.request.user
+        altname.save()
+        return HttpResponseRedirect(reverse('altname-update', args=[altname.id]))
+
+
+class UpdateAltName(UpdateView):
+    model = AlternativePersonName
+    form_class = AddAltNameForm
+
+    def get_success_url(self):
+        if 'continue' in self.request.POST:
+            url = reverse_lazy('altname-update', args=[self.object.id])
+        else:
+            url = reverse_lazy('person-update', args=[self.object.person.id])
+        return url
+
+
+class DeleteAltName(DeleteView):
+    model = AlternativePersonName
+
+    def delete(self, request, *args, **kwargs):
+        self.person_pk = self.get_object().person.pk
+        return super(DeleteAltName, self).delete(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse_lazy('person-update', args=[self.person_pk])
+
+
+class AddLifeEvent(CreateView):
+    form_class = AddLifeEventForm
+    model = LifeEvent
+
+    def get_initial(self):
+        person_id = self.kwargs.get('person_id', None)
+        initial = {'person': person_id}
+        return initial
+
+    def form_valid(self, form):
+        event = form.save(commit=False)
+        event.added_by = self.request.user
+        event.save()
+        return HttpResponseRedirect(reverse('lifeevent-update', args=[event.id]))
+
+
+class UpdateLifeEvent(UpdateView):
+    form_class = AddLifeEventForm
+    model = LifeEvent
+
+    def get_success_url(self):
+        if 'continue' in self.request.POST:
+            url = reverse_lazy('lifeevent-update', args=[self.object.id])
+        else:
+            url = reverse_lazy('lifeevent-view', args=[self.object.id])
+        return url
+
+    def prepare_date(self, name):
+        date = getattr(self.object, name)
+        name = name[:-5]
+        if date:
+            year = date.year
+            month = date.month
+            day = date.day
+            if getattr(self.object, '{}_month_known'.format(name)) is False:
+                month = 0
+            if getattr(self.object, '{}_day_known'.format(name)) is False:
+                day = 0
+            date = '{}-{}-{}'.format(year, month, day)
+        return date
+
+    def get_initial(self):
+        initial = {}
+        initial['start_earliest_date'] = self.prepare_date('start_earliest_date')
+        initial['start_latest_date'] = self.prepare_date('start_latest_date')
+        initial['end_earliest_date'] = self.prepare_date('end_earliest_date')
+        initial['end_latest_date'] = self.prepare_date('end_latest_date')
+        return initial
+
+
+class DeleteLifeEvent(DeleteView):
+    model = Birth
+
+    def delete(self, request, *args, **kwargs):
+        self.person_pk = self.get_object().person.pk
+        return super(DeleteLifeEvent, self).delete(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse_lazy('person-update', args=[self.person_pk])
+
+
+class AddEventLocation(CreateView):
+    form_class = AddEventLocationForm
+    model = EventLocation
+
+    def get_initial(self):
+        event_id = self.kwargs.get('event_id', None)
+        initial = {'lifeevent': event_id}
+        return initial
+
+    def get_success_url(self):
+        return reverse_lazy('eventlocation-update', args=[self.object.id])
+
+
+class UpdateEventLocation(UpdateView):
+    form_class = AddEventLocationForm
+    model = EventLocation
+
+    def get_success_url(self):
+        if 'continue' in self.request.POST:
+            url = reverse_lazy('eventlocation-update', args=[self.object.id])
+        else:
+            url = reverse_lazy('lifeevent-view', args=[self.lifeevent.id])
+        return url
+
+
+class DeleteEventLocation(DeleteView):
+    model = Birth
+
+    def delete(self, request, *args, **kwargs):
+        self.person_pk = self.get_object().person.pk
+        return super(DeleteEventLocation, self).delete(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse_lazy('eventlocation-update', args=[self.person_pk])
+
+
+class AddBirth(CreateView):
+    form_class = AddBirthForm
+    model = Birth
+
+    def get_initial(self):
+        person_id = self.kwargs.get('person_id', None)
+        initial = {'person': person_id}
+        return initial
+
+    def form_valid(self, form):
+        birth = form.save(commit=False)
+        birth.added_by = self.request.user
+        birth.save()
+        return HttpResponseRedirect(reverse('birth-update', args=[birth.id]))
+
+
+class UpdateBirth(UpdateView):
+    form_class = AddBirthForm
+    model = Birth
+
+    def get_success_url(self):
+        if 'continue' in self.request.POST:
+            url = reverse_lazy('birth-update', args=[self.object.id])
+        else:
+            url = reverse_lazy('birth-view', args=[self.object.id])
+        return url
+
+    def prepare_date(self, name):
+        date = getattr(self.object, name)
+        name = name[:-5]
+        if date:
+            year = date.year
+            month = date.month
+            day = date.day
+            if getattr(self.object, '{}_month_known'.format(name)) is False:
+                month = 0
+            if getattr(self.object, '{}_day_known'.format(name)) is False:
+                day = 0
+            date = '{}-{}-{}'.format(year, month, day)
+        return date
+
+    def get_initial(self):
+        initial = {}
+        initial['start_earliest_date'] = self.prepare_date('start_earliest_date')
+        initial['start_latest_date'] = self.prepare_date('start_latest_date')
+        return initial
+
+
+class DeleteBirth(DeleteView):
+    model = Birth
+
+    def delete(self, request, *args, **kwargs):
+        self.person_pk = self.get_object().person.pk
+        return super(DeleteBirth, self).delete(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse_lazy('person-update', args=[self.person_pk])
+
+
+class AddDeath(CreateView):
+    form_class = AddDeathForm
+    model = Death
+
+    def get_initial(self):
+        person_id = self.kwargs.get('person_id', None)
+        initial = {'person': person_id}
+        return initial
+
+    def form_valid(self, form):
+        death = form.save(commit=False)
+        death.added_by = self.request.user
+        death.save()
+        return HttpResponseRedirect(reverse('death-update', args=[death.id]))
+
+
+class UpdateDeath(UpdateView):
+    form_class = AddDeathForm
+    model = Death
+
+    def get_success_url(self):
+        if 'continue' in self.request.POST:
+            url = reverse_lazy('death-update', args=[self.object.id])
+        else:
+            url = reverse_lazy('death-view', args=[self.object.id])
+        return url
+
+    def prepare_date(self, name):
+        date = getattr(self.object, name)
+        name = name[:-5]
+        if date:
+            year = date.year
+            month = date.month
+            day = date.day
+            if getattr(self.object, '{}_month_known'.format(name)) is False:
+                month = 0
+            if getattr(self.object, '{}_day_known'.format(name)) is False:
+                day = 0
+            date = '{}-{}-{}'.format(year, month, day)
+        return date
+
+    def get_initial(self):
+        initial = {}
+        initial['start_earliest_date'] = self.prepare_date('start_earliest_date')
+        initial['start_latest_date'] = self.prepare_date('start_latest_date')
+        return initial
+
+
+class DeleteDeath(DeleteView):
+    model = Death
+
+    def delete(self, request, *args, **kwargs):
+        self.person_pk = self.get_object().person.pk
+        return super(DeleteDeath, self).delete(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse_lazy('person-update', args=[self.person_pk])
 
 
 @permission_required('people.add_peoplestory', accept_global_perms=True)
@@ -425,19 +823,4 @@ def delete_image(request, id=None):
     })
 
 
-def person_autocomplete(request):
-    query = request.GET.get('query', 'a')
-    num_results = request.GET.get('num_results', 10)
-    page = request.GET.get('page', 1)
-    num_results = request.GET.get('num_results', 10)
-    start = (int(page) - 1) * int(num_results)
-    end = start + int(num_results)
-    options = {}
-    people = Person.objects.values_list('id', 'family_name', 'other_names').filter(family_name__istartswith=query).order_by('family_name')[start:end]
-    if len(people) < int(num_results):
-        options['more'] = False
-    else:
-        options['more'] = True
-    options['results'] = [{'id': id, 'text': '%s, %s' % (family_name, other_names)} for id, family_name, other_names in people]
-    return HttpResponse(json.dumps(options), content_type="application/json")
 

@@ -8,94 +8,118 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'Source'
-        db.create_table('sources_source', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('date_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('date_modified', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
-            ('added_by', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('title', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('source_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['sources.SourceType'])),
-            ('publisher', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
-            ('publication_place', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
-            ('publication_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('publication_date_month_known', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('publication_date_day_known', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('publication_date_end', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('publication_date_end_month_known', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('publication_date_end_day_known', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('collection', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='collection_source', null=True, to=orm['sources.Source'])),
-            ('collection_title', self.gf('django.db.models.fields.CharField')(max_length=250, null=True, blank=True)),
-            ('collection_item_id', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
-            ('repository_item_id', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
-            ('repository', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='repository_source', null=True, to=orm['people.Organisation'])),
-            ('citation', self.gf('django.db.models.fields.CharField')(max_length=250, null=True, blank=True)),
-            ('pages', self.gf('django.db.models.fields.CharField')(max_length=50, null=True, blank=True)),
-            ('url', self.gf('django.db.models.fields.URLField')(max_length=200, null=True, blank=True)),
-            ('rdf_url', self.gf('django.db.models.fields.URLField')(max_length=200, null=True, blank=True)),
-            ('json_url', self.gf('django.db.models.fields.URLField')(max_length=200, null=True, blank=True)),
-        ))
-        db.send_create_signal('sources', ['Source'])
+        # Adding field 'Person.biography'
+        db.add_column('people_person', 'biography',
+                      self.gf('django.db.models.fields.TextField')(null=True, blank=True),
+                      keep_default=False)
 
-        # Adding model 'SourcePerson'
-        db.create_table('sources_sourceperson', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('source', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['sources.Source'])),
-            ('person', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['people.Person'])),
-            ('role', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['sources.SourceRole'])),
-        ))
-        db.send_create_signal('sources', ['SourcePerson'])
+        # Adding field 'Person.birth_earliest_date'
+        db.add_column('people_person', 'birth_earliest_date',
+                      self.gf('django.db.models.fields.DateField')(null=True, blank=True),
+                      keep_default=False)
 
-        # Adding model 'SourceRole'
-        db.create_table('sources_sourcerole', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('label', self.gf('django.db.models.fields.CharField')(max_length=50)),
-        ))
-        db.send_create_signal('sources', ['SourceRole'])
+        # Adding field 'Person.birth_earliest_month_known'
+        db.add_column('people_person', 'birth_earliest_month_known',
+                      self.gf('django.db.models.fields.BooleanField')(default=False),
+                      keep_default=False)
 
-        # Adding M2M table for field rdf_property on 'SourceRole'
-        db.create_table('sources_sourcerole_rdf_property', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('sourcerole', models.ForeignKey(orm['sources.sourcerole'], null=False)),
-            ('rdfproperty', models.ForeignKey(orm['linkeddata.rdfproperty'], null=False))
-        ))
-        db.create_unique('sources_sourcerole_rdf_property', ['sourcerole_id', 'rdfproperty_id'])
+        # Adding field 'Person.birth_earliest_day_known'
+        db.add_column('people_person', 'birth_earliest_day_known',
+                      self.gf('django.db.models.fields.BooleanField')(default=False),
+                      keep_default=False)
 
-        # Adding model 'SourceType'
-        db.create_table('sources_sourcetype', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('label', self.gf('django.db.models.fields.CharField')(max_length=50)),
-        ))
-        db.send_create_signal('sources', ['SourceType'])
+        # Adding field 'Person.birth_latest_date'
+        db.add_column('people_person', 'birth_latest_date',
+                      self.gf('django.db.models.fields.DateField')(null=True, blank=True),
+                      keep_default=False)
 
-        # Adding M2M table for field rdf_class on 'SourceType'
-        db.create_table('sources_sourcetype_rdf_class', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('sourcetype', models.ForeignKey(orm['sources.sourcetype'], null=False)),
-            ('rdfclass', models.ForeignKey(orm['linkeddata.rdfclass'], null=False))
-        ))
-        db.create_unique('sources_sourcetype_rdf_class', ['sourcetype_id', 'rdfclass_id'])
+        # Adding field 'Person.birth_latest_month_known'
+        db.add_column('people_person', 'birth_latest_month_known',
+                      self.gf('django.db.models.fields.BooleanField')(default=False),
+                      keep_default=False)
 
+        # Adding field 'Person.birth_latest_day_known'
+        db.add_column('people_person', 'birth_latest_day_known',
+                      self.gf('django.db.models.fields.BooleanField')(default=False),
+                      keep_default=False)
+
+        # Adding field 'Person.death_earliest_date'
+        db.add_column('people_person', 'death_earliest_date',
+                      self.gf('django.db.models.fields.DateField')(null=True, blank=True),
+                      keep_default=False)
+
+        # Adding field 'Person.death_earliest_month_known'
+        db.add_column('people_person', 'death_earliest_month_known',
+                      self.gf('django.db.models.fields.BooleanField')(default=False),
+                      keep_default=False)
+
+        # Adding field 'Person.death_earliest_day_known'
+        db.add_column('people_person', 'death_earliest_day_known',
+                      self.gf('django.db.models.fields.BooleanField')(default=False),
+                      keep_default=False)
+
+        # Adding field 'Person.death_latest_date'
+        db.add_column('people_person', 'death_latest_date',
+                      self.gf('django.db.models.fields.DateField')(null=True, blank=True),
+                      keep_default=False)
+
+        # Adding field 'Person.death_latest_month_known'
+        db.add_column('people_person', 'death_latest_month_known',
+                      self.gf('django.db.models.fields.BooleanField')(default=False),
+                      keep_default=False)
+
+        # Adding field 'Person.death_latest_day_known'
+        db.add_column('people_person', 'death_latest_day_known',
+                      self.gf('django.db.models.fields.BooleanField')(default=False),
+                      keep_default=False)
+
+
+        # Changing field 'Person.display_name'
+        db.alter_column('people_person', 'display_name', self.gf('django.db.models.fields.CharField')(max_length=200))
 
     def backwards(self, orm):
-        # Deleting model 'Source'
-        db.delete_table('sources_source')
+        # Deleting field 'Person.biography'
+        db.delete_column('people_person', 'biography')
 
-        # Deleting model 'SourcePerson'
-        db.delete_table('sources_sourceperson')
+        # Deleting field 'Person.birth_earliest_date'
+        db.delete_column('people_person', 'birth_earliest_date')
 
-        # Deleting model 'SourceRole'
-        db.delete_table('sources_sourcerole')
+        # Deleting field 'Person.birth_earliest_month_known'
+        db.delete_column('people_person', 'birth_earliest_month_known')
 
-        # Removing M2M table for field rdf_property on 'SourceRole'
-        db.delete_table('sources_sourcerole_rdf_property')
+        # Deleting field 'Person.birth_earliest_day_known'
+        db.delete_column('people_person', 'birth_earliest_day_known')
 
-        # Deleting model 'SourceType'
-        db.delete_table('sources_sourcetype')
+        # Deleting field 'Person.birth_latest_date'
+        db.delete_column('people_person', 'birth_latest_date')
 
-        # Removing M2M table for field rdf_class on 'SourceType'
-        db.delete_table('sources_sourcetype_rdf_class')
+        # Deleting field 'Person.birth_latest_month_known'
+        db.delete_column('people_person', 'birth_latest_month_known')
 
+        # Deleting field 'Person.birth_latest_day_known'
+        db.delete_column('people_person', 'birth_latest_day_known')
+
+        # Deleting field 'Person.death_earliest_date'
+        db.delete_column('people_person', 'death_earliest_date')
+
+        # Deleting field 'Person.death_earliest_month_known'
+        db.delete_column('people_person', 'death_earliest_month_known')
+
+        # Deleting field 'Person.death_earliest_day_known'
+        db.delete_column('people_person', 'death_earliest_day_known')
+
+        # Deleting field 'Person.death_latest_date'
+        db.delete_column('people_person', 'death_latest_date')
+
+        # Deleting field 'Person.death_latest_month_known'
+        db.delete_column('people_person', 'death_latest_month_known')
+
+        # Deleting field 'Person.death_latest_day_known'
+        db.delete_column('people_person', 'death_latest_day_known')
+
+
+        # Changing field 'Person.display_name'
+        db.alter_column('people_person', 'display_name', self.gf('django.db.models.fields.CharField')(max_length=250))
 
     models = {
         'auth.group': {
@@ -177,6 +201,122 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '250', 'null': 'True', 'blank': 'True'})
         },
+        'people.alternativepersonname': {
+            'Meta': {'object_name': 'AlternativePersonName'},
+            'display_name': ('django.db.models.fields.CharField', [], {'max_length': '250', 'blank': 'True'}),
+            'family_name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'nickname': ('django.db.models.fields.CharField', [], {'max_length': '100', 'blank': 'True'}),
+            'other_names': ('django.db.models.fields.CharField', [], {'max_length': '100', 'blank': 'True'}),
+            'person': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['people.Person']"}),
+            'source': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': "orm['sources.Source']", 'null': 'True', 'blank': 'True'})
+        },
+        'people.birth': {
+            'Meta': {'object_name': 'Birth'},
+            'added_by': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
+            'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'date_modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
+            'description': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'end_earliest_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
+            'end_earliest_day_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'end_earliest_month_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'end_latest_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
+            'end_latest_day_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'end_latest_month_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'label': ('django.db.models.fields.CharField', [], {'max_length': '250', 'null': 'True', 'blank': 'True'}),
+            'location': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['places.Place']", 'null': 'True', 'blank': 'True'}),
+            'person': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['people.Person']"}),
+            'sources': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': "orm['sources.Source']", 'null': 'True', 'blank': 'True'}),
+            'start_earliest_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
+            'start_earliest_day_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'start_earliest_month_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'start_latest_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
+            'start_latest_day_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'start_latest_month_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
+        },
+        'people.death': {
+            'Meta': {'object_name': 'Death'},
+            'added_by': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
+            'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'date_modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
+            'description': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'end_earliest_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
+            'end_earliest_day_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'end_earliest_month_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'end_latest_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
+            'end_latest_day_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'end_latest_month_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'label': ('django.db.models.fields.CharField', [], {'max_length': '250', 'null': 'True', 'blank': 'True'}),
+            'location': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['places.Place']", 'null': 'True', 'blank': 'True'}),
+            'person': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['people.Person']"}),
+            'sources': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': "orm['sources.Source']", 'null': 'True', 'blank': 'True'}),
+            'start_earliest_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
+            'start_earliest_day_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'start_earliest_month_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'start_latest_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
+            'start_latest_day_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'start_latest_month_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
+        },
+        'people.family': {
+            'Meta': {'object_name': 'Family'},
+            'family_name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
+        },
+        'people.lifeevent': {
+            'Meta': {'object_name': 'LifeEvent'},
+            'added_by': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
+            'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'date_modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
+            'description': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'end_earliest_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
+            'end_earliest_day_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'end_earliest_month_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'end_latest_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
+            'end_latest_day_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'end_latest_month_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'event_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['people.LifeEventType']", 'null': 'True', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'label': ('django.db.models.fields.CharField', [], {'max_length': '250', 'null': 'True', 'blank': 'True'}),
+            'location': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['places.Place']", 'null': 'True', 'blank': 'True'}),
+            'person': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['people.Person']"}),
+            'sources': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': "orm['sources.Source']", 'null': 'True', 'blank': 'True'}),
+            'start_earliest_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
+            'start_earliest_day_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'start_earliest_month_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'start_latest_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
+            'start_latest_day_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'start_latest_month_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
+        },
+        'people.lifeeventtype': {
+            'Meta': {'object_name': 'LifeEventType'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'label': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
+            'rdf_class': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': "orm['linkeddata.RDFClass']", 'null': 'True', 'blank': 'True'})
+        },
+        'people.lifeperiod': {
+            'Meta': {'object_name': 'LifePeriod'},
+            'added_by': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
+            'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'date_modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
+            'description': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'end_earliest_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
+            'end_earliest_day_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'end_earliest_month_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'end_latest_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
+            'end_latest_day_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'end_latest_month_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'label': ('django.db.models.fields.CharField', [], {'max_length': '250', 'null': 'True', 'blank': 'True'}),
+            'person': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['people.Person']"}),
+            'start_earliest_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
+            'start_earliest_day_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'start_earliest_month_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'start_latest_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
+            'start_latest_day_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'start_latest_month_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
+        },
         'people.organisation': {
             'Meta': {'object_name': 'Organisation'},
             'associated_sources': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': "orm['sources.Source']", 'null': 'True', 'through': "orm['people.OrganisationAssociatedSource']", 'blank': 'True'}),
@@ -236,9 +376,22 @@ class Migration(SchemaMigration):
             'associated_people': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'related_people'", 'to': "orm['people.Person']", 'through': "orm['people.PersonAssociatedPerson']", 'blank': 'True', 'symmetrical': 'False', 'null': 'True'}),
             'associated_places': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': "orm['places.Place']", 'null': 'True', 'through': "orm['people.PersonAssociatedPlace']", 'blank': 'True'}),
             'associated_sources': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': "orm['sources.Source']", 'null': 'True', 'through': "orm['people.PersonAssociatedSource']", 'blank': 'True'}),
+            'biography': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'birth_earliest_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
+            'birth_earliest_day_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'birth_earliest_month_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'birth_latest_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
+            'birth_latest_day_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'birth_latest_month_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'date_modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'display_name': ('django.db.models.fields.CharField', [], {'max_length': '250', 'blank': 'True'}),
+            'death_earliest_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
+            'death_earliest_day_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'death_earliest_month_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'death_latest_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
+            'death_latest_day_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'death_latest_month_known': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'display_name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
             'family_name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'images': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': "orm['people.PeopleImage']", 'null': 'True', 'blank': 'True'}),
@@ -309,6 +462,12 @@ class Migration(SchemaMigration):
             'label': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
             'rdf_property': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': "orm['linkeddata.RDFProperty']", 'null': 'True', 'blank': 'True'})
         },
+        'people.personrole': {
+            'Meta': {'object_name': 'PersonRole'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'label': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
+            'rdf_property': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': "orm['linkeddata.RDFProperty']", 'null': 'True', 'blank': 'True'})
+        },
         'places.address': {
             'Meta': {'object_name': 'Address'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -375,4 +534,4 @@ class Migration(SchemaMigration):
         }
     }
 
-    complete_apps = ['sources']
+    complete_apps = ['people']

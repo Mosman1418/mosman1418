@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+        <div class="row">
+            {% with current='people' %}{% include '_sidenav.html' %}{% endwith %}
+            <div class="span8">
+                <h1>Life event</h1>
+                <h2><a href="{% url person-view content.person.id %}">{{ content.person }}</a></h2>
+                <h3>{{ content.label }}</h3>
+                {% if content.earliest_start %}
+                    <h4>Date</h4>
+                    <p>
+                        {% if content.latest_start %}
+                            Between {{ content.earliest_start }} and {{ content.latest_start }}
+                        {% else %}
+                            {{ content.earliest_start }}
+                        {% endif %}
+                    </p>
+                {% endif %}
+
+                {% if content.location %}
+                    <h4>Location</h4>
+                    <p>
+                        <a href="{{ content.get_absolute_url }}">{{ content.location }}</a>
+                    </p>
+                {% endif %}
+
+                {% if content.sources %}
+                    <h4>Documented by</h4>
+                    <ul>
+                        {% for source in content.sources.all %}
+                            <li>
+                                {% include 'sources/_source_summary.html' %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+            </div>
+        </div>
+
+{% endblock %}
+{% block footer %}
+<div class="row">
+    <div class="span8 offset2">
+        Identifer: <a href="{{ identifier }}">{{ identifier }}</a> |
+        <a href="{{ id_path }}.html/">HTML</a> |
+        <a href="{{ id_path }}.rdf/">RDF+XML</a> |
+        <a href="{{ id_path }}.ttl/">Turtle</a> |
+        <a href="{{ id_path }}.json/">JSON</a>
+    </div>
+</div>
+{% endblock %}

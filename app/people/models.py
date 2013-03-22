@@ -1,12 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import User
-from app.linkeddata.models import RDFProperty
+from django.core.urlresolvers import reverse
+from app.linkeddata.models import RDFClass, RDFRelationship, RDFType
+from app.generic.models import StandardMetadata, Event, Period, Person as GenericPerson, Group
 
 
-class Person(models.Model):
+class Person(GenericPerson):
     family_name = models.CharField(max_length=100)
     other_names = models.CharField(max_length=100, blank=True)
-    display_name = models.CharField(max_length=250, blank=True)
     nickname = models.CharField(max_length=100, blank=True)
     #roles = models.ManyToManyField('PersonRole')
     addresses = models.ManyToManyField('places.Address', blank=True, null=True, through='PersonAddress')
@@ -34,20 +35,32 @@ class Person(models.Model):
     def alpha_name(self):
         return '%s, %s' % (self.family_name, self.other_names)
 
+    def main_sources(self):
+        relations = self.personassociatedsource_set.filter(
+                                    association__label='primary topic of'
+                                    )
+        return [relation.source for relation in relations]
+
+    def other_sources(self):
+        relations = self.personassociatedsource_set.filter(
+                                    association__label='topic of'
+                                    )
+        return [relation.source for relation in relations]
+
     class Meta:
         ordering = ['family_name', 'other_names']
 
-    @models.permalink
     def get_absolute_url(self):
-        return ('person_view', [str(self.id)])
+        return reverse('person-view', args=[str(self.id)])
 
 
 class AlternativePersonName(models.Model):
     person = models.ForeignKey('Person')
-    family_name = models.CharField(max_length=100)
+    family_name = models.CharField(max_length=100, blank=True)
     other_names = models.CharField(max_length=100, blank=True)
-    display_name = models.CharField(max_length=250, blank=True)
+    display_name = models.CharField(max_length=250)
     nickname = models.CharField(max_length=100, blank=True)
+    sources = models.ManyToManyField('sources.Source', blank=True, null=True)
 
     def __unicode__(self):
         if self.display_name:
@@ -58,6 +71,102 @@ class AlternativePersonName(models.Model):
             else:
                 display = self.family_name
         return display
+
+    def get_absolute_url(self):
+        return reverse('altname-view', args=[str(self.id)])
+
+
+class LifeEvent(Event):
+    person = models.ForeignKey('people.Person')
+    locations = models.ManyToManyField('places.Place', blank=True, null=True, through='EventLocation')
+    sources = models.ManyToManyField('sources.Source', blank=True, null=True)
+    event_type = models.ForeignKey('people.LifeEventType', blank=True, null=True)
+
+    def __unicode__(self):
+        return '{} ({})'.format(self.label, self.date_summary())
+
+    def get_absolute_url(self):
+        return reverse('lifeevent-view', args=[str(self.id)])
+
+    def date_summary(self):
+        start = self.start_earliest()
+        end_earliest = self.end_earliest()
+        end_latest = self.end_latest()
+        dates = []
+        if start:
+            dates.append(start)
+        if end_latest:
+            dates.append(end_latest)
+        elif end_earliest:
+            dates.append(end_earliest)
+        if len(dates) > 0:
+            summary = ' &ndash; '.join(dates)
+        else:
+            summary = ''
+        return summary
+
+
+class EventLocation(models.Model):
+    lifeevent = models.ForeignKey('people.LifeEvent')
+    location = models.ForeignKey('places.Place', blank=True, null=True)
+    association = models.ForeignKey('people.EventLocationAssociation', blank=True, null=True)
+
+    def __unicode__(self):
+        return '{} {} {}'.format(self.lifeevent, self.association, self.location)
+
+
+class EventLocationAssociation(RDFRelationship):
+    pass
+
+
+class LifePeriod(Period):
+    person = models.ForeignKey('people.Person')
+
+
+class Birth(Event):
+    person = models.ForeignKey('people.Person')
+    location = models.ForeignKey('places.Place', blank=True, null=True)
+    sources = models.ManyToManyField('sources.Source', blank=True, null=True)
+
+    def __unicode__(self):
+        earliest = self.formatted_date('start_earliest')
+        latest = self.formatted_date('start_latest')
+        summary = '{} born '.format(self.person)
+        if earliest and latest:
+            summary += 'between {} and {}'.format(earliest, latest)
+        elif earliest:
+            summary += str(earliest)
+            if self.location:
+                summary += ' in '
+        if self.location:
+            summary += self.location.__unicode__()
+        return summary
+
+    def get_absolute_url(self):
+        return reverse('birth-view', args=[str(self.id)])
+
+
+class Death(Event):
+    person = models.ForeignKey('people.Person')
+    location = models.ForeignKey('places.Place', blank=True, null=True)
+    sources = models.ManyToManyField('sources.Source', blank=True, null=True)
+
+    def __unicode__(self):
+        earliest = self.formatted_date('start_earliest')
+        latest = self.formatted_date('start_latest')
+        summary = '{} died '.format(self.person)
+        if earliest and latest:
+            summary += 'between {} and {}'.format(earliest, latest)
+        elif earliest:
+            summary += earliest
+            if self.location:
+                summary += ' in '
+        if self.location:
+            summary += self.location.__unicode__()
+        return summary
+
+    def get_absolute_url(self):
+        return reverse('death-view', [str(self.id)])
 
 
 class Family(models.Model):
@@ -75,6 +184,10 @@ class Organisation(models.Model):
 
     def __unicode__(self):
         return self.name
+
+
+class Repository(Group):
+    daa_id = models.URLField(blank=True)
 
 
 class PeopleImage(models.Model):
@@ -120,9 +233,8 @@ class PeopleStory(models.Model):
         return ('view_story', [str(self.id)])
 
 
-class PersonRole(models.Model):
-    label = models.CharField(max_length=50)
-    rdf_property = models.ManyToManyField(RDFProperty, blank=True, null=True)
+class PersonRole(RDFRelationship):
+    pass
 
 
 class PersonAddress(models.Model):
@@ -169,19 +281,19 @@ class PersonAssociatedEvent(models.Model):
 
 class PersonAssociatedSource(models.Model):
     person = models.ForeignKey('Person')
-    event = models.ForeignKey('sources.Source')
+    source = models.ForeignKey('sources.Source')
     association = models.ForeignKey('PersonAssociation')
 
 
-class PersonAssociation(models.Model):
-    label = models.CharField(max_length=50)
-    rdf_property = models.ManyToManyField(RDFProperty, blank=True, null=True)
-
-    def __unicode__(self):
-        return self.label
+class PersonAssociation(RDFRelationship):
+    pass
 
 
 class OrganisationAssociatedSource(models.Model):
     organisation = models.ForeignKey('Organisation')
     source = models.ForeignKey('sources.Source')
     association = models.ForeignKey('PersonAssociation')
+
+
+class LifeEventType(RDFType):
+    pass

@@ -3,6 +3,7 @@
   <head>
     <title>{% block page_title %}{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="{{ STATIC_URL }}js/jquery-1.8.0.min.js"></script>
     <link href="{{ STATIC_URL }}css/bootstrap.min.css" rel="stylesheet">
     <link href="{{ STATIC_URL }}css/local.css" rel="stylesheet">
     <link href="{{ STATIC_URL }}/css/bootstrap-responsive.css" rel="stylesheet">
@@ -39,8 +40,11 @@
         </div>
 
         {% block content %}{% endblock %}
+
+        <footer>
+            {% block footer %}{% endblock %}
+        </footer>
     </div>
-    <script src="{{ STATIC_URL }}js/jquery-1.8.0.min.js"></script>
     <script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
     {% block extra_scripts %}{% endblock %}
   </body>

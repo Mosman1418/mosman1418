@@ -1,0 +1,49 @@
+                <div class="form-field control-group">
+                    <label class="control-label" for="id_start_earliest_date">{{ date_label }}</label>
+                    {% if form.start_earliest_date.errors %}
+                        <div class="alert alert-error">
+                            {{ form.start_earliest_date.errors }}
+                        </div>
+                    {% endif %}
+                    <div class="controls">
+                        {{ form.start_earliest_date }}
+                        {{ form.start_earliest_date_month_known }}
+                        {{ form.start_earliest_date_day_known }}
+                    </div>
+                </div>
+                <div class="form-field control-group">
+                    <label class="control-label" for="id_start_latest_date_end">Latest possible date</label>
+                    {% if form.start_latest_date.errors %}
+                        <div class="alert alert-error">
+                            {{ form.start_latest_date.errors }}
+                        </div>
+                    {% endif %}
+                    <div class="controls">
+                        {{ form.start_latest_date }}
+                        {{ form.start_latest_date_month_known }}
+                        {{ form.start_latest_date_day_known }}
+                    </div>
+                </div>
+                <div class="form-field date_type control-group">
+                    <div class="controls">
+                        <label class="radio inline">
+                           <input type="radio" name="start_date_type" checked="checked" value="single"> Single date
+                        </label>
+                        <label class="radio inline">
+                           <input type="radio" name="start_date_type" value="range"> Date range
+                        </label>
+                    </div>
+                </div>
+                <script>
+                    $(function(){
+                        $('input:radio[name=start_date_type]').change(function() {
+                            var date_type = $('input:radio[name=start_date_type]:checked').val();
+                            if (date_type == 'single') {
+                                $('#id_start_latest_date_year').parent().parent().hide();
+                            } else if (date_type == 'range') {
+                                $('#id_start_latest_date_year').parent().parent().show();
+                            }
+                        });
+                        $('#id_start_latest_date_year').parent().parent().hide();
+                    });
+                </script>

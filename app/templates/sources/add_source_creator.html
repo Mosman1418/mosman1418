@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load django_select2_tags %}
+{% block title %}Log in{% endblock %}
+{% block extra_scripts %}
+{% import_django_select2_js %}
+<script src="{{ STATIC_URL }}js/add-source.js"></script>
+{% endblock %}
+{% block extra_styles %}
+{% import_django_select2_css %}
+{% endblock %}
+{% block content %}
+    <div class="row">
+        {% with current='images' %}{% include '_sidenav.html' %}{% endwith %}
+        <div class="span10">
+            <h2>{% if link_id %}Edit{% else %}Add{% endif %} a source</h2>
+            <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">{% csrf_token %}
+                {% with label='Source' field=form.source %}
+                    {% include '_form_field.html' %}
+                {% endwith %}
+                {% with label='Role' field=form.role %}
+                    {% include '_form_field.html' %}
+                {% endwith %}
+                {% with label='Family name' field=form.family_name %}
+                    {% include '_form_field.html' %}
+                {% endwith %}
+                {% with label='Other names' field=form.other_names %}
+                    {% include '_form_field.html' %}
+                {% endwith %}
+                <div class="form-actions">
+                    <input class="btn btn-primary" type="submit" value="Save">
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

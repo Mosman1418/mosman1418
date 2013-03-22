@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Log in{% endblock %}
+{% block extra_scripts %}
+<script src="{{ STATIC_URL }}js/select2.min.js"></script>
+<script src="{{ STATIC_URL }}js/person_add_story.js"></script>
+{% endblock %}
+{% block extra_styles %}
+<link href="{{ STATIC_URL }}css/select2.css" rel="stylesheet">
+{% endblock %}
+{% block content %}
+    <div class="row">
+        {% with current='none' %}{% include '_sidenav.html' %}{% endwith %}
+        <div class="span10">
+            <h2>{% if story_id %}Edit{% else %}Add{% endif %} a story</h2>
+            <form action="" method="post">{% csrf_token %}
+                {{ form.as_p }}
+                <h4>Related people</h4>
+                <ul id="related_people" class="related-list">
+                    {% for person in people %}
+                        <li data-id="{{ person.id }}" class="btn btn-info person-info btn-mini">{{ person.alpha_name }} <i class="icon-white icon-remove-sign"></i></li>
+                    {% endfor %}
+                </ul>
+
+                <p><input class="input-xlarge" type="hidden" id="person_select">
+                <button id="add_person" class="btn btn-info btn-mini">Add</button></p>
+                <p class="form-buttons">
+                    <input class="btn btn-primary" type="submit" value="Save">
+                    {% if story_id %}<a href="{% url delete_story story_id %}" class="btn btn-danger">Delete</a>{% endif %}
+                </p>
+            </form>
+        </div>
+    </div>
+{% endblock %}

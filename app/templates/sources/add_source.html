@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load django_select2_tags %}
+{% block title %}Log in{% endblock %}
+{% block extra_scripts %}
+{% import_django_select2_js %}
+<script src="{{ STATIC_URL }}js/add-source.js"></script>
+{% endblock %}
+{% block extra_styles %}
+{% import_django_select2_css %}
+{% endblock %}
+{% block content %}
+    <div class="row">
+        {% with current='images' %}{% include '_sidenav.html' %}{% endwith %}
+        <div class="span10">
+            <h2>{% if link_id %}Edit{% else %}Add{% endif %} a source</h2>
+            <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">{% csrf_token %}
+                {% if 'birth_record' in form.initial.keys %}
+                    {% with label='Birth record' field=form.birth_record %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                {% endif %}
+                {% if 'death_record' in form.initial.keys %}
+                    {% with label='Death record' field=form.death_record %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                {% endif %}
+                {% if source.id %}
+                    {% with label='Source type' field=form.source_type extra='url'%}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                {% else %}
+                    {% with label='Source type' field=form.category extra='url'%}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                {% endif %}
+                {% with label='Title' field=form.title %}
+                    {% include '_form_field.html' %}
+                {% endwith %}
+                {% with label='URL' field=form.url extra='url' %}
+                    {% include '_form_field.html' %}
+                {% endwith %}
+                {% with label='Publication date' field=form.publication_date %}
+                    {% include '_form_field.html' %}
+                {% endwith %}
+                {{ form.publication_date_month_known }}
+                {{ form.publication_date_day_known }}
+                {% with label='Publication date end' field=form.publication_date_end %}
+                    {% include '_form_field.html' %}
+                {% endwith %}
+                {{ form.publication_date_end_month_known }}
+                {{ form.publication_date_end_day_known }}
+                <div class="form-field date_type control-group">
+                    <div class="controls">
+                        <label class="radio inline">
+                           <input type="radio" name="publication_date_type" checked="checked" value="single"> Single date
+                        </label>
+                        <label class="radio inline">
+                           <input type="radio" name="publication_date_type" value="range"> Date range
+                        </label>
+                    </div>
+                </div>
+                <fieldset id="creators">
+                    <legend>Creators</legend>
+                    {% with label='Authors' field=form.authors %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                    {% with label='Editors' field=form.editors %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                </fieldset>
+                <fieldset id="collection">
+                    <legend>Part of</legend>
+                    {% with label='Collection' field=form.collection %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                    {% with label='Collection title' field=form.collection_title %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                    {% with label='Repository' field=form.repository %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                    {% with label='Collection identifier' field=form.collection_item_id %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                    {% with label='Repository identifier' field=form.repository_item_id %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                    {% with label='Pages' field=form.pages %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                </fieldset>
+                <fieldset id="publication">
+                    <legend>Publisher</legend>
+                    {% with label='Publisher' field=form.publisher %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                    {% with label='Place of publication' field=form.publication_place %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                </fieldset>
+                <fieldset id="subjects">
+                    <legend>Subjects</legend>
+                    {% if 'birth_record' not in form.initial.keys and 'death_record' not in form.initial.keys %}
+                        {% with label='Main people' field=form.main_people %}
+                            {% include '_form_field.html' %}
+                        {% endwith %}
+                    {% endif %}
+                </fieldset>
+                <div class="form-actions">
+                    <input class="btn btn-primary" type="submit" value="Save">
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load django_select2_tags %}
+{% block title %}Log in{% endblock %}
+{% block extra_scripts %}
+{% import_django_select2_js %}
+<script src="{{ STATIC_URL }}js/add-birth.js"></script>
+{% endblock %}
+{% block extra_styles %}
+{% import_django_select2_css %}
+{% endblock %}
+{% block content %}
+    <div class="row">
+        {% with current='none' %}{% include '_sidenav.html' %}{% endwith %}
+        <div class="span10">
+            <h2>{% if birth.id %}Update{% else %}Add{% endif %} a birth record</h2>
+            <form action="" method="post" class="form-horizontal">{% csrf_token %}
+                {% with label='Person' field=form.person %}
+                    {% include '_form_field.html' %}
+                {% endwith %}
+                {% with date_label='Birth date' %}
+                    {% include 'people/_start_date_select.html' %}
+                {% endwith %}
+                {% if birth.id %}
+                    <div class="form-field control-group">
+                        <label class="control-label" for="id_location">Place of birth</label>
+                        {% if form.location.errors %}
+                            <div class="alert alert-error">
+                                {{ form.location.errors }}
+                            </div>
+                        {% endif %}
+                        <div class="controls">
+                            {{ form.location }} <a href="{% url place-add-event event_id=birth.id event_type='births' %}" class="btn btn-mini">Create a new place</a>
+                        </div>
+                    </div>
+                    <div class="form-field control-group">
+                        <label class="control-label" for="id_sources">Sources</label>
+                        {% if form.sources.errors %}
+                            <div class="alert alert-error">
+                                {{ form.sources.errors }}
+                            </div>
+                        {% endif %}
+                        <div class="controls">
+                            {{ form.sources }} <a href="{% url source-add-event event_id=birth.id event_type='births' %}" class="btn btn-mini">Create a new source</a>
+                        </div>
+                    </div>
+                {% endif %}
+                <div class="form-actions">
+                    {% if birth.id %}
+                        <input class="btn btn-primary" name="continue" type="submit" value="Save &amp; continue editing">
+                        <input class="btn btn-primary" name="finished" type="submit" value="Finished">
+                    {% else %}
+                        <input class="btn btn-primary" name="next" type="submit" value="Next">
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

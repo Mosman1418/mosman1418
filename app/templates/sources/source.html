@@ -1,36 +1,111 @@
 {% extends 'base.html' %}
 {% block content %}
         <div class="row">
-            <div class="span2">
-                <ul class="nav nav-list">
-                    <li><a href="/memorials/">Memorials</a></li>
-                    <li><a href="/people/">People</a></li>
-                    <li class="active"><a href="/sources/">Sources</a></li>
-                </ul>
-            </div>
-            <div class="span10">
-                <h1>{{ entity }}</h1>
-                <p>Type: {{ entity.source_type }}</p>
-                {% if entity.collection %}
-                    <p>Part of: <a href="{{ entity.collection.get_absolute_url }}">{{ entity.collection }}</a></p>
+            {% with current='sources' %}{% include '_sidenav.html' %}{% endwith %}
+            <div class="span8">
+                <h1>Source</h1>
+                <h2>{{ content }}</h2>
+                <p>
+                    <span class="label">Type</span>
+                    {{ content.source_type }}
+                </p>
+                {% if content.sourceperson_set.all %}
+                    <h4>Creators</h4>
+                    <ul>
+                    {% for creator in content.sourceperson_set.all %}
+                        <li>{{ creator.person }} ({{ creator.role }})</li>
+                    {% endfor %}
+                    </ul>
                 {% endif %}
-                {% if entity.collection_source.all %}
+                {% if content.repository %}
+                    <p>
+                        <span class="label">Repository</span>
+                        {{ content.repository }}
+                    </p>
+                {% endif %}
+                {% if content.collection %}
+                    <p>
+                        <span class="label">Part of</span>
+                        <a href="{{ content.collection.get_absolute_url }}">{{ content.collection.title }}</a> ({{ content.collection.source_type }})
+                    </p>
+                {% endif %}
+                {% if content.collection_title %}
+                    <p>
+                        <span class="label">Part of</span>
+                        {{ content.collection_title }}</a>
+                    </p>
+                {% endif %}
+                {% if content.collection_item_id %}
+                    <p>
+                        <span class="label">Identifier</span>
+                        {{ content.collection_item_id }}
+                    </p>
+                {% endif %}
+                {% if content.repository_item_id %}
+                    <p>
+                        <span class="label">Identifier</span>
+                        {{ content.repository_item_id }}
+                    </p>
+                {% endif %}
+                {% if content.display_publisher %}
+                    <p>
+                        <span class="label">Publisher</span>
+
+                        {{ content.display_publisher }}
+                    </p>
+                {% endif %}
+                {% if content.publication_place %}
+                    <p>
+                        <span class="label">Place of publication</span>
+                        {{ content.publication_place }}
+                    </p>
+                {% endif %}
+                {% if content.start_date %}
+                    <p>
+                        <span class="label">Date</span>
+                        {{ content.start_date }}
+                        {% if content.end_date %}
+                            &ndash; {{ content.end_date }}
+                        {% endif %}
+                    </p>
+                {% endif %}
+                {% if content.pages %}
+                    <p><span class="label">Page{{ content.pages|pluralize}}:</span> {{ content.pages }}</p>
+                {% endif %}
+                {% if content.url %}
+                    <p>
+                        <span class="label">Web</span>
+                        {{ content.url|urlize }}
+                    </p>
+                {% endif %}
+                {% if content.collection_source.all %}
                     <h4>Includes</h4>
                     <ul>
-                    {% for part in entity.collection_source.all %}
+                    {% for part in content.collection_source.all %}
                         <li><a href="{{ part.get_absolute_url }}">{{ part }}</a></li>
                     {% endfor %}
                 </ul>
                 {% endif %}
-                {% if entity.url %}
-                    <p>Web: {{ entity.url|urlize }}</p>
+                {% if content.main_people %}
+                <h4>Main subject{{ content.main_people|pluralize }}</h4>
+                <ul>
+                {% for subject in content.main_people %}
+                    <li><a href="{% url person-view subject.id %}">{{ subject }}</a></li>
+                {% endfor %}
+                </ul>
+
                 {% endif %}
-                <p>Identifer: <a href="{{ identifier }}">{{ identifier }}</a> |
-                    <a href="{{ id_path }}.html/">HTML</a> |
-                    <a href="{{ id_path }}.rdf/">RDF+XML</a> |
-                    <a href="{{ id_path }}.ttl/">Turtle</a> |
-                    <a href="{{ id_path }}.json/">JSON</a>
-                </p>
             </div>
         </div>
+{% endblock %}
+{% block footer %}
+<div class="row">
+    <div class="span8 offset2">
+        Identifer: <a href="{{ identifier }}">{{ identifier }}</a> |
+        <a href="{{ id_path }}.html/">HTML</a> |
+        <a href="{{ id_path }}.rdf/">RDF+XML</a> |
+        <a href="{{ id_path }}.ttl/">Turtle</a> |
+        <a href="{{ id_path }}.json/">JSON</a>
+    </div>
+</div>
 {% endblock %}

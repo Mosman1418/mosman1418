@@ -1,0 +1,3 @@
+{% if source.source_type.label == "item" %}
+    <a href="{%url source-view source.id %}">{{ source.title }}</a>
+{% endif %}

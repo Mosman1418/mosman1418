@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% block title %}Log in{% endblock %}
+{% block extra_scripts %}
+<script src="{{ STATIC_URL }}js/select2.min.js"></script>
+<script src="{{ STATIC_URL }}js/add-person.js"></script>
+{% endblock %}
+{% block extra_styles %}
+<link href="{{ STATIC_URL }}css/select2.css" rel="stylesheet">
+{% endblock %}
+{% block content %}
+    <div class="row">
+        {% with current='none' %}{% include '_sidenav.html' %}{% endwith %}
+        <div class="span10">
+            <h2>Add a person</h2>
+            <form action="" method="post">{% csrf_token %}
+                {% if form.errors %}
+    <div class="alert alert-error">
+        <button type="button" class="close" data-dismiss="alert">×</button>
+        {% for field in form %}
+            {% if field.errors %}
+            <li>{{ field.label }}: {{ field.errors|striptags }}</li>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endif %}
+                <div class="form-field">
+                    <label for="id_display_name">Display name:</label>
+                    {% if form.display_name.errors %}
+                        <div class="alert alert-error">
+                            {{ form.display_name.errors }}
+                        </div>
+                    {% endif %}
+                    {{ form.display_name }}
+                </div>
+                <div class="form-field">
+                    <label for="id_family_name">Family name:</label>
+                    {% if form.family_name.errors %}
+                        <div class="alert alert-error">
+                            {{ form.family_name.errors }}
+                        </div>
+                    {% endif %}
+                    {{ form.family_name }}
+                </div>
+                <div class="form-field">
+                    <label for="id_family_name">Other names:</label>
+                    {% if form.other_names.errors %}
+                        <div class="alert alert-error">
+                            {{ form.other_names.errors }}
+                        </div>
+                    {% endif %}
+                    {{ form.other_names }}
+                </div>
+                <div class="form-field">
+                    <label for="id_birth_earliest_date">Birth date:</label>
+                    {% if form.birth_earliest_date.errors %}
+                        <div class="alert alert-error">
+                            {{ form.birth_earliest_date.errors }}
+                        </div>
+                    {% endif %}
+                    {{ form.birth_earliest_date }}
+                    {{ form.birth_earliest_date_month_known }}
+                    {{ form.birth_earliest_date_day_known }}
+                </div>
+                <div class="form-field">
+                    <label for="id_birth_latest_date_end">Latest possible birth date:</label>
+                    {% if form.birth_latest_date.errors %}
+                        <div class="alert alert-error">
+                            {{ form.birth_latest_date.errors }}
+                        </div>
+                    {% endif %}
+                    {{ form.birth_latest_date }}
+                    {{ form.birth_latest_date_month_known }}
+                    {{ form.birth_latest_date_day_known }}
+                </div>
+                <div class="form-field date_type">
+                    <label class="radio inline">
+                       <input type="radio" name="birth_date_type" checked="checked" value="single"> Single date
+                    </label>
+                    <label class="radio inline">
+                       <input type="radio" name="birth_date_type" value="range"> Date range
+                    </label>
+                </div>
+                <div class="form-field">
+                    <label for="id_death_earliest_date">Date of death:</label>
+                    {% if form.death_earliest_date.errors %}
+                        <div class="alert alert-error">
+                            {{ form.death_earliest_date.errors }}
+                        </div>
+                    {% endif %}
+                    {{ form.death_earliest_date }}
+                    {{ form.death_earliest_date_month_known }}
+                    {{ form.death_earliest_date_day_known }}
+                </div>
+                <div class="form-field">
+                    <label for="id_death_latest_date_end">Latest possible death date:</label>
+                    {% if form.death_latest_date.errors %}
+                        <div class="alert alert-error">
+                            {{ form.death_latest_date.errors }}
+                        </div>
+                    {% endif %}
+                    {{ form.death_latest_date }}
+                    {{ form.death_latest_date_month_known }}
+                    {{ form.death_latest_date_day_known }}
+                </div>
+                <div class="form-field date_type">
+                    <label class="radio inline">
+                       <input type="radio" name="death_date_type" checked="checked" value="single"> Single date
+                    </label>
+                    <label class="radio inline">
+                       <input type="radio" name="death_date_type" value="range"> Date range
+                    </label>
+                </div>
+                    <p class="form-buttons">
+                        <input class="btn btn-primary" type="submit" value="Save">
+                    </p>
+                </form>
+            </div>
+        </div>
+{% endblock %}

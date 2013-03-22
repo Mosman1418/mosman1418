@@ -7,3 +7,4 @@ from app.people.models import *
 admin.site.register(Person)
 admin.site.register(PeopleImage)
 admin.site.register(PeopleStory)
+admin.site.register(PersonAssociation)

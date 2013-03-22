@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% block title %}Log in{% endblock %}
+{% block extra_scripts %}
+<script src="{{ STATIC_URL }}js/select2.min.js"></script>
+<script src="{{ STATIC_URL }}js/add-person.js"></script>
+{% endblock %}
+{% block extra_styles %}
+<link href="{{ STATIC_URL }}css/select2.css" rel="stylesheet">
+{% endblock %}
+{% block content %}
+    <div class="row">
+        {% with current='none' %}{% include '_sidenav.html' %}{% endwith %}
+        <div class="span10">
+            <h2>
+                {% if person %}
+                    Update details for {{ person }}
+                {% else %}
+                    Add a person
+                {% endif %}
+            </h2>
+            <form action="" method="post" class="form-horizontal">{% csrf_token %}
+                <fieldset>
+                    <legend>Basic details</legend>
+                    {% with label='Name to display' field=form.display_name %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                    {% with label='Family name' field=form.family_name %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                    {% with label='Other names' field=form.other_names %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                    {% with label='Birth date' field=form.birth_earliest_date %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                    {{ form.birth_earliest_date_month_known }}
+                    {{ form.birth_earliest_date_day_known }}
+                    {% with label='Latest possible date' field=form.birth_latest_date %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                    {{ form.birth_latest_date_month_known }}
+                    {{ form.birth_latest_date_day_known }}
+                    <div class="form-field date_type control-group">
+                        <div class="controls">
+                            <label class="radio inline">
+                               <input type="radio" name="birth_date_type" checked="checked" value="single"> Single date
+                            </label>
+                            <label class="radio inline">
+                               <input type="radio" name="birth_date_type" value="range"> Date range
+                            </label>
+                        </div>
+                    </div>
+                    {% with label='Death date' field=form.death_earliest_date %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                    {{ form.death_earliest_date_month_known }}
+                    {{ form.death_earliest_date_day_known }}
+                    {% with label='Latest possible date' field=form.death_latest_date %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                    {{ form.death_latest_date_month_known }}
+                    {{ form.death_latest_date_day_known }}
+                    <div class="form-field date_type control-group">
+                        <div class="controls">
+                            <label class="radio inline">
+                               <input type="radio" name="death_date_type" checked="checked" value="single"> Single date
+                            </label>
+                            <label class="radio inline">
+                               <input type="radio" name="death_date_type" value="range"> Date range
+                            </label>
+                        </div>
+                    </div>
+                    {% with label='Biographical note' field=form.biography %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                    {% if person.id %}
+                        <div class="form-field control-group">
+                            <label class="control-label">Recorded names</label>
+                            <div class="controls">
+                                <ul>
+                                {% for name in person.alternativepersonname_set.all %}
+                                    <li>
+                                        <a href="{{ name.get_absolute_url }}">
+                                            {{ name }}
+                                        </a>
+                                        <a class="btn btn-mini" href="{% url altname-update name.id %}">Update</a>
+                                    </li>
+                                {% empty %}
+                                    <li>No name records</li>
+                                {% endfor %}
+                                </ul>
+                                <a class="btn btn-small btn-primary" href="{% url altname-add person.id %}">Add name record</a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </fieldset>
+                {% if person %}
+                <fieldset>
+                    <legend>Life events</legend>
+                    <div class="form-field control-group">
+                        <label class="control-label">Birth records</label>
+                        <div class="controls">
+                            <ul>
+                            {% for birth in person.birth_set.all %}
+                                <li>
+                                    <a href="{{ birth.get_absolute_url }}">
+                                        {{ birth }}
+                                    </a>
+                                    <a class="btn btn-mini" href="{% url birth-update birth.id %}">Update</a>
+                                </li>
+                            {% empty %}
+                                <li>No birth records</li>
+                            {% endfor %}
+                            </ul>
+                            <a class="btn btn-small btn-primary" href="{% url birth-add person.id %}">Add birth record</a>
+                        </div>
+                    </div>
+                    <div class="form-field control-group">
+                        <label class="control-label">Death records</label>
+                        <div class="controls">
+                            <ul>
+                            {% for death in person.death_set.all %}
+                                <li>
+                                    <a href="{{ death.get_absolute_url }}">
+                                        {{ death }}
+                                    </a>
+                                    <a class="btn btn-mini" href="{% url death-update death.id %}">Update</a>
+                                </li>
+                            {% empty %}
+                                <li>No death records</li>
+                            {% endfor %}
+                            </ul>
+                            <a class="btn btn-small btn-primary" href="{% url death-add person.id %}">Add death record</a>
+                        </div>
+                    </div>
+                </fieldset>
+                {% endif %}
+                <div class="form-actions">
+                    {% if person %}
+                        <input class="btn btn-primary" type="submit" value="Save">
+                    {% else %}
+                        <input class="btn btn-primary" type="submit" value="Next">
+                    {% endif %}
+                </div>
+                </form>
+            </div>
+        </div>
+{% endblock %}

@@ -4,15 +4,58 @@
             {% with current='people' %}{% include '_sidenav.html' %}{% endwith %}
             <div class="span8">
                 <h1>{{ content }}</h1>
+
+
+                <h4>Birth</h4>
+                {% if content.birth_set.all %}
+                    <h5>What the sources tell us</h5>
+                    <ul>
+                    {% for birth in content.birth_set.all %}
+                            <li>
+                                <a href="{{ birth.get_absolute_url }}">
+                                    {{ birth }}
+                                </a>
+                            </li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+                {% if content.lifeevent_set.all %}
+                    <h4>Life events</h4>
+                    <ul>
+                    {% for event in content.lifeevent_set.all %}
+                        <li><a href="{{ event.get_absolute_url }}">{{ event }}</a></li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
                 {% if content.stories.all %}
                     <h4>Stories</h4>
                     {% for story in content.stories.all %}
                     <article>
                         <h5>{{ story.title }}</h5>
                         {{ story.text|linebreaks|truncatewords_html:100 }}
-                        <p><a href="{% url view_story story.id %}">More</a></p>
+                        <p><a href="{{ story.get_absolute_url }}">More</a></p>
                     </article>
                     {% endfor %}
+                {% endif %}
+
+                {% if content.main_sources %}
+                <h4>Main sources of information</h4>
+                <ul>
+                    {% for source in content.main_sources %}
+                         <li><a href="{{ source.get_absolute_url }}">{{ source.title }}</a> ({{ source.source_type}})</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+
+                {% if content.other_sources %}
+                <h4>Other sources of information</h4>
+                <ul>
+                    {% for source in content.other_sources %}
+                        {% if source.source_type.label == "item" %}
+                         <li>{{ source.repository }}: <a href="{{ source.get_absolute_url }}">{{ source.citation }}</a> (file)</li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
                 {% endif %}
 
                 {% if content.memorialname_set.all %}
@@ -23,21 +66,35 @@
                     {% endfor %}
                 </ul>
                 {% endif %}
-                <p>Identifer: <a href="{{ identifier }}">{{ identifier }}</a> |
-                    <a href="{{ id_path }}.html/">HTML</a> |
-                    <a href="{{ id_path }}.rdf/">RDF+XML</a> |
-                    <a href="{{ id_path }}.ttl/">Turtle</a> |
-                    <a href="{{ id_path }}.json/">JSON</a>
-                </p>
+
             </div>
             <div class="span2">
                 <h5>Contribute</h5>
+                {% if perms.people.person %}
+                <p>
+                    <a class="btn btn-primary btn-medium" href="{% url person-update content.id%}">Update</a>
+                </p>
+                {% endif %}
                 <p>
                     <a class="btn btn-primary btn-medium" href="{% url person_add_story 'person' content.id%}">Add a story</a>
                 </p>
                 <p>
                     <a class="btn btn-primary btn-medium" href="{% url person_add_image 'person' content.id%}">Add an image</a>
                 </p>
+                <p>
+                    <a class="btn btn-primary btn-medium" href="{% url source-add-person 'person' content.id%}">Add a link</a>
+                </p>
             </div>
         </div>
+{% endblock %}
+{% block footer %}
+<div class="row">
+    <div class="span8 offset2">
+        Identifer: <a href="{{ identifier }}">{{ identifier }}</a> |
+        <a href="{{ id_path }}.html/">HTML</a> |
+        <a href="{{ id_path }}.rdf/">RDF+XML</a> |
+        <a href="{{ id_path }}.ttl/">Turtle</a> |
+        <a href="{{ id_path }}.json/">JSON</a>
+    </div>
+</div>
 {% endblock %}
