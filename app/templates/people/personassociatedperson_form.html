@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load django_select2_tags %}
+{% block title %}Log in{% endblock %}
+{% block extra_scripts %}
+{% import_django_select2_js %}
+<script src="{{ STATIC_URL }}js/add-birth.js"></script>
+{% endblock %}
+{% block extra_styles %}
+{% import_django_select2_css %}
+{% endblock %}
+{% block content %}
+    <div class="row">
+        {% with current='none' %}{% include '_sidenav.html' %}{% endwith %}
+        <div class="span10">
+            <h2>{% if personassociatedperson.id %}Update{% else %}Add{% endif %} a related person</h2>
+            <form action="" method="post" class="form-horizontal">{% csrf_token %}
+
+                {% with label='Person' field=form.person %}
+                    {% include '_form_field.html' %}
+                {% endwith %}
+                {% with label='Relation' field=form.association %}
+                    {% include '_form_field.html' %}
+                {% endwith %}
+                {% if personassociatedperson.id %}
+                    {% url person-add-person personassociatedperson.id as addperson %}
+                    {% with label='Related person' field=form.associated_person create_url=addperson create_type='person' %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+
+
+                    {% url source-add-association 'people' personassociatedperson.id as addsource %}
+                    {% with label='Sources' field=form.sources create_url=addsource create_type='source' %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                {% endif %}
+                <div class="form-actions">
+                    {% if personassociatedperson.id %}
+                        <input class="btn btn-primary" name="continue" type="submit" value="Save &amp; continue editing">
+                        <input class="btn btn-primary" name="finished" type="submit" value="Finished">
+                        <a class="btn btn-primary btn-danger" href="{% url persontoperson-delete personassociatedperson.id %}">Delete</a>
+                    {% else %}
+                        <input class="btn btn-primary" name="next" type="submit" value="Next">
+                    {% endif %}
+
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

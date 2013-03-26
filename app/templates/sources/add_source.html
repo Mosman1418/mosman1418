@@ -14,6 +14,21 @@
         <div class="span10">
             <h2>{% if link_id %}Edit{% else %}Add{% endif %} a source</h2>
             <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">{% csrf_token %}
+                {% if form.errors %}
+    <!-- Error messaging -->
+    <div id="errors">
+        <div class="inner">
+            <p>There were some errors in the information you entered. Please correct the following:</p>
+            {{ form.non_field_errors }}
+            <ul>
+                {% for field in form %}
+                    {% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <!-- /Error messaging -->
+{% endif %}
                 {% if 'birth_record' in form.initial.keys %}
                     {% with label='Birth record' field=form.birth_record %}
                         {% include '_form_field.html' %}
@@ -21,6 +36,11 @@
                 {% endif %}
                 {% if 'death_record' in form.initial.keys %}
                     {% with label='Death record' field=form.death_record %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                {% endif %}
+                {% if 'associated_people' in form.initial.keys %}
+                    {% with label='Documenting relationship' field=form.associated_people %}
                         {% include '_form_field.html' %}
                     {% endwith %}
                 {% endif %}

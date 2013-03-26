@@ -90,6 +90,7 @@ class DateSelectMixin(object):
 
 class AddPersonForm(ModelForm, DateSelectMixin):
     # These are CharFields so they don't get vaildated as dates
+    related_person = forms.ModelChoiceField(queryset=PersonAssociatedPerson.objects.all())
     birth_earliest_date = forms.CharField(widget=NewSelectDateWidget(
                                 attrs={'class': 'input-small'},
                                 years=YEARS), required=False)
@@ -157,6 +158,7 @@ class AddAltNameForm(ModelForm):
 class AddLifeEventForm(AddEventForm):
     person = PersonChoice()
     sources = SourcesMultiChoice(required=False)
+    #event_type = forms.ModelChoiceField(queryset=LifeEventType.objects.all(), required=False)
 
     class Meta:
         model = LifeEvent
@@ -202,6 +204,44 @@ class AddDeathForm(AddEventForm):
     class Meta:
         model = Death
         exclude = ('added_by',)
+
+
+class AddAssociatedPersonForm(ModelForm, DateSelectMixin):
+    person = PersonChoice()
+    associated_person = PersonChoice(required=False)
+    start_earliest_date = forms.CharField(widget=NewSelectDateWidget(
+                                attrs={'class': 'input-small'},
+                                years=YEARS), required=False)
+    end_earliest_date = forms.CharField(widget=NewSelectDateWidget(
+                                attrs={'class': 'input-small'},
+                                years=YEARS), required=False)
+    sources = SourcesMultiChoice(required=False)
+
+    def clean(self):
+        cleaned_data = super(AddAssociatedPersonForm, self).clean()
+        start_earliest_date = cleaned_data['start_earliest_date']
+        cleaned_data['start_earliest_month_known'] = self.clean_month(start_earliest_date, 'start')
+        cleaned_data['start_earliest_day_known'] = self.clean_day(start_earliest_date, 'start')
+        cleaned_data['start_earliest_date'] = self.clean_date(start_earliest_date, 'start')
+        end_earliest_date = cleaned_data['end_earliest_date']
+        cleaned_data['end_earliest_month_known'] = self.clean_month(end_earliest_date, 'start')
+        cleaned_data['end_earliest_day_known'] = self.clean_day(end_earliest_date, 'start')
+        cleaned_data['end_earliest_date'] = self.clean_date(end_earliest_date, 'start')
+        return cleaned_data
+
+    class Meta:
+        model = PersonAssociatedPerson
+        exclude = ('added_by',)
+        widgets = {
+                    'start_earliest_month_known': forms.HiddenInput,
+                    'start_earliest_day_known': forms.HiddenInput,
+                    'start_latest_month_known': forms.HiddenInput,
+                    'start_latest_day_known': forms.HiddenInput,
+                    'end_earliest_month_known': forms.HiddenInput,
+                    'end_earliest_day_known': forms.HiddenInput,
+                    'end_latest_month_known': forms.HiddenInput,
+                    'end_latest_day_known': forms.HiddenInput,
+                }
 
 
 class AddResourceForm(ModelForm, DateSelectMixin):

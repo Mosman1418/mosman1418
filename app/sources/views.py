@@ -125,6 +125,7 @@ class AddSourceView(CreateView):
             creator_link.save()
 
     def form_valid(self, form):
+        self.form = form
         source = form.save(commit=False)
         source.added_by = self.request.user
         category = form.cleaned_data['category']
@@ -154,19 +155,38 @@ class AddSourceView(CreateView):
          #   link.person_set.add(Organisation.objects.get(id=int(organisation)))
         birth = form.cleaned_data.get('birth_record', None)
         if birth:
-            birth.location = place
+            print birth
+            birth.sources.add(source)
             birth.save()
         death = form.cleaned_data.get('death_record', None)
         if death:
-            death.location = place
+            death.sources.add(source)
             death.save()
+        associated_people = form.cleaned_data.get('associated_people', None)
+        if associated_people:
+            associated_people.sources.add(source)
+            associated_people.save()
         # Permissions
         assign('sources.change_source', self.request.user, source)
         assign('sources.delete_source', self.request.user, source)
         # Extra processing
         if source.collection and source.collection.repository_item_id == 'B2455':
             self.get_moa_page(form)
-        return HttpResponseRedirect(reverse('source-view', args=[source.id]))
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        birth = self.form.cleaned_data.get('birth_record', None)
+        death = self.form.cleaned_data.get('death_record', None)
+        associated_people = self.form.cleaned_data.get('associated_people', None)
+        if birth:
+            url = reverse_lazy('birth-update', args=[birth.id])
+        elif death:
+            url = reverse_lazy('death-update', args=[death.id])
+        elif associated_people:
+            url = reverse_lazy('persontoperson-update', args=[associated_people.id])
+        else:
+            url = reverse_lazy('source-update', args=[self.object.id])
+        return url
 
     def get_moa_page(self, form):
         ''' If it's an NAA WWI service record, automatically check for a MoA page. '''
@@ -282,6 +302,10 @@ class AddSourceView(CreateView):
             initial['birth_record'] = event_id
         elif event_type == 'deaths':
             initial['death_record'] = event_id
+        assoc_type = self.kwargs.get('assoc_type', None)
+        assoc_id = self.kwargs.get('assoc_id', None)
+        if assoc_type == 'people':
+            initial['associated_people'] = assoc_id
         return initial
 
 

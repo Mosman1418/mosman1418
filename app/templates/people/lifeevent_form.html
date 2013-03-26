@@ -12,12 +12,15 @@
     <div class="row">
         {% with current='none' %}{% include '_sidenav.html' %}{% endwith %}
         <div class="span10">
-            <h2>{% if birth.id %}Update{% else %}Add{% endif %} a life event</h2>
+            <h2>{% if lifeevent.id %}Update{% else %}Add{% endif %} a life event</h2>
             <form action="" method="post" class="form-horizontal">{% csrf_token %}
                 {% with label='Person' field=form.person %}
                     {% include '_form_field.html' %}
                 {% endwith %}
                 {% with label='Label' field=form.label %}
+                    {% include '_form_field.html' %}
+                {% endwith %}
+                {% with label='Event type' field=form.type_of_event %}
                     {% include '_form_field.html' %}
                 {% endwith %}
                 {% with label='Description' field=form.description %}
@@ -81,7 +84,7 @@
                                         <a class="btn btn-mini" href="{% url eventlocation-update location.id %}">Update</a>
                                     </li>
                                 {% empty %}
-                                    <li>No name records</li>
+                                    <li>No locations</li>
                                 {% endfor %}
                                 </ul>
                                 <a class="btn btn-small btn-primary" href="{% url eventlocation-add lifeevent.id %}">Add location</a>

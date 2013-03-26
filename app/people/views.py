@@ -310,10 +310,30 @@ class AddPerson(CreateView):
     model = Person
 
     def form_valid(self, form):
+        self.form = form
         person = form.save(commit=False)
         person.added_by = self.request.user
         person.save()
-        return HttpResponseRedirect(reverse('person-update', args=[person.id]))
+        related_person = form.cleaned_data.get('related_person', None)
+        if related_person:
+            related_person.associated_person = person
+            related_person.save()
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_initial(self):
+        person_id = self.kwargs.get('person_id', None)
+        initial = {'related_person': person_id}
+        return initial
+
+    def get_success_url(self):
+        related_person = self.form.cleaned_data.get('related_person', None)
+        print related_person.id
+        if related_person:
+            url = reverse_lazy('persontoperson-update', args=[related_person.id])
+        else:
+            url = reverse_lazy('person-update', args=[self.object.id])
+        print url
+        return url
 
 
 class UpdatePerson(UpdateView):
@@ -411,6 +431,11 @@ class AddLifeEvent(CreateView):
 class UpdateLifeEvent(UpdateView):
     form_class = AddLifeEventForm
     model = LifeEvent
+
+    def form_valid(self, form):
+        event = form.save(commit=False)
+        event.save()
+        return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
         if 'continue' in self.request.POST:
@@ -515,7 +540,7 @@ class UpdateBirth(UpdateView):
         if 'continue' in self.request.POST:
             url = reverse_lazy('birth-update', args=[self.object.id])
         else:
-            url = reverse_lazy('birth-view', args=[self.object.id])
+            url = reverse_lazy('person-update', args=[self.object.person.id])
         return url
 
     def prepare_date(self, name):
@@ -574,7 +599,7 @@ class UpdateDeath(UpdateView):
         if 'continue' in self.request.POST:
             url = reverse_lazy('death-update', args=[self.object.id])
         else:
-            url = reverse_lazy('death-view', args=[self.object.id])
+            url = reverse_lazy('person-view', args=[self.object.person.id])
         return url
 
     def prepare_date(self, name):
@@ -604,6 +629,68 @@ class DeleteDeath(DeleteView):
     def delete(self, request, *args, **kwargs):
         self.person_pk = self.get_object().person.pk
         return super(DeleteDeath, self).delete(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse_lazy('person-update', args=[self.person_pk])
+
+
+class AddPersonAssociatedPerson(CreateView):
+    model = PersonAssociatedPerson
+    form_class = AddAssociatedPersonForm
+
+    def get_initial(self):
+        person_id = self.kwargs.get('person_id', None)
+        initial = {'person': person_id}
+        return initial
+
+    def form_valid(self, form):
+        assoc = form.save(commit=False)
+        assoc.added_by = self.request.user
+        assoc.save()
+        return HttpResponseRedirect(reverse('persontoperson-update', args=[assoc.id]))
+
+
+class UpdatePersonAssociatedPerson(UpdateView):
+    model = PersonAssociatedPerson
+    form_class = AddAssociatedPersonForm
+
+    def prepare_date(self, name):
+        date = getattr(self.object, name)
+        name = name[:-5]
+        if date:
+            year = date.year
+            month = date.month
+            day = date.day
+            if getattr(self.object, '{}_month_known'.format(name)) is False:
+                month = 0
+            if getattr(self.object, '{}_day_known'.format(name)) is False:
+                day = 0
+            date = '{}-{}-{}'.format(year, month, day)
+        return date
+
+    def get_initial(self):
+        initial = {}
+        initial['start_earliest_date'] = self.prepare_date('start_earliest_date')
+        #initial['start_latest_date'] = self.prepare_date('start_latest_date')
+        initial['end_earliest_date'] = self.prepare_date('end_earliest_date')
+        #initial['end_latest_date'] = self.prepare_date('end_latest_date')
+        return initial
+
+    def get_success_url(self):
+        if 'continue' in self.request.POST:
+            url = reverse_lazy('persontoperson-update', args=[self.object.id])
+        else:
+            url = reverse_lazy('person-update', args=[self.object.person.id])
+        return url
+
+
+class DeletePersonAssociatedPerson(DeleteView):
+    model = PersonAssociatedPerson
+    template_name = 'people/confirm_delete.html'
+
+    def delete(self, request, *args, **kwargs):
+        self.person_pk = self.get_object().person.pk
+        return super(DeletePersonAssociatedPerson, self).delete(request, *args, **kwargs)
 
     def get_success_url(self):
         return reverse_lazy('person-update', args=[self.person_pk])

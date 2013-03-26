@@ -86,12 +86,12 @@ class LifeEvent(Event):
     person = models.ForeignKey('people.Person')
     locations = models.ManyToManyField('places.Place', blank=True, null=True, through='EventLocation')
     sources = models.ManyToManyField('sources.Source', blank=True, null=True)
-    event_type = models.ForeignKey('people.LifeEventType', blank=True, null=True)
+    type_of_event = models.ForeignKey('people.LifeEventType', blank=True, null=True)
 
     def __unicode__(self):
         return '{}: {} ({})'.format(self.person, self.label, self.date_summary())
 
-    def label(self):
+    def summary(self):
         return '{} ({})'.format(self.label, self.date_summary())
 
     def get_absolute_url(self):
@@ -132,7 +132,7 @@ class EventLocation(models.Model):
             summary += ' {} {}'.format(self.association, self.location)
         return summary
 
-    def label(self):
+    def summary(self):
         return '{} {}'.format(self.association, self.location)
 
     def class_name(self):
@@ -162,12 +162,12 @@ class Birth(Event):
             elif earliest:
                 summary += earliest
             if self.location:
-                summary += ' in '
+                summary += ' in {}'.format(self.location)
         elif self.location:
             summary = 'In {}'.format(self.location.__unicode__())
         return summary
 
-    def label(self):
+    def summary(self):
         earliest = self.formatted_date('start_earliest')
         latest = self.formatted_date('start_latest')
         if earliest:
@@ -176,7 +176,7 @@ class Birth(Event):
             elif earliest:
                 summary = earliest
             if self.location:
-                summary += ' in '
+                summary += ' in {}'.format(self.location)
         elif self.location:
             summary = 'In {}'.format(self.location.__unicode__())
         return summary
@@ -206,12 +206,12 @@ class Death(Event):
             elif earliest:
                 summary += earliest
         if self.location:
-            summary += ' in '
+            summary += ' in {}'.format(self.location)
         elif self.location:
             summary = 'In {}'.format(self.location.__unicode__())
         return summary
 
-    def label(self):
+    def summary(self):
         earliest = self.formatted_date('start_earliest')
         latest = self.formatted_date('start_latest')
         if earliest:
@@ -220,7 +220,7 @@ class Death(Event):
             elif earliest:
                 summary = earliest
             if self.location:
-                summary += ' in '
+                summary += ' in {}'.format(self.location)
         elif self.location:
             summary = 'In {}'.format(self.location.__unicode__())
         return summary
@@ -323,8 +323,31 @@ class PersonAssociatedPlace(models.Model):
 
 class PersonAssociatedPerson(models.Model):
     person = models.ForeignKey('Person')
-    associated_person = models.ForeignKey('Person', related_name='related_person')
+    associated_person = models.ForeignKey('Person', related_name='related_person', blank=True, null=True)
     association = models.ForeignKey('PersonAssociation')
+    start_earliest_date = models.DateField(blank=True, null=True)
+    start_earliest_month = models.BooleanField(default=False)
+    start_earliest_day = models.BooleanField(default=False)
+    end_earliest_date = models.DateField(blank=True, null=True)
+    end_earliest_month = models.BooleanField(default=False)
+    end_earliest_day = models.BooleanField(default=False)
+    sources = models.ManyToManyField('sources.Source', blank=True, null=True)
+
+    def __unicode__(self):
+        if self.associated_person:
+            summary = '{} {} {}'.format(self.person, self.association, self.associated_person)
+        else:
+            summary = '{} {}'.format(self.person, self.association)
+        return summary
+
+    def summary(self):
+        return '{} &ndash; {}'.format(self.association, self.associated_person)
+
+    def class_name(self):
+        return self.__class__.__name__
+
+    def get_absolute_url(self):
+        return reverse('persontoperson-view', args=[str(self.id)])
 
 
 class PersonAssociatedOrganisation(models.Model):
@@ -362,4 +385,5 @@ class OrganisationAssociatedSource(models.Model):
 
 
 class LifeEventType(RDFType):
+    ''' Tyep of life event '''
     pass

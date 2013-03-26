@@ -84,14 +84,6 @@ class PeopleMultiChoices(AutoModelSelect2MultipleField):
     search_fields = ['family_name__istartswith', ]
 
 
-class BirthChoice(AutoModelSelect2Field):
-    queryset = Birth.objects
-
-
-class DeathChoice(AutoModelSelect2Field):
-    queryset = Death.objects
-
-
 class SourceChoice(AutoModelSelect2Field):
     queryset = Source.objects
 
@@ -111,24 +103,7 @@ class AuthorMultiChoices(AutoModelSelect2MultipleField):
     search_fields = ['family_name__istartswith', ]
 
 
-class SourceForm(ModelForm, DateSelectMixin):
-
-    class Meta:
-        model = Source
-        exclude = ('added_by', 'source_type', 'citation', 'rdf_url', 'json_url')
-        widgets = {
-                    'title': forms.TextInput(attrs={'class': 'input-xxlarge'}),
-                    'publication_date': NewSelectDateWidget(attrs={'class': 'input-small'}, years=YEARS),
-                    'publication_date_month_known': forms.HiddenInput,
-                    'publication_date_day_known': forms.HiddenInput,
-                    'publication_date_end_month_known': forms.HiddenInput,
-                    'publication_date_end_day_known': forms.HiddenInput,
-                    'publication_date_end': NewSelectDateWidget(attrs={'class': 'input-small'}, years=YEARS),
-                    'url': forms.TextInput(attrs={'class': 'input-xxlarge'}),
-                }
-
-
-class AddSourceForm(SourceForm):
+class AddSourceForm(ModelForm, DateSelectMixin):
     categories = (
             ('website', 'website'),
             ('webpage', 'webpage'),
@@ -140,12 +115,24 @@ class AddSourceForm(SourceForm):
     main_people = PeopleMultiChoices(required=False)
     related_people = PeopleMultiChoices(required=False)
     category = forms.ChoiceField(choices=categories)
-    birth_record = BirthChoice(required=False)
-    death_record = DeathChoice(required=False)
     collection = CollectionChoice(required=False)
     repository = RepositoryChoice(required=False)
     authors = AuthorMultiChoices(required=False)
     editors = AuthorMultiChoices(required=False)
+    birth_record = forms.ModelChoiceField(
+                queryset=Birth.objects.all(),
+                required=False,
+                widget=forms.Select(attrs={'readonly': 'readonly'})
+        )
+    death_record = forms.ModelChoiceField(
+                queryset=Death.objects.all(),
+                required=False,
+                widget=forms.Select(attrs={'readonly': 'readonly'})
+        )
+    associated_people = forms.ModelChoiceField(
+                queryset=PersonAssociatedPerson.objects.all(),
+                required=False,
+                widget=forms.Select(attrs={'readonly': 'readonly'}))
 
     def clean(self):
         cleaned_data = super(AddSourceForm, self).clean()
@@ -308,8 +295,22 @@ class AddSourceForm(SourceForm):
 
         return details
 
+    class Meta:
+        model = Source
+        exclude = ('added_by', 'source_type', 'citation', 'rdf_url', 'json_url')
+        widgets = {
+                    'title': forms.TextInput(attrs={'class': 'input-xxlarge'}),
+                    'publication_date': NewSelectDateWidget(attrs={'class': 'input-small'}, years=YEARS),
+                    'publication_date_month_known': forms.HiddenInput,
+                    'publication_date_day_known': forms.HiddenInput,
+                    'publication_date_end_month_known': forms.HiddenInput,
+                    'publication_date_end_day_known': forms.HiddenInput,
+                    'publication_date_end': NewSelectDateWidget(attrs={'class': 'input-small'}, years=YEARS),
+                    'url': forms.TextInput(attrs={'class': 'input-xxlarge'}),
+                }
 
-class UpdateSourceForm(SourceForm):
+
+class UpdateSourceForm(ModelForm, DateSelectMixin):
 
     main_people = PeopleMultiChoices(required=False)
     related_people = PeopleMultiChoices(required=False)
@@ -329,6 +330,21 @@ class UpdateSourceForm(SourceForm):
         cleaned_data['publication_date'] = self.clean_date(publication_date, 'start')
         cleaned_data['publication_date_end'] = self.clean_date(publication_date_end, 'end')
         return cleaned_data
+
+    class Meta:
+        model = Source
+        exclude = ('added_by', 'source_type', 'citation', 'rdf_url', 'json_url')
+        widgets = {
+                    'title': forms.TextInput(attrs={'class': 'input-xxlarge'}),
+                    'publication_date': NewSelectDateWidget(attrs={'class': 'input-small'}, years=YEARS),
+                    'publication_date_month_known': forms.HiddenInput,
+                    'publication_date_day_known': forms.HiddenInput,
+                    'publication_date_end_month_known': forms.HiddenInput,
+                    'publication_date_end_day_known': forms.HiddenInput,
+                    'publication_date_end': NewSelectDateWidget(attrs={'class': 'input-small'}, years=YEARS),
+                    'url': forms.TextInput(attrs={'class': 'input-xxlarge'}),
+                }
+
 
 
 class AddSourcePersonForm(ModelForm):
