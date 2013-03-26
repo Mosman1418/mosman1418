@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Confirm deletion{% endblock %}
+{% block content %}
+    <div class="row">
+        {% with current='none' %}{% include '_sidenav.html' %}{% endwith %}
+        <div class="span10">
+            <h2>Confirm deletion</h2>
+            <form action="" method="post">{% csrf_token %}
+                    <p>Do you really want to delete this?</p>
+                    <ul>
+                        <li>{{ object.class_name }}: <a href="{{ object.get_absolute_url }}">{{ object }}</a></li>
+                    </ul>
+                <div>
+                    <input class="btn btn-danger" name="delete" type="submit" value="Delete">
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -133,6 +133,24 @@
                             <a class="btn btn-small btn-primary" href="{% url death-add person.id %}">Add death record</a>
                         </div>
                     </div>
+                    <div class="form-field control-group">
+                        <label class="control-label">Life events</label>
+                        <div class="controls">
+                            <ul>
+                            {% for event in person.lifeevent_set.all %}
+                                <li>
+                                    <a href="{{ event.get_absolute_url }}">
+                                        {{ event }}
+                                    </a>
+                                    <a class="btn btn-mini" href="{% url lifeevent-update event.id %}">Update</a>
+                                </li>
+                            {% empty %}
+                                <li>No life events</li>
+                            {% endfor %}
+                            </ul>
+                            <a class="btn btn-small btn-primary" href="{% url lifeevent-add person.id %}">Add life event</a>
+                        </div>
+                    </div>
                 </fieldset>
                 {% endif %}
                 <div class="form-actions">

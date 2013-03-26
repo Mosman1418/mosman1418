@@ -14,13 +14,18 @@
         <div class="span10">
             <h2>{% if place.id %}Update{% else %}Add{% endif %} a place</h2>
             <form action="" method="post" class="form-horizontal">{% csrf_token %}
-                {% if 'birth_record' in form.initial.keys %}
-                    {% with label='Birth record' field=form.birth_record %}
+                {% if 'birth_event' in form.initial.keys %}
+                    {% with label='Birth record' field=form.birth_event %}
                         {% include '_form_field.html' %}
                     {% endwith %}
                 {% endif %}
-                {% if 'death_record' in form.initial.keys %}
-                    {% with label='Death record' field=form.death_record %}
+                {% if 'death_event' in form.initial.keys %}
+                    {% with label='Death record' field=form.death_event %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                {% endif %}
+                {% if 'life_event' in form.initial.keys %}
+                    {% with label='Event record' field=form.life_event %}
                         {% include '_form_field.html' %}
                     {% endwith %}
                 {% endif %}

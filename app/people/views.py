@@ -443,7 +443,8 @@ class UpdateLifeEvent(UpdateView):
 
 
 class DeleteLifeEvent(DeleteView):
-    model = Birth
+    model = LifeEvent
+    template_name = 'people/confirm_delete.html'
 
     def delete(self, request, *args, **kwargs):
         self.person_pk = self.get_object().person.pk
@@ -474,19 +475,20 @@ class UpdateEventLocation(UpdateView):
         if 'continue' in self.request.POST:
             url = reverse_lazy('eventlocation-update', args=[self.object.id])
         else:
-            url = reverse_lazy('lifeevent-view', args=[self.lifeevent.id])
+            url = reverse_lazy('lifeevent-update', args=[self.object.lifeevent.id])
         return url
 
 
 class DeleteEventLocation(DeleteView):
-    model = Birth
+    model = EventLocation
+    template_name = 'people/confirm_delete.html'
 
     def delete(self, request, *args, **kwargs):
-        self.person_pk = self.get_object().person.pk
+        self.lifeevent_id = self.get_object().lifeevent.id
         return super(DeleteEventLocation, self).delete(request, *args, **kwargs)
 
     def get_success_url(self):
-        return reverse_lazy('eventlocation-update', args=[self.person_pk])
+        return reverse_lazy('lifeevent-update', args=[self.lifeevent_id])
 
 
 class AddBirth(CreateView):

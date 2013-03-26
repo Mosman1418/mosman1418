@@ -3,7 +3,7 @@
 {% block title %}Log in{% endblock %}
 {% block extra_scripts %}
 {% import_django_select2_js %}
-<script src="{{ STATIC_URL }}js/add-birth.js"></script>
+<script src="{{ STATIC_URL }}js/add-event.js"></script>
 {% endblock %}
 {% block extra_styles %}
 {% import_django_select2_css %}
@@ -67,40 +67,47 @@
                     </div>
                 </fieldset>
                 {% if lifeevent.id %}
-                    <div class="form-field control-group">
-                        <label class="control-label">Associated locations</label>
-                        <div class="controls">
-                            <ul>
-                            {% for location in person.eventlocation_set.all %}
-                                <li>
-                                    <a href="{{ location.get_absolute_url }}">
-                                        {{ location }}
-                                    </a>
-                                    <a class="btn btn-mini" href="{% url eventlocation-update location.id %}">Update</a>
-                                </li>
-                            {% empty %}
-                                <li>No name records</li>
-                            {% endfor %}
-                            </ul>
-                            <a class="btn btn-small btn-primary" href="{% url eventlocation-add lifeevent.id %}">Add name record</a>
-                        </div>
-                    </div>
-                    <div class="form-field control-group">
-                        <label class="control-label" for="id_sources">Sources</label>
-                        {% if form.sources.errors %}
-                            <div class="alert alert-error">
-                                {{ form.sources.errors }}
+                    <fieldset>
+                        <legend>Locations</legend>
+                        <div class="form-field control-group">
+                            <label class="control-label">Associated locations</label>
+                            <div class="controls">
+                                <ul>
+                                {% for location in lifeevent.eventlocation_set.all %}
+                                    <li>
+                                        <a href="{{ location.get_absolute_url }}">
+                                            {{ location.label }}
+                                        </a>
+                                        <a class="btn btn-mini" href="{% url eventlocation-update location.id %}">Update</a>
+                                    </li>
+                                {% empty %}
+                                    <li>No name records</li>
+                                {% endfor %}
+                                </ul>
+                                <a class="btn btn-small btn-primary" href="{% url eventlocation-add lifeevent.id %}">Add location</a>
                             </div>
-                        {% endif %}
-                        <div class="controls">
-                            {{ form.sources }} <a href="{% url source-add-event event_id=lifeevent.id event_type='lifeevents' %}" class="btn btn-mini">Create a new source</a>
                         </div>
-                    </div>
+                    </fieldset>
+                    <fieldset>
+                        <legend>Sources</legend>
+                        <div class="form-field control-group">
+                            <label class="control-label" for="id_sources">Sources</label>
+                            {% if form.sources.errors %}
+                                <div class="alert alert-error">
+                                    {{ form.sources.errors }}
+                                </div>
+                            {% endif %}
+                            <div class="controls">
+                                {{ form.sources }} <a href="{% url source-add-event event_id=lifeevent.id event_type='lifeevents' %}" class="btn btn-mini">Create a new source</a>
+                            </div>
+                        </div>
+                    </fieldset>
                 {% endif %}
                 <div class="form-actions">
-                    {% if birth.id %}
+                    {% if lifeevent.id %}
                         <input class="btn btn-primary" name="continue" type="submit" value="Save &amp; continue editing">
                         <input class="btn btn-primary" name="finished" type="submit" value="Finished">
+                        <a class="btn btn-primary btn-danger" href="{% url lifeevent-delete lifeevent.id %}">Delete</a>
                     {% else %}
                         <input class="btn btn-primary" name="next" type="submit" value="Next">
                     {% endif %}

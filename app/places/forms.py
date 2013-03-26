@@ -20,9 +20,14 @@ class DeathChoice(AutoModelSelect2Field):
     queryset = Death.objects
 
 
+class EventChoice(AutoModelSelect2Field):
+    queryset = EventLocation.objects
+
+
 class AddPlaceForm(ModelForm):
-    birth_record = BirthChoice(required=False)
-    death_record = DeathChoice(required=False)
+    birth_event = BirthChoice(required=False)
+    death_event = DeathChoice(required=False)
+    life_event = EventChoice(required=False)
 
     class Meta:
         model = Place

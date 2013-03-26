@@ -53,6 +53,9 @@ class Person(GenericPerson):
     def get_absolute_url(self):
         return reverse('person-view', args=[str(self.id)])
 
+    def class_name(self):
+        return self.__class__.__name__
+
 
 class AlternativePersonName(models.Model):
     person = models.ForeignKey('Person')
@@ -75,6 +78,9 @@ class AlternativePersonName(models.Model):
     def get_absolute_url(self):
         return reverse('altname-view', args=[str(self.id)])
 
+    def class_name(self):
+        return self.__class__.__name__
+
 
 class LifeEvent(Event):
     person = models.ForeignKey('people.Person')
@@ -83,6 +89,9 @@ class LifeEvent(Event):
     event_type = models.ForeignKey('people.LifeEventType', blank=True, null=True)
 
     def __unicode__(self):
+        return '{}: {} ({})'.format(self.person, self.label, self.date_summary())
+
+    def label(self):
         return '{} ({})'.format(self.label, self.date_summary())
 
     def get_absolute_url(self):
@@ -105,6 +114,12 @@ class LifeEvent(Event):
             summary = ''
         return summary
 
+    def event_type(self):
+        return 'events'
+
+    def class_name(self):
+        return self.__class__.__name__
+
 
 class EventLocation(models.Model):
     lifeevent = models.ForeignKey('people.LifeEvent')
@@ -112,7 +127,16 @@ class EventLocation(models.Model):
     association = models.ForeignKey('people.EventLocationAssociation', blank=True, null=True)
 
     def __unicode__(self):
-        return '{} {} {}'.format(self.lifeevent, self.association, self.location)
+        summary = self.lifeevent.__unicode__()
+        if self.location:
+            summary += ' {} {}'.format(self.association, self.location)
+        return summary
+
+    def label(self):
+        return '{} {}'.format(self.association, self.location)
+
+    def class_name(self):
+        return self.__class__.__name__
 
 
 class EventLocationAssociation(RDFRelationship):
@@ -132,18 +156,39 @@ class Birth(Event):
         earliest = self.formatted_date('start_earliest')
         latest = self.formatted_date('start_latest')
         summary = '{} born '.format(self.person)
-        if earliest and latest:
-            summary += 'between {} and {}'.format(earliest, latest)
-        elif earliest:
-            summary += str(earliest)
+        if earliest:
+            if earliest and latest:
+                summary += 'between {} and {}'.format(earliest, latest)
+            elif earliest:
+                summary += earliest
             if self.location:
                 summary += ' in '
-        if self.location:
-            summary += self.location.__unicode__()
+        elif self.location:
+            summary = 'In {}'.format(self.location.__unicode__())
+        return summary
+
+    def label(self):
+        earliest = self.formatted_date('start_earliest')
+        latest = self.formatted_date('start_latest')
+        if earliest:
+            if earliest and latest:
+                summary = 'Between {} and {}'.format(earliest, latest)
+            elif earliest:
+                summary = earliest
+            if self.location:
+                summary += ' in '
+        elif self.location:
+            summary = 'In {}'.format(self.location.__unicode__())
         return summary
 
     def get_absolute_url(self):
         return reverse('birth-view', args=[str(self.id)])
+
+    def event_type(self):
+        return 'births'
+
+    def class_name(self):
+        return self.__class__.__name__
 
 
 class Death(Event):
@@ -155,18 +200,39 @@ class Death(Event):
         earliest = self.formatted_date('start_earliest')
         latest = self.formatted_date('start_latest')
         summary = '{} died '.format(self.person)
-        if earliest and latest:
-            summary += 'between {} and {}'.format(earliest, latest)
-        elif earliest:
-            summary += earliest
+        if earliest:
+            if earliest and latest:
+                summary += 'between {} and {}'.format(earliest, latest)
+            elif earliest:
+                summary += earliest
+        if self.location:
+            summary += ' in '
+        elif self.location:
+            summary = 'In {}'.format(self.location.__unicode__())
+        return summary
+
+    def label(self):
+        earliest = self.formatted_date('start_earliest')
+        latest = self.formatted_date('start_latest')
+        if earliest:
+            if earliest and latest:
+                summary = 'Between {} and {}'.format(earliest, latest)
+            elif earliest:
+                summary = earliest
             if self.location:
                 summary += ' in '
-        if self.location:
-            summary += self.location.__unicode__()
+        elif self.location:
+            summary = 'In {}'.format(self.location.__unicode__())
         return summary
 
     def get_absolute_url(self):
         return reverse('death-view', [str(self.id)])
+
+    def event_type(self):
+        return 'deaths'
+
+    def class_name(self):
+        return self.__class__.__name__
 
 
 class Family(models.Model):

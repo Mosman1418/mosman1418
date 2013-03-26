@@ -61,18 +61,19 @@ class AddPlace(CreateView):
         event_type = self.kwargs.get('event_type', None)
         event_id = self.kwargs.get('event_id', None)
         if event_type == 'births':
-            initial = {'birth_record': event_id}
+            initial = {'birth_event': event_id}
         elif event_type == 'deaths':
-            initial = {'death_record': event_id}
+            initial = {'death_event': event_id}
+        elif event_type == 'lifeevents':
+            initial = {'life_event': event_id}
         else:
-            initial = None
+            initial = {}
         return initial
 
     def get_success_url(self):
-        event_type = self.kwargs.get('event_type', None)
-        event_id = self.kwargs.get('event_id', None)
-        if event_type and event_id:
-            url = reverse_lazy('{}-update'.format(event_type[:-1]), args=[event_id])
+        if self.event:
+            event_type = self.event.__class__.__name__.lower()
+            url = reverse_lazy('{}-update'.format(event_type), args=[self.event.id])
         else:
             url = reverse_lazy('place-view', args=[self.object.id])
         return url
@@ -81,10 +82,21 @@ class AddPlace(CreateView):
         place = form.save(commit=False)
         place.added_by = self.request.user
         place.save()
-        birth = form.cleaned_data.get('birth_record', None)
+        birth = form.cleaned_data.get('birth_event', None)
+        death = form.cleaned_data.get('death_event', None)
+        life_event = form.cleaned_data.get('life_event', None)
         if birth:
-            birth.location = place
-            birth.save()
+            event = birth
+        elif death:
+            event = death
+        elif life_event:
+            event = life_event
+        else:
+            event = None
+        if event:
+            event.location = place
+            event.save()
+            self.event = event
         return HttpResponseRedirect(self.get_success_url())
 
 
