@@ -44,6 +44,16 @@
                         {% include '_form_field.html' %}
                     {% endwith %}
                 {% endif %}
+                {% if 'person_organisation' in form.initial.keys %}
+                    {% with label='Documenting relationship' field=form.person_organisation %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                {% endif %}
+                {% if 'address' in form.initial.keys %}
+                    {% with label='Documenting address' field=form.address %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                {% endif %}
                 {% if source.id %}
                     {% with label='Source type' field=form.source_type extra='url'%}
                         {% include '_form_field.html' %}

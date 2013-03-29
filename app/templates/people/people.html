@@ -3,7 +3,7 @@
         <div class="row">
             {% with current='people' %}{% include '_sidenav.html' %}{% endwith %}
             <div class="span8">
-                <h1>People</h1>
+                <h1>People {% if status == 'pending' %}awaiting approval{% endif %}</h1>
                 <ul>
                 {% for person in content %}
                     <li>

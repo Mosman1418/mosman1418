@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load django_select2_tags %}
+{% block title %}Log in{% endblock %}
+{% block extra_scripts %}
+{% import_django_select2_js %}
+<script src="{{ STATIC_URL }}js/add-place.js"></script>
+{% endblock %}
+{% block extra_styles %}
+{% import_django_select2_css %}
+{% endblock %}
+{% block content %}
+    <div class="row">
+        {% with current='none' %}{% include '_sidenav.html' %}{% endwith %}
+        <div class="span10">
+            <h2>{% if place.id %}Update{% else %}Add{% endif %} a place</h2>
+            <form action="" method="post" class="form-horizontal">{% csrf_token %}
+                {% if 'person' in form.initial.keys %}
+                    {% with label='Adding address to' field=form.person %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                {% endif %}
+                {% if 'person_address' in form.initial.keys %}
+                    {% with label='Changing address of' field=form.person_address %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                {% endif %}
+                {% with label='Building name' field=form.building_name %}
+                    {% include '_form_field.html' %}
+                {% endwith %}
+                {% with label='Street number' field=form.street_number %}
+                    {% include '_form_field.html' %}
+                {% endwith %}
+                {% with label='Street name' field=form.street_name %}
+                    {% include '_form_field.html' %}
+                {% endwith %}
+                {% with label='Mosman street' field=form.mosman_street %}
+                    {% include '_form_field.html' %}
+                {% endwith %}
+                {% if address.id %}
+                    {% url place-add-entity 'address' address.id as addplace %}
+                    {% with label='Place' field=form.place create_url=addplace create_type='place' %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                {% elif 'person_address' in form.initial.keys or 'person' in form.initial.keys %}
+                    {% with label='Place' field=form.place %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                {% endif %}
+                <div class="form-actions">
+                    {% if address.id %}
+                        <input class="btn btn-primary" name="continue" type="submit" value="Save &amp; continue editing">
+                        <input class="btn btn-primary" name="finished" type="submit" value="Finished">
+                        <a class="btn btn-primary btn-danger" href="{% url address-delete address.id %}">Delete</a>
+                    {% else %}
+                        <input class="btn btn-primary" name="next" type="submit" value="Next">
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

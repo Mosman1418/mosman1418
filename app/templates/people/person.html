@@ -1,10 +1,19 @@
 {% extends 'base.html' %}
+{% load guardian_tags %}
 {% block content %}
+        {% get_obj_perms request.user for content as 'perms' %}
         <div class="row">
             {% with current='people' %}{% include '_sidenav.html' %}{% endwith %}
             <div class="span8">
                 <h1>{{ content }}</h1>
-
+                {% if content.status == 'pending' %}
+                <div class="alert">
+                    This entry is awaiting approval.
+                    {% if 'approve_person' in perms %}
+                        <a class="btn btn-mini btn-primary" href="{% url person-approve content.id %}">Approve</a>
+                    {% endif %}
+                </div>
+                {% endif %}
 
                 <h4>Birth</h4>
                 {% if content.birth_set.all %}

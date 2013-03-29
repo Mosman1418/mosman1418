@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}Log in{% endblock %}
+{% block content %}
+    <div class="row">
+        {% with current='none' %}{% include '_sidenav.html' %}{% endwith %}
+        <div class="span10">
+            <h2>
+                Approve
+            </h2>
+            <form action="" method="post" class="form-horizontal">{% csrf_token %}
+                {% if form.errors %}
+    <!-- Error messaging -->
+    <div id="errors">
+        <div class="inner">
+            <p>There were some errors in the information you entered. Please correct the following:</p>
+            {{ form.non_field_errors }}
+            <ul>
+                {% for field in form %}
+                    {% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <!-- /Error messaging -->
+{% endif %}
+                <div class="controls">
+                    <a href="{{ person.get_absolute_url }}">{{ person }}</a>
+                </div>
+                <div class="form-field control-group">
+                    <label class="control-label">Added by</label>
+                    <div class="controls">
+                        {{ person.added_by }} (<a href="mailto:{{ person.added_by.email }}">{{ person.added_by.email }}</a>) on {{ person.date_created }}
+                    </div>
+                </div>
+                {% with label='Status' field=form.status %}
+                    {% include '_form_field.html' %}
+                {% endwith %}
+
+                <div class="form-actions">
+                    <input class="btn btn-primary" type="submit" value="Save">
+                </div>
+                </form>
+            </div>
+        </div>
+{% endblock %}

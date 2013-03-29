@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from app.linkeddata.models import RDFClass, RDFRelationship, RDFType
-from app.generic.models import StandardMetadata, Event, Period, Person as GenericPerson, Group
+from app.generic.models import StandardMetadata, Event, Period, Person as GenericPerson, Group, ShortDateMixin, LongDateMixin
 
 
 class Person(GenericPerson):
@@ -20,7 +20,14 @@ class Person(GenericPerson):
     images = models.ManyToManyField('PeopleImage', blank=True, null=True)
     stories = models.ManyToManyField('PeopleStory', blank=True, null=True)
     public = models.BooleanField(default=False)  # Display on website
-    mosman_related = models.BooleanField(default=True)  # Appear in main people lists (not just authors)
+    status = models.CharField(max_length=15, choices=(
+                                                ('confirmed', 'confirmed'),
+                                                ('pending', 'pending'),
+                                                ('rejected', 'rejected'),
+                                                ('non-service', 'non-service')
+                                                ))
+    mosman_connection = models.TextField(blank=True, null=True)
+    admin_note = models.TextField(blank=True, null=True)
 
     def __unicode__(self):
         if self.display_name:
@@ -49,6 +56,9 @@ class Person(GenericPerson):
 
     class Meta:
         ordering = ['family_name', 'other_names']
+        permissions = (
+                ('approve_person', 'Approve person'),
+            )
 
     def get_absolute_url(self):
         return reverse('person-view', args=[str(self.id)])
@@ -239,7 +249,7 @@ class Family(models.Model):
     family_name = models.CharField(max_length=100)
 
 
-class Organisation(models.Model):
+class Organisation(Group):
     name = models.CharField(max_length=250)
     short_name = models.CharField(max_length=100, null=True, blank=True)
     public = models.BooleanField(default=False)  # Display on website
@@ -306,13 +316,22 @@ class PersonRole(RDFRelationship):
 class PersonAddress(models.Model):
     person = models.ForeignKey('Person')
     address = models.ForeignKey('places.Address')
-    start_date = models.DateField(blank=True, null=True)
-    start_date_month = models.BooleanField(default=False)
-    start_date_day = models.BooleanField(default=False)
-    end_date = models.DateField(blank=True, null=True)
-    end_date_month = models.BooleanField(default=False)
-    end_date_day = models.BooleanField(default=False)
+    start_earliest_date = models.DateField(blank=True, null=True)
+    start_earliest_month = models.BooleanField(default=False)
+    start_earliest_day = models.BooleanField(default=False)
+    end_earliest_date = models.DateField(blank=True, null=True)
+    end_earliest_month = models.BooleanField(default=False)
+    end_earliest_day = models.BooleanField(default=False)
     sources = models.ManyToManyField('sources.Source', blank=True, null=True)
+
+    def __unicode__(self):
+        return '{} lived at {}'.format(self.person, self.address)
+
+    def summary(self):
+        return 'lived at {}'.format(self.address)
+
+    def class_name(self):
+        return self.__class__.__name__
 
 
 class PersonAssociatedPlace(models.Model):
@@ -350,10 +369,24 @@ class PersonAssociatedPerson(models.Model):
         return reverse('persontoperson-view', args=[str(self.id)])
 
 
-class PersonAssociatedOrganisation(models.Model):
+class PersonAssociatedOrganisation(StandardMetadata, ShortDateMixin):
     person = models.ForeignKey('Person')
     organisation = models.ForeignKey('Organisation')
-    association = models.ForeignKey('PersonAssociation')
+    association = models.ForeignKey('OrgAssociation', null=True, blank=True)
+    sources = models.ManyToManyField('sources.Source', blank=True, null=True)
+
+    def __unicode__(self):
+        if self.organisation:
+            summary = '{} {} {}'.format(self.person, self.association, self.organisation)
+        else:
+            summary = '{} {}'.format(self.person, self.association)
+        return summary
+
+    def summary(self):
+        return '{} &ndash; {}'.format(self.association, self.organisation)
+
+    def get_absolute_url(self):
+        return reverse('personorganisation-view', args=[str(self.id)])
 
 
 class PersonAssociatedObject(models.Model):
@@ -365,23 +398,39 @@ class PersonAssociatedObject(models.Model):
 class PersonAssociatedEvent(models.Model):
     person = models.ForeignKey('Person')
     event = models.ForeignKey('events.Event')
-    association = models.ForeignKey('PersonAssociation')
+    association = models.ForeignKey('EventAssociation')
 
 
 class PersonAssociatedSource(models.Model):
     person = models.ForeignKey('Person')
     source = models.ForeignKey('sources.Source')
-    association = models.ForeignKey('PersonAssociation')
+    association = models.ForeignKey('SourceAssociation')
 
 
 class PersonAssociation(RDFRelationship):
     pass
 
 
+class SourceAssociation(RDFRelationship):
+    pass
+
+
+class EventAssociation(RDFRelationship):
+    pass
+
+
+class OrgAssociation(RDFRelationship):
+    pass
+
+
+class ObjectAssociation(RDFRelationship):
+    pass
+
+
 class OrganisationAssociatedSource(models.Model):
     organisation = models.ForeignKey('Organisation')
     source = models.ForeignKey('sources.Source')
-    association = models.ForeignKey('PersonAssociation')
+    association = models.ForeignKey('SourceAssociation')
 
 
 class LifeEventType(RDFType):

@@ -14,7 +14,7 @@ class RDFSchema(models.Model):
 class RDFProperty(models.Model):
     schema = models.ForeignKey('RDFSchema')
     rdf_property = models.CharField(max_length=50)
-    inverse = models.CharField(max_length=50, blank=True, null=True)
+    inverse_rdf_property = models.CharField(max_length=50, blank=True, null=True)
 
     def __unicode__(self):
         return '%s: %s' % (self.schema.prefix, self.rdf_property)
@@ -31,6 +31,7 @@ class RDFClass(models.Model):
 class RDFRelationship(models.Model):
     '''Generic relationship.'''
     label = models.CharField(max_length=50)
+    inverse_label = models.CharField(max_length=50, blank=True, null=True)
     rdf_property = models.ManyToManyField('linkeddata.RDFProperty', blank=True, null=True)
 
     def __unicode__(self):

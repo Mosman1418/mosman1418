@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Log in{% endblock %}
+{% block extra_scripts %}
+<script src="{{ STATIC_URL }}js/select2.min.js"></script>
+<script src="{{ STATIC_URL }}js/add-person.js"></script>
+{% endblock %}
+{% block extra_styles %}
+<link href="{{ STATIC_URL }}css/select2.css" rel="stylesheet">
+{% endblock %}
+{% block content %}
+    <div class="row">
+        {% with current='none' %}{% include '_sidenav.html' %}{% endwith %}
+        <div class="span10">
+            <h2>
+                {% if person %}
+                    Update details for {{ organisation }}
+                {% else %}
+                    Add an organisation
+                {% endif %}
+            </h2>
+            <form action="" method="post" class="form-horizontal">{% csrf_token %}
+                {% if 'associated_person' in form.initial %}
+                    {% with label='Associated with' field=form.associated_person %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                {% endif %}
+                {% if 'person' in form.initial %}
+                    {% with label='Associated with' field=form.person %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                {% endif %}
+                <fieldset>
+                    <legend>Basic details</legend>
+                    {% with label='Name to display' field=form.display_name %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                    {% with label='Name' field=form.name %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                </fieldset>
+                <div class="form-actions">
+                    {% if person %}
+                        <input class="btn btn-primary" type="submit" value="Save">
+                    {% else %}
+                        <input class="btn btn-primary" type="submit" value="Next">
+                    {% endif %}
+                </div>
+                </form>
+            </div>
+        </div>
+{% endblock %}

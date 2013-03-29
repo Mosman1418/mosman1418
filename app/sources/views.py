@@ -124,6 +124,30 @@ class AddSourceView(CreateView):
             creator_link = SourcePerson(person=creator, source=self.object, role=role)
             creator_link.save()
 
+    def get_initial(self):
+        initial = {}
+        entity_type = self.kwargs.get('entity_type', None)
+        entity_id = self.kwargs.get('entity_id', None)
+        if entity_type == 'person':
+            initial['main_people'] = [entity_id]
+        elif entity_type == 'organisation':
+            initial['main_organisations'] = [entity_id]
+        event_type = self.kwargs.get('event_type', None)
+        event_id = self.kwargs.get('event_id', None)
+        if event_type == 'births':
+            initial['birth_record'] = event_id
+        elif event_type == 'deaths':
+            initial['death_record'] = event_id
+        assoc_type = self.kwargs.get('assoc_type', None)
+        assoc_id = self.kwargs.get('assoc_id', None)
+        if assoc_type == 'people':
+            initial['associated_people'] = assoc_id
+        elif assoc_type == 'personorganisation':
+            initial['person_organisation'] = assoc_id
+        elif assoc_type == 'address':
+            initial['address'] = assoc_id
+        return initial
+
     def form_valid(self, form):
         self.form = form
         source = form.save(commit=False)
@@ -155,7 +179,6 @@ class AddSourceView(CreateView):
          #   link.person_set.add(Organisation.objects.get(id=int(organisation)))
         birth = form.cleaned_data.get('birth_record', None)
         if birth:
-            print birth
             birth.sources.add(source)
             birth.save()
         death = form.cleaned_data.get('death_record', None)
@@ -166,6 +189,14 @@ class AddSourceView(CreateView):
         if associated_people:
             associated_people.sources.add(source)
             associated_people.save()
+        person_organisation = form.cleaned_data.get('person_organisation', None)
+        if person_organisation:
+            person_organisation.sources.add(source)
+            person_organisation.save()
+        person_address = form.cleaned_data.get('address', None)
+        if person_address:
+            person_address.sources.add(source)
+            person_address.save()
         # Permissions
         assign('sources.change_source', self.request.user, source)
         assign('sources.delete_source', self.request.user, source)
@@ -287,26 +318,6 @@ class AddSourceView(CreateView):
                         association=relation_type
                         )
             return True
-
-    def get_initial(self):
-        initial = {}
-        entity_type = self.kwargs.get('entity_type', None)
-        entity_id = self.kwargs.get('entity_id', None)
-        if entity_type == 'person':
-            initial['main_people'] = [entity_id]
-        elif entity_type == 'organisation':
-            initial['main_organisations'] = [entity_id]
-        event_type = self.kwargs.get('event_type', None)
-        event_id = self.kwargs.get('event_id', None)
-        if event_type == 'births':
-            initial['birth_record'] = event_id
-        elif event_type == 'deaths':
-            initial['death_record'] = event_id
-        assoc_type = self.kwargs.get('assoc_type', None)
-        assoc_id = self.kwargs.get('assoc_id', None)
-        if assoc_type == 'people':
-            initial['associated_people'] = assoc_id
-        return initial
 
 
 class UpdateSourceView(UpdateView):

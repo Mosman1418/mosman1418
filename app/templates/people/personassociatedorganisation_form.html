@@ -12,18 +12,22 @@
     <div class="row">
         {% with current='none' %}{% include '_sidenav.html' %}{% endwith %}
         <div class="span10">
-            <h2>{% if personassociatedperson.id %}Update{% else %}Add{% endif %} a related person</h2>
+            <h2>{% if personassociatedorganisation.id %}Update{% else %}Add{% endif %} a person&rsquo;s association</h2>
             <form action="" method="post" class="form-horizontal">{% csrf_token %}
 
                 {% with label='Person' field=form.person %}
                     {% include '_form_field.html' %}
                 {% endwith %}
-                {% with label='Relation' field=form.association %}
+                {% if 'person' in form.initial.keys %}
+                    {% url organisation-add-entity 'person' form.initial.person as addorg %}
+                {% elif personassociatedorganisation.id %}
+                    {% url organisation-add-entity 'personorganisation' personassociatedorganisation.id as addorg %}
+                {% endif %}
+                {% with label='Organisation' field=form.organisation create_url=addorg create_type='organisation' %}
                     {% include '_form_field.html' %}
                 {% endwith %}
-                {% if personassociatedperson.id %}
-                    {% url person-add-person personassociatedperson.id as addperson %}
-                    {% with label='Related person' field=form.associated_person create_url=addperson create_type='person' %}
+                {% if personassociatedorganisation.id %}
+                    {% with label='Association' field=form.association %}
                         {% include '_form_field.html' %}
                     {% endwith %}
                     <fieldset>
@@ -39,20 +43,16 @@
                         {{ form.end_earliest_month_known }}
                         {{ form.end_earliest_day_known }}
                     </fieldset>
-
-                    <fieldset>
-                        <legend>Sources</legend>
-                        {% url source-add-association 'people' personassociatedperson.id as addsource %}
-                        {% with label='Sources' field=form.sources create_url=addsource create_type='source' %}
-                            {% include '_form_field.html' %}
-                        {% endwith %}
-                    </fieldset>
+                    {% url source-add-association 'personorganisation' personassociatedorganisation.id as addsource %}
+                    {% with label='Sources' field=form.sources create_url=addsource create_type='source' %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
                 {% endif %}
                 <div class="form-actions">
-                    {% if personassociatedperson.id %}
+                    {% if personassociatedorganisation.id %}
                         <input class="btn btn-primary" name="continue" type="submit" value="Save &amp; continue editing">
                         <input class="btn btn-primary" name="finished" type="submit" value="Finished">
-                        <a class="btn btn-primary btn-danger" href="{% url persontoperson-delete personassociatedperson.id %}">Delete</a>
+                        <a class="btn btn-primary btn-danger" href="{% url personorganisation-delete personassociatedorganisation.id %}">Delete</a>
                     {% else %}
                         <input class="btn btn-primary" name="next" type="submit" value="Next">
                     {% endif %}

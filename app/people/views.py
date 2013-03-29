@@ -6,9 +6,12 @@ from django.views.generic.edit import FormView
 import json
 from django.http import HttpResponse, HttpResponseRedirect
 from guardian.decorators import permission_required
+from guardian.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.contrib.contenttypes.models import ContentType
+from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic import ListView
 from calendar import monthrange
 import re
 from urllib2 import Request, urlopen, URLError, HTTPError
@@ -118,6 +121,7 @@ class PersonListView(LinkedDataListView):
     model = Person
     path = '/people/results'
     template_name = 'people/people'
+    queryset = Person.objects.filter(status='confirmed')
 
     def make_graph(self, entities):
         namespaces = {}
@@ -133,6 +137,19 @@ class PersonListView(LinkedDataListView):
             graph.add((this_person, namespaces['rdf']['type'], namespaces['foaf']['Person']))
             graph.add((this_person, namespaces['rdfs']['label'], Literal(str(entity))))
         return graph
+
+
+class SuggestedPersonListView(PermissionRequiredMixin, ListView):
+    model = Person
+    template_name = 'people/people.html'
+    queryset = Person.objects.filter(status='pending')
+    context_object_name = 'content'
+    permission_required = 'people.approve_person'
+
+    def get_context_data(self, **kwargs):
+        context = super(SuggestedPersonListView, self).get_context_data(**kwargs)
+        context['status'] = 'pending'
+        return context
 
 
 class AltNameView(LinkedDataView):
@@ -305,9 +322,95 @@ class ImageListView(LinkedDataListView):
         return graph
 
 
-class AddPerson(CreateView):
+class OrganisationView(LinkedDataView):
+    model = Organisation
+    path = '/organisations/%s'
+    template_name = 'people/organisation'
+
+    def make_graph(self, entity):
+        namespaces = {}
+        graph = Graph()
+        schemas = RDFSchema.objects.all()
+        for schema in schemas:
+            namespace = Namespace(schema.uri)
+            graph.bind(schema.prefix, namespace)
+            namespaces[schema.prefix] = namespace
+        host_ns = Namespace('http://%s' % (Site.objects.get_current().domain))
+        this_person = URIRef(host_ns[entity.get_absolute_url()])
+        graph.add((this_person, namespaces['rdf']['type'], namespaces['foaf']['Person']))
+        graph.add((this_person, namespaces['rdfs']['label'], Literal(str(entity))))
+        return graph
+
+
+class OrganisationListView(LinkedDataListView):
+    model = Organisation
+    path = '/organisations/results'
+    template_name = 'people/organisations'
+
+    def make_graph(self, entities):
+        namespaces = {}
+        graph = Graph()
+        schemas = RDFSchema.objects.all()
+        for schema in schemas:
+            namespace = Namespace(schema.uri)
+            graph.bind(schema.prefix, namespace)
+            namespaces[schema.prefix] = namespace
+        host_ns = Namespace('http://%s' % (Site.objects.get_current().domain))
+        for entity in entities:
+            this_person = URIRef(host_ns[entity.get_absolute_url()])
+            graph.add((this_person, namespaces['rdf']['type'], namespaces['foaf']['Person']))
+            graph.add((this_person, namespaces['rdfs']['label'], Literal(str(entity))))
+        return graph
+
+
+class SuggestPerson(LoginRequiredMixin, CreateView):
+    '''
+    A logged-in user can suggest a service person for inclusion.
+    The entry is marked "pending" until an admin user inspects it.
+    '''
     form_class = AddPersonForm
     model = Person
+
+    def form_valid(self, form):
+        self.form = form
+        person = form.save(commit=False)
+        person.added_by = self.request.user
+        person.status = 'pending'
+        person.save()
+        self.object = person
+        assign('people.change_person', self.request.user, person)
+        assign('people.delete_person', self.request.user, person)
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_context_data(self, **kwargs):
+        context = super(SuggestPerson, self).get_context_data(**kwargs)
+        context['status'] = 'pending'
+        return context
+
+    def get_success_url(self):
+        return reverse_lazy('person-suggest-response', args=[self.object.id])
+
+
+class SuggestPersonResponse(PermissionRequiredMixin, TemplateView):
+    '''
+    Thank user for suggested person.
+    Provide update link to add more details.
+    '''
+    template_name = 'people/suggest_person_thanks.html'
+    permission_required = 'people.add_person'
+
+    def get_context_data(self, **kwargs):
+        context = super(SuggestPersonResponse, self).get_context_data(**kwargs)
+        person_id = self.kwargs.get('person_id', None)
+        if person_id:
+            context['person'] = Person.objects.get(id=person_id)
+        return context
+
+
+class AddPerson(PermissionRequiredMixin, CreateView):
+    form_class = AddPersonForm
+    model = Person
+    permission_required = 'people.add_person'
 
     def form_valid(self, form):
         self.form = form
@@ -318,18 +421,36 @@ class AddPerson(CreateView):
         if related_person:
             related_person.associated_person = person
             related_person.save()
+        source = form.cleaned_data.get('source', None)
+        creator_type = form.cleaned_data.get('creator_type', None)
+        if source and creator_type:
+            role = SourceRole.objects.get(label=creator_type)
+            creator, created = SourcePerson.objects.get_or_create(
+                        person=person,
+                        source=source,
+                        role=role
+                    )
         return HttpResponseRedirect(self.get_success_url())
 
     def get_initial(self):
+        initial = {}
         person_id = self.kwargs.get('person_id', None)
-        initial = {'related_person': person_id}
+        if person_id:
+            initial['related_person'] = person_id
+        source_id = self.kwargs.get('source_id', None)
+        creator_type = self.kwargs.get('creator_type', None)
+        if source_id and creator_type:
+            initial['source'] = source_id
+            initial['creator_type'] = creator_type
         return initial
 
     def get_success_url(self):
         related_person = self.form.cleaned_data.get('related_person', None)
-        print related_person.id
+        source = self.form.cleaned_data.get('source', None)
         if related_person:
             url = reverse_lazy('persontoperson-update', args=[related_person.id])
+        elif source:
+            url = reverse_lazy('source-update', args=[source.id])
         else:
             url = reverse_lazy('person-update', args=[self.object.id])
         print url
@@ -366,6 +487,13 @@ class UpdatePerson(UpdateView):
         person = form.save(commit=False)
         person.save()
         return HttpResponseRedirect(reverse('person-view', args=[person.id]))
+
+
+class ApprovePerson(PermissionRequiredMixin, UpdateView):
+    model = Person
+    form_class = ApprovePersonForm
+    permission_required = 'people.approve_person'
+    template_name = 'people/person_approve.html'
 
 
 class DeletePerson(DeleteView):
@@ -634,6 +762,89 @@ class DeleteDeath(DeleteView):
         return reverse_lazy('person-update', args=[self.person_pk])
 
 
+class AddOrganisation(CreateView):
+    form_class = AddOrganisationForm
+    model = Organisation
+
+    def form_valid(self, form):
+        self.form = form
+        org = form.save(commit=False)
+        org.added_by = self.request.user
+        org.save()
+        person = form.cleaned_data.get('person', None)
+        associated_person = form.cleaned_data.get('associated_person', None)
+        if person:
+            person_org = PersonAssociatedOrganisation.objects.create(
+                    person=person,
+                    organisation=org,
+                    added_by=self.request.user
+                )
+            self.entity = person_org
+        elif associated_person:
+            associated_person.organisation = org
+            associated_person.save()
+            self.entity = associated_person
+        else:
+            self.entity = None
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_initial(self):
+        entity_type = self.kwargs.get('entity_type', None)
+        entity_id = self.kwargs.get('entity_id', None)
+        if entity_type == 'person':
+            initial = {'person': entity_id}
+        elif entity_type == 'personaddress':
+            initial = {'associated_person': entity_id}
+        else:
+            initial = {}
+        return initial
+
+    def get_success_url(self):
+        if self.entity:
+            url = reverse_lazy('personorganisation-update', args=[self.entity.id])
+        else:
+            url = reverse_lazy('organisation-update', args=[self.object.id, ])
+        return url
+
+
+class UpdateOrganisation(UpdateView):
+    form_class = AddOrganisationForm
+    model = Organisation
+
+    def prepare_date(self, name):
+        date = getattr(self.object, name)
+        name = name[:-5]
+        if date:
+            year = date.year
+            month = date.month
+            day = date.day
+            if getattr(self.object, '{}_month'.format(name)) is False:
+                month = 0
+            if getattr(self.object, '{}_day'.format(name)) is False:
+                day = 0
+            date = '{}-{}-{}'.format(year, month, day)
+        return date
+
+    def get_initial(self):
+        initial = {}
+        initial['birth_earliest_date'] = self.prepare_date('birth_earliest_date')
+        initial['birth_latest_date'] = self.prepare_date('birth_latest_date')
+        initial['death_earliest_date'] = self.prepare_date('death_earliest_date')
+        initial['death_latest_date'] = self.prepare_date('death_latest_date')
+        return initial
+
+    def form_valid(self, form):
+        org = form.save(commit=False)
+        org.save()
+        return HttpResponseRedirect(reverse('organisation-view', args=[person.id]))
+
+
+class DeleteOrganisation(DeleteView):
+    model = Organisation
+    template_name = 'people/confirm_delete.html'
+    success_url = reverse_lazy('organisation-list')
+
+
 class AddPersonAssociatedPerson(CreateView):
     model = PersonAssociatedPerson
     form_class = AddAssociatedPersonForm
@@ -661,9 +872,9 @@ class UpdatePersonAssociatedPerson(UpdateView):
             year = date.year
             month = date.month
             day = date.day
-            if getattr(self.object, '{}_month_known'.format(name)) is False:
+            if getattr(self.object, '{}_month'.format(name)) is False:
                 month = 0
-            if getattr(self.object, '{}_day_known'.format(name)) is False:
+            if getattr(self.object, '{}_day'.format(name)) is False:
                 day = 0
             date = '{}-{}-{}'.format(year, month, day)
         return date
@@ -691,6 +902,130 @@ class DeletePersonAssociatedPerson(DeleteView):
     def delete(self, request, *args, **kwargs):
         self.person_pk = self.get_object().person.pk
         return super(DeletePersonAssociatedPerson, self).delete(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse_lazy('person-update', args=[self.person_pk])
+
+
+class AddPersonAssociatedOrganisation(CreateView):
+    model = PersonAssociatedOrganisation
+    form_class = AddAssociatedOrganisationForm
+
+    def get_initial(self):
+        person_id = self.kwargs.get('person_id', None)
+        initial = {'person': person_id}
+        return initial
+
+    def form_valid(self, form):
+        assoc = form.save(commit=False)
+        assoc.added_by = self.request.user
+        assoc.save()
+        return HttpResponseRedirect(reverse('personorganisation-update', args=[assoc.id]))
+
+
+class UpdatePersonAssociatedOrganisation(UpdateView):
+    model = PersonAssociatedOrganisation
+    form_class = AddAssociatedOrganisationForm
+
+    def prepare_date(self, name):
+        date = getattr(self.object, name)
+        name = name[:-5]
+        if date:
+            year = date.year
+            month = date.month
+            day = date.day
+            if getattr(self.object, '{}_month'.format(name)) is False:
+                month = 0
+            if getattr(self.object, '{}_day'.format(name)) is False:
+                day = 0
+            date = '{}-{}-{}'.format(year, month, day)
+        return date
+
+    def get_initial(self):
+        initial = {}
+        initial['start_earliest_date'] = self.prepare_date('start_earliest_date')
+        initial['end_earliest_date'] = self.prepare_date('end_earliest_date')
+        return initial
+
+    def get_success_url(self):
+        if 'continue' in self.request.POST:
+            url = reverse_lazy('personorganisation-update', args=[self.object.id])
+        else:
+            url = reverse_lazy('person-update', args=[self.object.person.id])
+        return url
+
+
+class DeletePersonAssociatedOrganisation(DeleteView):
+    model = PersonAssociatedOrganisation
+    template_name = 'people/confirm_delete.html'
+
+    def delete(self, request, *args, **kwargs):
+        self.person_pk = self.get_object().person.pk
+        return super(DeletePersonAssociatedOrganisation, self).delete(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse_lazy('person-update', args=[self.person_pk])
+
+
+class AddPersonAddress(CreateView):
+    model = PersonAddress
+    form_class = AddPersonAddressForm
+
+    def get_initial(self):
+        person_id = self.kwargs.get('person_id', None)
+        initial = {'person': person_id}
+        return initial
+
+    def form_valid(self, form):
+        address = form.save(commit=False)
+        address.added_by = self.request.user
+        address.save()
+        assign('people.change_personaddress', self.request.user, address)
+        assign('people.delete_personaddress', self.request.user, address)
+        return HttpResponseRedirect(reverse('personaddress-update', args=[address.id]))
+
+
+class UpdatePersonAddress(UpdateView):
+    model = PersonAddress
+    form_class = AddPersonAddressForm
+
+    def prepare_date(self, name):
+        date = getattr(self.object, name)
+        name = name[:-5]
+        if date:
+            year = date.year
+            month = date.month
+            day = date.day
+            if getattr(self.object, '{}_month_known'.format(name)) is False:
+                month = 0
+            if getattr(self.object, '{}_day_known'.format(name)) is False:
+                day = 0
+            date = '{}-{}-{}'.format(year, month, day)
+        return date
+
+    def get_initial(self):
+        initial = {}
+        initial['start_earliest_date'] = self.prepare_date('start_earliest_date')
+        #initial['start_latest_date'] = self.prepare_date('start_latest_date')
+        initial['end_earliest_date'] = self.prepare_date('end_earliest_date')
+        #initial['end_latest_date'] = self.prepare_date('end_latest_date')
+        return initial
+
+    def get_success_url(self):
+        if 'continue' in self.request.POST:
+            url = reverse_lazy('personaddress-update', args=[self.object.id])
+        else:
+            url = reverse_lazy('person-update', args=[self.object.person.id])
+        return url
+
+
+class DeletePersonAddress(DeleteView):
+    model = PersonAddress
+    template_name = 'people/confirm_delete.html'
+
+    def delete(self, request, *args, **kwargs):
+        self.person_pk = self.get_object().person.pk
+        return super(DeletePersonAddress, self).delete(request, *args, **kwargs)
 
     def get_success_url(self):
         return reverse_lazy('person-update', args=[self.person_pk])

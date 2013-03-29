@@ -29,7 +29,7 @@
                             </div>
                         {% endif %}
                         <div class="controls">
-                            {{ form.location }} <a href="{% url place-add-event event_id=death.id event_type='deaths' %}" class="btn btn-mini">Create a new place</a>
+                            {{ form.location }} <a href="{% url place-add-entity entity_id=death.id entity_type='deaths' %}" class="btn btn-mini">Create a new place</a>
                         </div>
                     </div>
                     <div class="form-field control-group">

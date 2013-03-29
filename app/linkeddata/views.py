@@ -129,7 +129,10 @@ class LinkedDataListView(LinkedDataView):
     def get(self, request, format=None):
         context = {}
         if format:
-            results = self.model.objects.select_related().all()
+            if self.queryset:
+                results = self.queryset
+            else:
+                results = self.model.objects.select_related().all()
             paginator = Paginator(results, 25)
             page = request.GET.get('page', '1')
             try:

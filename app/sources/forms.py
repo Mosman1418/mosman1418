@@ -133,6 +133,14 @@ class AddSourceForm(ModelForm, DateSelectMixin):
                 queryset=PersonAssociatedPerson.objects.all(),
                 required=False,
                 widget=forms.Select(attrs={'readonly': 'readonly'}))
+    address = forms.ModelChoiceField(
+                queryset=PersonAddress.objects.all(),
+                required=False,
+                widget=forms.Select(attrs={'readonly': 'readonly'}))
+    person_organisation = forms.ModelChoiceField(
+                queryset=PersonAssociatedOrganisation.objects.all(),
+                required=False,
+                widget=forms.Select(attrs={'readonly': 'readonly'}))
 
     def clean(self):
         cleaned_data = super(AddSourceForm, self).clean()

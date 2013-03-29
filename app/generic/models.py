@@ -11,6 +11,60 @@ class StandardMetadata(models.Model):
     date_modified = models.DateTimeField(auto_now=True)
     added_by = models.ForeignKey(User)
 
+    def class_name(self):
+        return self.__class__.__name__
+
+    class Meta:
+        abstract = True
+
+
+class ShortDateMixin(models.Model):
+    start_earliest_date = models.DateField(null=True, blank=True)
+    start_earliest_month = models.BooleanField(default=False)
+    start_earliest_day = models.BooleanField(default=False)
+    end_earliest_date = models.DateField(null=True, blank=True)
+    end_earliest_month = models.BooleanField(default=False)
+    end_earliest_day = models.BooleanField(default=False)
+
+    def formatted_date(self, date_name):
+        months = calendar.month_name
+        date_obj = getattr(self, '{}_date'.format(date_name))
+        month = getattr(self, '{}_month'.format(date_name))
+        day = getattr(self, '{}_day'.format(date_name))
+        if date_obj and month and day:
+            date_str = '{} {} {}'.format(date_obj.day, months[date_obj.month], date_obj.year)
+        elif date_obj and month:
+            date_str = '{} {}'.format(months[date_obj.month], date_obj.year)
+        elif date_obj:
+            date_str = str(date_obj.year)
+        else:
+            date_str = None
+        return date_str
+
+    def start_earliest(self):
+        return self.formatted_date('start_earliest')
+
+    def end_earliest(self):
+        return self.formatted_date('end_earliest')
+
+    class Meta:
+        abstract = True
+
+
+class LongDateMixin(ShortDateMixin):
+    start_latest_date = models.DateField(null=True, blank=True)
+    start_latest_month = models.BooleanField(default=False)
+    start_latest_day = models.BooleanField(default=False)
+    end_latest_date = models.DateField(null=True, blank=True)
+    end_latest_month = models.BooleanField(default=False)
+    end_latest_day = models.BooleanField(default=False)
+
+    def start_latest(self):
+        return self.formatted_date('start_latest')
+
+    def end_latest(self):
+        return self.formatted_date('end_latest')
+
     class Meta:
         abstract = True
 
@@ -49,7 +103,7 @@ class Person(StandardMetadata):
         return self.display_name
 
 
-class Group(StandardMetadata):
+class Group(StandardMetadata, ShortDateMixin):
     display_name = models.CharField(max_length=200)
     description = models.TextField(blank=True, null=True)
 

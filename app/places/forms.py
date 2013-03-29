@@ -24,6 +24,11 @@ class EventChoice(AutoModelSelect2Field):
     queryset = EventLocation.objects
 
 
+class PlaceChoice(AutoModelSelect2Field):
+    queryset = Place.objects
+    search_fields = ['display_name__istartswith', 'place_name__istartswith']
+
+
 class AddPlaceForm(ModelForm):
     birth_event = BirthChoice(required=False)
     death_event = DeathChoice(required=False)
@@ -33,3 +38,23 @@ class AddPlaceForm(ModelForm):
         model = Place
         exclude = ('added_by', )
 
+
+class AddAddressForm(ModelForm):
+    person = forms.ModelChoiceField(
+            queryset=Person.objects.all(),
+            required=False,
+            widget=forms.Select(attrs={'readonly': 'readonly'})
+        )
+    person_address = forms.ModelChoiceField(
+            queryset=PersonAddress.objects.all(),
+            required=False,
+            widget=forms.Select(attrs={'readonly': 'readonly'})
+        )
+    place = PlaceChoice(required=False)
+
+    class Meta:
+        model = Address
+        exclude = ('added_by', )
+        widgets = {
+                'mosman_street': Select2Widget()
+            }

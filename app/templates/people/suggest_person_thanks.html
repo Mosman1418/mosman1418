@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+        <div class="row">
+            {% with current='people' %}{% include '_sidenav.html' %}{% endwith %}
+            <div class="span8">
+                <h1>Thanks!</h1>
+                <p>Thank you for suggesting <a href="{% url person-view person.id %}">{{ person }}</a> for inclusion. Our staff needs to check that this entry meets our guidelines before adding it to the public list of Mosman service people. They'll contact you if they have any questions.</p>
+
+                <p>In the meantime, feel free to <a href="{% url person-update person.id %}">update your suggestion</a> with additional biographical details.</p>
+            </div>
+        </div>
+{% endblock %}
+{% block footer %}
+{% endblock %}

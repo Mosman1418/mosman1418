@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load guardian_tags %}
 {% block title %}Log in{% endblock %}
 {% block extra_scripts %}
 <script src="{{ STATIC_URL }}js/select2.min.js"></script>
@@ -14,15 +15,49 @@
             <h2>
                 {% if person %}
                     Update details for {{ person }}
+                {% elif status == 'pending' %}
+                    Suggest a service person
                 {% else %}
                     Add a person
                 {% endif %}
             </h2>
+            {% if person %}
+                {% get_obj_perms request.user for person as 'perms' %}
+                {% if person.status == 'pending' %}
+                    <div class="alert">
+                        This entry is awaiting approval.
+                        {% if 'approve_person' in perms %}
+                            <a class="btn btn-mini btn-primary" href="{% url person-approve person.id %}">Approve</a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endif %}
             <form action="" method="post" class="form-horizontal">{% csrf_token %}
+                {% if form.errors %}
+    <!-- Error messaging -->
+    <div id="errors">
+        <div class="inner">
+            <p>There were some errors in the information you entered. Please correct the following:</p>
+            {{ form.non_field_errors }}
+            <ul>
+                {% for field in form %}
+                    {% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <!-- /Error messaging -->
+{% endif %}
                 {% if 'related_person' in form.initial %}
                     {% with label='Adding to relationship' field=form.related_person %}
                         {% include '_form_field.html' %}
                     {% endwith %}
+                {% endif %}
+                {% if 'source' in form.initial %}
+                    {% with label='Creator of' field=form.source %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                    {{ form.creator_type }}
                 {% endif %}
                 <fieldset>
                     <legend>Basic details</legend>
@@ -98,6 +133,11 @@
                             </div>
                         </div>
                     {% endif %}
+                    {% if status == 'pending' %}
+                        {% with label='Connection to Mosman' field=form.mosman_connection %}
+                            {% include '_form_field.html' %}
+                        {% endwith %}
+                    {% endif %}
                 </fieldset>
                 {% if person %}
                 <fieldset>
@@ -158,6 +198,28 @@
                     </div>
                 </fieldset>
                 <fieldset>
+                    <legend>Places</legend>
+                    <div class="form-field control-group">
+                        <label class="control-label">Addresses</label>
+                        <div class="controls">
+                            <ul>
+                            {% for address in person.personaddress_set.all %}
+                                <li>
+                                    <a href="{{ address.get_absolute_url }}">
+                                        {{ address|safe }}
+                                    </a>
+                                    <a class="btn btn-mini" href="{% url personaddress-update address.id %}">Update</a>
+                                </li>
+                            {% empty %}
+                                <li>No related people</li>
+                            {% endfor %}
+                            </ul>
+                            <a class="btn btn-small btn-primary" href="{% url personaddress-add person.id %}">Add address</a>
+                        </div>
+                    </div>
+
+                </fieldset>
+                <fieldset>
                     <legend>Associations</legend>
                     <div class="form-field control-group">
                         <label class="control-label">Related people</label>
@@ -175,6 +237,24 @@
                             {% endfor %}
                             </ul>
                             <a class="btn btn-small btn-primary" href="{% url persontoperson-add person.id %}">Add related person</a>
+                        </div>
+                    </div>
+                    <div class="form-field control-group">
+                        <label class="control-label">Associated organisations</label>
+                        <div class="controls">
+                            <ul>
+                            {% for assoc in person.personassociatedorganisation_set.all %}
+                                <li>
+                                    <a href="{{ assoc.get_absolute_url }}">
+                                        {{ assoc.summary|safe }}
+                                    </a>
+                                    <a class="btn btn-mini" href="{% url personorganisation-update assoc.id %}">Update</a>
+                                </li>
+                            {% empty %}
+                                <li>No related organisations</li>
+                            {% endfor %}
+                            </ul>
+                            <a class="btn btn-small btn-primary" href="{% url persontoperson-add person.id %}">Add related organisation</a>
                         </div>
                     </div>
 
