@@ -127,51 +127,12 @@ class Place(StandardMetadata):
         return self.display_name
 
 
-class Event(StandardMetadata):
+class Event(StandardMetadata, LongDateMixin):
     label = models.CharField(max_length=250, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
-    start_earliest_date = models.DateField(null=True, blank=True)
-    start_earliest_month_known = models.BooleanField(default=False)
-    start_earliest_day_known = models.BooleanField(default=False)
-    start_latest_date = models.DateField(null=True, blank=True)
-    start_latest_month_known = models.BooleanField(default=False)
-    start_latest_day_known = models.BooleanField(default=False)
-    end_earliest_date = models.DateField(null=True, blank=True)
-    end_earliest_month_known = models.BooleanField(default=False)
-    end_earliest_day_known = models.BooleanField(default=False)
-    end_latest_date = models.DateField(null=True, blank=True)
-    end_latest_month_known = models.BooleanField(default=False)
-    end_latest_day_known = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.label
-
-    def formatted_date(self, date_name):
-        months = calendar.month_name
-        date_obj = getattr(self, '{}_date'.format(date_name))
-        month = getattr(self, '{}_month_known'.format(date_name))
-        day = getattr(self, '{}_day_known'.format(date_name))
-        if date_obj and month and day:
-            date_str = '{} {} {}'.format(date_obj.day, months[date_obj.month], date_obj.year)
-        elif date_obj and month:
-            date_str = '{} {}'.format(months[date_obj.month], date_obj.year)
-        elif date_obj:
-            date_str = str(date_obj.year)
-        else:
-            date_str = None
-        return date_str
-
-    def start_earliest(self):
-        return self.formatted_date('start_earliest')
-
-    def start_latest(self):
-        return self.formatted_date('start_latest')
-
-    def end_earliest(self):
-        return self.formatted_date('end_earliest')
-
-    def end_latest(self):
-        return self.formatted_date('end_latest')
 
     class Meta:
         abstract = True

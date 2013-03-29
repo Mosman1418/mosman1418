@@ -10,7 +10,7 @@
 {% endblock %}
 {% block content %}
     <div class="row">
-        {% with current='none' %}{% include '_sidenav.html' %}{% endwith %}
+        {% with current='people' %}{% include '_sidenav.html' %}{% endwith %}
         <div class="span10">
             <h2>
                 {% if person %}
@@ -254,7 +254,7 @@
                                 <li>No related organisations</li>
                             {% endfor %}
                             </ul>
-                            <a class="btn btn-small btn-primary" href="{% url persontoperson-add person.id %}">Add related organisation</a>
+                            <a class="btn btn-small btn-primary" href="{% url personorganisation-add person.id %}">Add related organisation</a>
                         </div>
                     </div>
 

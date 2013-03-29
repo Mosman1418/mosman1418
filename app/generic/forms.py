@@ -147,18 +147,18 @@ class AddEventForm(ModelForm, DateSelectMixin):
         cleaned_data = super(AddEventForm, self).clean()
         start_earliest_date = cleaned_data['start_earliest_date']
         start_latest_date = cleaned_data['start_latest_date']
-        cleaned_data['start_earliest_month_known'] = self.clean_month(start_earliest_date, 'start')
-        cleaned_data['start_earliest_day_known'] = self.clean_day(start_earliest_date, 'start')
-        cleaned_data['start_latest_month_known'] = self.clean_month(start_latest_date, 'end')
-        cleaned_data['start_latest_day_known'] = self.clean_day(start_latest_date, 'end')
+        cleaned_data['start_earliest_month'] = self.clean_month(start_earliest_date, 'start')
+        cleaned_data['start_earliest_day'] = self.clean_day(start_earliest_date, 'start')
+        cleaned_data['start_latest_month'] = self.clean_month(start_latest_date, 'end')
+        cleaned_data['start_latest_day'] = self.clean_day(start_latest_date, 'end')
         cleaned_data['start_earliest_date'] = self.clean_date(start_earliest_date, 'start')
         cleaned_data['start_latest_date'] = self.clean_date(start_latest_date, 'end')
         end_earliest_date = cleaned_data['end_earliest_date']
         end_latest_date = cleaned_data['end_latest_date']
-        cleaned_data['end_earliest_month_known'] = self.clean_month(end_earliest_date, 'start')
-        cleaned_data['end_earliest_day_known'] = self.clean_day(end_earliest_date, 'start')
-        cleaned_data['end_latest_month_known'] = self.clean_month(end_latest_date, 'end')
-        cleaned_data['end_latest_day_known'] = self.clean_day(end_latest_date, 'end')
+        cleaned_data['end_earliest_month'] = self.clean_month(end_earliest_date, 'start')
+        cleaned_data['end_earliest_day'] = self.clean_day(end_earliest_date, 'start')
+        cleaned_data['end_latest_month'] = self.clean_month(end_latest_date, 'end')
+        cleaned_data['end_latest_day'] = self.clean_day(end_latest_date, 'end')
         cleaned_data['end_earliest_date'] = self.clean_date(end_earliest_date, 'start')
         cleaned_data['end_latest_date'] = self.clean_date(end_latest_date, 'end')
         return cleaned_data

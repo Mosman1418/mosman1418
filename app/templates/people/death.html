@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block content %}
+        <div class="row">
+            {% with current='people' %}{% include '_sidenav.html' %}{% endwith %}
+            <div class="span8">
+                <h1>Death record</h1>
+                <p>Details for <a href="{{ content.person.get_absolute_url }}">{{ content.person }}</a></p>
+                {% if content.earliest_start %}
+                    <h4>Date</h4>
+                    <p>
+                        {% if content.latest_start %}
+                            Between {{ content.earliest_start }} and {{ content.latest_start }}
+                        {% else %}
+                            {{ content.earliest_start }}
+                        {% endif %}
+                    </p>
+                {% endif %}
+
+                {% if content.location %}
+                    <h4>Location</h4>
+                    <p>
+                        {{ content.location }}
+                    </p>
+                {% endif %}
+
+                {% if content.sources %}
+                    <h4>Documented by</h4>
+                    <ul>
+                        {% for source in content.sources.all %}
+                            <li>
+                                {{ source.title }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+            </div>
+        </div>
+
+{% endblock %}
+{% block footer %}
+<div class="row">
+    <div class="span8 offset2">
+        Identifer: <a href="{{ identifier }}">{{ identifier }}</a> |
+        <a href="{{ id_path }}.html/">HTML</a> |
+        <a href="{{ id_path }}.rdf/">RDF+XML</a> |
+        <a href="{{ id_path }}.ttl/">Turtle</a> |
+        <a href="{{ id_path }}.json/">JSON</a>
+    </div>
+</div>
+{% endblock %}

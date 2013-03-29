@@ -9,6 +9,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from guardian.decorators import permission_required
+from guardian.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.utils.decorators import method_decorator
 from django.core.urlresolvers import reverse, reverse_lazy
 
 from guardian.shortcuts import assign
@@ -112,6 +114,12 @@ class AddSourceView(CreateView):
     template_name = 'sources/add_source.html'
     form_class = AddSourceForm
     model = Source
+
+    # Use this instead the Guardian Permission mixin -
+    # it doesn't seem to like CreateView
+    @method_decorator(permission_required('people.add_source'))
+    def dispatch(self, *args, **kwargs):
+        return super(AddSourceView, self).dispatch(*args, **kwargs)
 
     def associate_people(self, people, association):
         for person in people:
@@ -320,10 +328,11 @@ class AddSourceView(CreateView):
             return True
 
 
-class UpdateSourceView(UpdateView):
+class UpdateSourceView(PermissionRequiredMixin, UpdateView):
     template_name = 'sources/add_source.html'
     form_class = UpdateSourceForm
     model = Source
+    permission_required = 'sources.change_source'
 
     def prepare_date(self, name):
         date = getattr(self.object, name)

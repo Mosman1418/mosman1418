@@ -12,6 +12,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView
+from django.utils.decorators import method_decorator
 from calendar import monthrange
 import re
 from urllib2 import Request, urlopen, URLError, HTTPError
@@ -363,13 +364,19 @@ class OrganisationListView(LinkedDataListView):
         return graph
 
 
-class SuggestPerson(LoginRequiredMixin, CreateView):
+class SuggestPerson(CreateView):
     '''
     A logged-in user can suggest a service person for inclusion.
     The entry is marked "pending" until an admin user inspects it.
     '''
     form_class = AddPersonForm
     model = Person
+
+    # Use this instead the Guardian Permission mixin -
+    # it doesn't seem to like CreateView
+    @method_decorator(permission_required('people.add_person'))
+    def dispatch(self, *args, **kwargs):
+        return super(SuggestPerson, self).dispatch(*args, **kwargs)
 
     def form_valid(self, form):
         self.form = form
@@ -407,16 +414,24 @@ class SuggestPersonResponse(PermissionRequiredMixin, TemplateView):
         return context
 
 
-class AddPerson(PermissionRequiredMixin, CreateView):
+class AddPerson(CreateView):
     form_class = AddPersonForm
     model = Person
-    permission_required = 'people.add_person'
+
+    # Use this instead the Guardian Permission mixin -
+    # it doesn't seem to like CreateView
+    @method_decorator(permission_required('people.add_person'))
+    def dispatch(self, *args, **kwargs):
+        return super(AddPerson, self).dispatch(*args, **kwargs)
 
     def form_valid(self, form):
         self.form = form
         person = form.save(commit=False)
         person.added_by = self.request.user
+        person.status = 'non-service'
         person.save()
+        assign('people.change_person', self.request.user, person)
+        assign('people.delete_person', self.request.user, person)
         related_person = form.cleaned_data.get('related_person', None)
         if related_person:
             related_person.associated_person = person
@@ -457,9 +472,10 @@ class AddPerson(PermissionRequiredMixin, CreateView):
         return url
 
 
-class UpdatePerson(UpdateView):
+class UpdatePerson(PermissionRequiredMixin, UpdateView):
     form_class = UpdatePersonForm
     model = Person
+    permission_required = 'people.change_person'
 
     def prepare_date(self, name):
         date = getattr(self.object, name)
@@ -496,14 +512,21 @@ class ApprovePerson(PermissionRequiredMixin, UpdateView):
     template_name = 'people/person_approve.html'
 
 
-class DeletePerson(DeleteView):
+class DeletePerson(PermissionRequiredMixin, DeleteView):
     model = Person
     success_url = reverse_lazy('people-list')
+    permission_required = 'people.delete_person'
 
 
 class AddAltName(CreateView):
     model = AlternativePersonName
     form_class = AddAltNameForm
+
+    # Use this instead the Guardian Permission mixin -
+    # it doesn't seem to like CreateView
+    @method_decorator(permission_required('people.add_person'))
+    def dispatch(self, *args, **kwargs):
+        return super(AddAltName, self).dispatch(*args, **kwargs)
 
     def get_initial(self):
         person_id = self.kwargs.get('person_id', None)
@@ -514,12 +537,15 @@ class AddAltName(CreateView):
         altname = form.save(commit=False)
         altname.added_by = self.request.user
         altname.save()
+        assign('people.change_alternativepersonname', self.request.user, altname)
+        assign('people.delete_alternativepersonname', self.request.user, altname)
         return HttpResponseRedirect(reverse('altname-update', args=[altname.id]))
 
 
-class UpdateAltName(UpdateView):
+class UpdateAltName(PermissionRequiredMixin, UpdateView):
     model = AlternativePersonName
     form_class = AddAltNameForm
+    permission_required = 'people.change_alternativepersonname'
 
     def get_success_url(self):
         if 'continue' in self.request.POST:
@@ -529,8 +555,9 @@ class UpdateAltName(UpdateView):
         return url
 
 
-class DeleteAltName(DeleteView):
+class DeleteAltName(PermissionRequiredMixin, DeleteView):
     model = AlternativePersonName
+    permission_required = 'people.delete_alternativepersonname'
 
     def delete(self, request, *args, **kwargs):
         self.person_pk = self.get_object().person.pk
@@ -544,6 +571,12 @@ class AddLifeEvent(CreateView):
     form_class = AddLifeEventForm
     model = LifeEvent
 
+    # Use this instead the Guardian Permission mixin -
+    # it doesn't seem to like CreateView
+    @method_decorator(permission_required('people.add_person'))
+    def dispatch(self, *args, **kwargs):
+        return super(AddLifeEvent, self).dispatch(*args, **kwargs)
+
     def get_initial(self):
         person_id = self.kwargs.get('person_id', None)
         initial = {'person': person_id}
@@ -553,12 +586,15 @@ class AddLifeEvent(CreateView):
         event = form.save(commit=False)
         event.added_by = self.request.user
         event.save()
+        assign('people.change_lifeevent', self.request.user, event)
+        assign('people.delete_lifeevent', self.request.user, event)
         return HttpResponseRedirect(reverse('lifeevent-update', args=[event.id]))
 
 
-class UpdateLifeEvent(UpdateView):
+class UpdateLifeEvent(PermissionRequiredMixin, UpdateView):
     form_class = AddLifeEventForm
     model = LifeEvent
+    permission_required = 'people.change_lifeevent'
 
     def form_valid(self, form):
         event = form.save(commit=False)
@@ -579,9 +615,9 @@ class UpdateLifeEvent(UpdateView):
             year = date.year
             month = date.month
             day = date.day
-            if getattr(self.object, '{}_month_known'.format(name)) is False:
+            if getattr(self.object, '{}_month'.format(name)) is False:
                 month = 0
-            if getattr(self.object, '{}_day_known'.format(name)) is False:
+            if getattr(self.object, '{}_day'.format(name)) is False:
                 day = 0
             date = '{}-{}-{}'.format(year, month, day)
         return date
@@ -595,9 +631,10 @@ class UpdateLifeEvent(UpdateView):
         return initial
 
 
-class DeleteLifeEvent(DeleteView):
+class DeleteLifeEvent(PermissionRequiredMixin, DeleteView):
     model = LifeEvent
     template_name = 'people/confirm_delete.html'
+    permission_required = 'people.delete_lifeevent'
 
     def delete(self, request, *args, **kwargs):
         self.person_pk = self.get_object().person.pk
@@ -611,18 +648,33 @@ class AddEventLocation(CreateView):
     form_class = AddEventLocationForm
     model = EventLocation
 
+    # Use this instead the Guardian Permission mixin -
+    # it doesn't seem to like CreateView
+    @method_decorator(permission_required('people.add_person'))
+    def dispatch(self, *args, **kwargs):
+        return super(AddEventLocation, self).dispatch(*args, **kwargs)
+
     def get_initial(self):
         event_id = self.kwargs.get('event_id', None)
         initial = {'lifeevent': event_id}
         return initial
 
+    def form_valid(self, form):
+        location = form.save(commit=False)
+        location.added_by = self.request.user
+        location.save()
+        assign('people.change_eventlocation', self.request.user, location)
+        assign('people.delete_eventlocation', self.request.user, location)
+        return HttpResponseRedirect(self.get_success_url())
+
     def get_success_url(self):
         return reverse_lazy('eventlocation-update', args=[self.object.id])
 
 
-class UpdateEventLocation(UpdateView):
+class UpdateEventLocation(PermissionRequiredMixin, UpdateView):
     form_class = AddEventLocationForm
     model = EventLocation
+    permission_required = 'people.change_eventlocation'
 
     def get_success_url(self):
         if 'continue' in self.request.POST:
@@ -632,9 +684,10 @@ class UpdateEventLocation(UpdateView):
         return url
 
 
-class DeleteEventLocation(DeleteView):
+class DeleteEventLocation(PermissionRequiredMixin, DeleteView):
     model = EventLocation
     template_name = 'people/confirm_delete.html'
+    permission_required = 'people.delete_eventlocation'
 
     def delete(self, request, *args, **kwargs):
         self.lifeevent_id = self.get_object().lifeevent.id
@@ -648,6 +701,12 @@ class AddBirth(CreateView):
     form_class = AddBirthForm
     model = Birth
 
+    # Use this instead the Guardian Permission mixin -
+    # it doesn't seem to like CreateView
+    @method_decorator(permission_required('people.add_person'))
+    def dispatch(self, *args, **kwargs):
+        return super(AddBirth, self).dispatch(*args, **kwargs)
+
     def get_initial(self):
         person_id = self.kwargs.get('person_id', None)
         initial = {'person': person_id}
@@ -657,12 +716,15 @@ class AddBirth(CreateView):
         birth = form.save(commit=False)
         birth.added_by = self.request.user
         birth.save()
+        assign('people.change_birth', self.request.user, birth)
+        assign('people.delete_birth', self.request.user, birth)
         return HttpResponseRedirect(reverse('birth-update', args=[birth.id]))
 
 
-class UpdateBirth(UpdateView):
+class UpdateBirth(PermissionRequiredMixin, UpdateView):
     form_class = AddBirthForm
     model = Birth
+    permission_required = 'people.change_birth'
 
     def get_success_url(self):
         if 'continue' in self.request.POST:
@@ -678,9 +740,9 @@ class UpdateBirth(UpdateView):
             year = date.year
             month = date.month
             day = date.day
-            if getattr(self.object, '{}_month_known'.format(name)) is False:
+            if getattr(self.object, '{}_month'.format(name)) is False:
                 month = 0
-            if getattr(self.object, '{}_day_known'.format(name)) is False:
+            if getattr(self.object, '{}_day'.format(name)) is False:
                 day = 0
             date = '{}-{}-{}'.format(year, month, day)
         return date
@@ -692,8 +754,9 @@ class UpdateBirth(UpdateView):
         return initial
 
 
-class DeleteBirth(DeleteView):
+class DeleteBirth(PermissionRequiredMixin, DeleteView):
     model = Birth
+    permission_required = 'people.delete_birth'
 
     def delete(self, request, *args, **kwargs):
         self.person_pk = self.get_object().person.pk
@@ -707,6 +770,12 @@ class AddDeath(CreateView):
     form_class = AddDeathForm
     model = Death
 
+    # Use this instead the Guardian Permission mixin -
+    # it doesn't seem to like CreateView
+    @method_decorator(permission_required('people.add_person'))
+    def dispatch(self, *args, **kwargs):
+        return super(AddDeath, self).dispatch(*args, **kwargs)
+
     def get_initial(self):
         person_id = self.kwargs.get('person_id', None)
         initial = {'person': person_id}
@@ -716,12 +785,15 @@ class AddDeath(CreateView):
         death = form.save(commit=False)
         death.added_by = self.request.user
         death.save()
+        assign('people.change_death', self.request.user, death)
+        assign('people.delete_death', self.request.user, death)
         return HttpResponseRedirect(reverse('death-update', args=[death.id]))
 
 
-class UpdateDeath(UpdateView):
+class UpdateDeath(PermissionRequiredMixin, UpdateView):
     form_class = AddDeathForm
     model = Death
+    permission_required = 'people.change_death'
 
     def get_success_url(self):
         if 'continue' in self.request.POST:
@@ -737,9 +809,9 @@ class UpdateDeath(UpdateView):
             year = date.year
             month = date.month
             day = date.day
-            if getattr(self.object, '{}_month_known'.format(name)) is False:
+            if getattr(self.object, '{}_month'.format(name)) is False:
                 month = 0
-            if getattr(self.object, '{}_day_known'.format(name)) is False:
+            if getattr(self.object, '{}_day'.format(name)) is False:
                 day = 0
             date = '{}-{}-{}'.format(year, month, day)
         return date
@@ -751,8 +823,9 @@ class UpdateDeath(UpdateView):
         return initial
 
 
-class DeleteDeath(DeleteView):
+class DeleteDeath(PermissionRequiredMixin, DeleteView):
     model = Death
+    permission_required = 'people.delete_death'
 
     def delete(self, request, *args, **kwargs):
         self.person_pk = self.get_object().person.pk
@@ -766,11 +839,19 @@ class AddOrganisation(CreateView):
     form_class = AddOrganisationForm
     model = Organisation
 
+    # Use this instead the Guardian Permission mixin -
+    # it doesn't seem to like CreateView
+    @method_decorator(permission_required('people.add_person'))
+    def dispatch(self, *args, **kwargs):
+        return super(AddOrganisation, self).dispatch(*args, **kwargs)
+
     def form_valid(self, form):
         self.form = form
         org = form.save(commit=False)
         org.added_by = self.request.user
         org.save()
+        assign('people.change_organisation', self.request.user, org)
+        assign('people.delete_organisation', self.request.user, org)
         person = form.cleaned_data.get('person', None)
         associated_person = form.cleaned_data.get('associated_person', None)
         if person:
@@ -807,63 +888,10 @@ class AddOrganisation(CreateView):
         return url
 
 
-class UpdateOrganisation(UpdateView):
+class UpdateOrganisation(PermissionRequiredMixin, UpdateView):
     form_class = AddOrganisationForm
     model = Organisation
-
-    def prepare_date(self, name):
-        date = getattr(self.object, name)
-        name = name[:-5]
-        if date:
-            year = date.year
-            month = date.month
-            day = date.day
-            if getattr(self.object, '{}_month'.format(name)) is False:
-                month = 0
-            if getattr(self.object, '{}_day'.format(name)) is False:
-                day = 0
-            date = '{}-{}-{}'.format(year, month, day)
-        return date
-
-    def get_initial(self):
-        initial = {}
-        initial['birth_earliest_date'] = self.prepare_date('birth_earliest_date')
-        initial['birth_latest_date'] = self.prepare_date('birth_latest_date')
-        initial['death_earliest_date'] = self.prepare_date('death_earliest_date')
-        initial['death_latest_date'] = self.prepare_date('death_latest_date')
-        return initial
-
-    def form_valid(self, form):
-        org = form.save(commit=False)
-        org.save()
-        return HttpResponseRedirect(reverse('organisation-view', args=[person.id]))
-
-
-class DeleteOrganisation(DeleteView):
-    model = Organisation
-    template_name = 'people/confirm_delete.html'
-    success_url = reverse_lazy('organisation-list')
-
-
-class AddPersonAssociatedPerson(CreateView):
-    model = PersonAssociatedPerson
-    form_class = AddAssociatedPersonForm
-
-    def get_initial(self):
-        person_id = self.kwargs.get('person_id', None)
-        initial = {'person': person_id}
-        return initial
-
-    def form_valid(self, form):
-        assoc = form.save(commit=False)
-        assoc.added_by = self.request.user
-        assoc.save()
-        return HttpResponseRedirect(reverse('persontoperson-update', args=[assoc.id]))
-
-
-class UpdatePersonAssociatedPerson(UpdateView):
-    model = PersonAssociatedPerson
-    form_class = AddAssociatedPersonForm
+    permission_required = 'people.change_organisation'
 
     def prepare_date(self, name):
         date = getattr(self.object, name)
@@ -882,9 +910,69 @@ class UpdatePersonAssociatedPerson(UpdateView):
     def get_initial(self):
         initial = {}
         initial['start_earliest_date'] = self.prepare_date('start_earliest_date')
-        #initial['start_latest_date'] = self.prepare_date('start_latest_date')
         initial['end_earliest_date'] = self.prepare_date('end_earliest_date')
-        #initial['end_latest_date'] = self.prepare_date('end_latest_date')
+        return initial
+
+    def form_valid(self, form):
+        org = form.save(commit=False)
+        org.save()
+        return HttpResponseRedirect(reverse('organisation-view', args=[person.id]))
+
+
+class DeleteOrganisation(PermissionRequiredMixin, DeleteView):
+    model = Organisation
+    template_name = 'people/confirm_delete.html'
+    success_url = reverse_lazy('organisation-list')
+    permission_required = 'people.delete_organisation'
+
+
+class AddPersonAssociatedPerson(CreateView):
+    model = PersonAssociatedPerson
+    form_class = AddAssociatedPersonForm
+
+    # Use this instead the Guardian Permission mixin -
+    # it doesn't seem to like CreateView
+    @method_decorator(permission_required('people.add_person'))
+    def dispatch(self, *args, **kwargs):
+        return super(AddPersonAssociatedPerson, self).dispatch(*args, **kwargs)
+
+    def get_initial(self):
+        person_id = self.kwargs.get('person_id', None)
+        initial = {'person': person_id}
+        return initial
+
+    def form_valid(self, form):
+        assoc = form.save(commit=False)
+        assoc.added_by = self.request.user
+        assoc.save()
+        assign('people.change_personassociatedperson', self.request.user, assoc)
+        assign('people.delete_personassociatedperson', self.request.user, assoc)
+        return HttpResponseRedirect(reverse('persontoperson-update', args=[assoc.id]))
+
+
+class UpdatePersonAssociatedPerson(PermissionRequiredMixin, UpdateView):
+    model = PersonAssociatedPerson
+    form_class = AddAssociatedPersonForm
+    permission_required = 'people.change_personassociatedperson'
+
+    def prepare_date(self, name):
+        date = getattr(self.object, name)
+        name = name[:-5]
+        if date:
+            year = date.year
+            month = date.month
+            day = date.day
+            if getattr(self.object, '{}_month'.format(name)) is False:
+                month = 0
+            if getattr(self.object, '{}_day'.format(name)) is False:
+                day = 0
+            date = '{}-{}-{}'.format(year, month, day)
+        return date
+
+    def get_initial(self):
+        initial = {}
+        initial['start_earliest_date'] = self.prepare_date('start_earliest_date')
+        initial['end_earliest_date'] = self.prepare_date('end_earliest_date')
         return initial
 
     def get_success_url(self):
@@ -895,9 +983,10 @@ class UpdatePersonAssociatedPerson(UpdateView):
         return url
 
 
-class DeletePersonAssociatedPerson(DeleteView):
+class DeletePersonAssociatedPerson(PermissionRequiredMixin, DeleteView):
     model = PersonAssociatedPerson
     template_name = 'people/confirm_delete.html'
+    permission_required = 'people.delete_personassociatedperson'
 
     def delete(self, request, *args, **kwargs):
         self.person_pk = self.get_object().person.pk
@@ -911,6 +1000,12 @@ class AddPersonAssociatedOrganisation(CreateView):
     model = PersonAssociatedOrganisation
     form_class = AddAssociatedOrganisationForm
 
+    # Use this instead the Guardian Permission mixin -
+    # it doesn't seem to like CreateView
+    @method_decorator(permission_required('people.add_person'))
+    def dispatch(self, *args, **kwargs):
+        return super(AddPersonAssociatedOrganisation, self).dispatch(*args, **kwargs)
+
     def get_initial(self):
         person_id = self.kwargs.get('person_id', None)
         initial = {'person': person_id}
@@ -920,12 +1015,15 @@ class AddPersonAssociatedOrganisation(CreateView):
         assoc = form.save(commit=False)
         assoc.added_by = self.request.user
         assoc.save()
+        assign('people.change_personassociatedorganisation', self.request.user, assoc)
+        assign('people.delete_personassociatedorganisation', self.request.user, assoc)
         return HttpResponseRedirect(reverse('personorganisation-update', args=[assoc.id]))
 
 
-class UpdatePersonAssociatedOrganisation(UpdateView):
+class UpdatePersonAssociatedOrganisation(PermissionRequiredMixin, UpdateView):
     model = PersonAssociatedOrganisation
     form_class = AddAssociatedOrganisationForm
+    permission_required = 'people.change_personassociatedorganisation'
 
     def prepare_date(self, name):
         date = getattr(self.object, name)
@@ -955,9 +1053,10 @@ class UpdatePersonAssociatedOrganisation(UpdateView):
         return url
 
 
-class DeletePersonAssociatedOrganisation(DeleteView):
+class DeletePersonAssociatedOrganisation(PermissionRequiredMixin, DeleteView):
     model = PersonAssociatedOrganisation
     template_name = 'people/confirm_delete.html'
+    permission_required = 'people.delete_personassociatedorganisation'
 
     def delete(self, request, *args, **kwargs):
         self.person_pk = self.get_object().person.pk
@@ -970,6 +1069,12 @@ class DeletePersonAssociatedOrganisation(DeleteView):
 class AddPersonAddress(CreateView):
     model = PersonAddress
     form_class = AddPersonAddressForm
+
+    # Use this instead the Guardian Permission mixin -
+    # it doesn't seem to like CreateView
+    @method_decorator(permission_required('people.add_person'))
+    def dispatch(self, *args, **kwargs):
+        return super(AddPersonAddress, self).dispatch(*args, **kwargs)
 
     def get_initial(self):
         person_id = self.kwargs.get('person_id', None)
@@ -985,9 +1090,10 @@ class AddPersonAddress(CreateView):
         return HttpResponseRedirect(reverse('personaddress-update', args=[address.id]))
 
 
-class UpdatePersonAddress(UpdateView):
+class UpdatePersonAddress(PermissionRequiredMixin, UpdateView):
     model = PersonAddress
     form_class = AddPersonAddressForm
+    permission_required = 'people.change_personaddress'
 
     def prepare_date(self, name):
         date = getattr(self.object, name)
@@ -996,9 +1102,9 @@ class UpdatePersonAddress(UpdateView):
             year = date.year
             month = date.month
             day = date.day
-            if getattr(self.object, '{}_month_known'.format(name)) is False:
+            if getattr(self.object, '{}_month'.format(name)) is False:
                 month = 0
-            if getattr(self.object, '{}_day_known'.format(name)) is False:
+            if getattr(self.object, '{}_day'.format(name)) is False:
                 day = 0
             date = '{}-{}-{}'.format(year, month, day)
         return date
@@ -1006,9 +1112,7 @@ class UpdatePersonAddress(UpdateView):
     def get_initial(self):
         initial = {}
         initial['start_earliest_date'] = self.prepare_date('start_earliest_date')
-        #initial['start_latest_date'] = self.prepare_date('start_latest_date')
         initial['end_earliest_date'] = self.prepare_date('end_earliest_date')
-        #initial['end_latest_date'] = self.prepare_date('end_latest_date')
         return initial
 
     def get_success_url(self):
@@ -1019,9 +1123,10 @@ class UpdatePersonAddress(UpdateView):
         return url
 
 
-class DeletePersonAddress(DeleteView):
+class DeletePersonAddress(PermissionRequiredMixin, DeleteView):
     model = PersonAddress
     template_name = 'people/confirm_delete.html'
+    permission_required = 'people.delete_personaddress'
 
     def delete(self, request, *args, **kwargs):
         self.person_pk = self.get_object().person.pk

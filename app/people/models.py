@@ -131,7 +131,7 @@ class LifeEvent(Event):
         return self.__class__.__name__
 
 
-class EventLocation(models.Model):
+class EventLocation(StandardMetadata):
     lifeevent = models.ForeignKey('people.LifeEvent')
     location = models.ForeignKey('places.Place', blank=True, null=True)
     association = models.ForeignKey('people.EventLocationAssociation', blank=True, null=True)
@@ -236,7 +236,7 @@ class Death(Event):
         return summary
 
     def get_absolute_url(self):
-        return reverse('death-view', [str(self.id)])
+        return reverse('death-view', args=[str(self.id)])
 
     def event_type(self):
         return 'deaths'
@@ -313,15 +313,9 @@ class PersonRole(RDFRelationship):
     pass
 
 
-class PersonAddress(models.Model):
+class PersonAddress(StandardMetadata, ShortDateMixin):
     person = models.ForeignKey('Person')
     address = models.ForeignKey('places.Address')
-    start_earliest_date = models.DateField(blank=True, null=True)
-    start_earliest_month = models.BooleanField(default=False)
-    start_earliest_day = models.BooleanField(default=False)
-    end_earliest_date = models.DateField(blank=True, null=True)
-    end_earliest_month = models.BooleanField(default=False)
-    end_earliest_day = models.BooleanField(default=False)
     sources = models.ManyToManyField('sources.Source', blank=True, null=True)
 
     def __unicode__(self):
@@ -340,16 +334,10 @@ class PersonAssociatedPlace(models.Model):
     association = models.ForeignKey('PersonAssociation')
 
 
-class PersonAssociatedPerson(models.Model):
+class PersonAssociatedPerson(StandardMetadata, ShortDateMixin):
     person = models.ForeignKey('Person')
     associated_person = models.ForeignKey('Person', related_name='related_person', blank=True, null=True)
     association = models.ForeignKey('PersonAssociation')
-    start_earliest_date = models.DateField(blank=True, null=True)
-    start_earliest_month = models.BooleanField(default=False)
-    start_earliest_day = models.BooleanField(default=False)
-    end_earliest_date = models.DateField(blank=True, null=True)
-    end_earliest_month = models.BooleanField(default=False)
-    end_earliest_day = models.BooleanField(default=False)
     sources = models.ManyToManyField('sources.Source', blank=True, null=True)
 
     def __unicode__(self):
@@ -401,7 +389,7 @@ class PersonAssociatedEvent(models.Model):
     association = models.ForeignKey('EventAssociation')
 
 
-class PersonAssociatedSource(models.Model):
+class PersonAssociatedSource(StandardMetadata):
     person = models.ForeignKey('Person')
     source = models.ForeignKey('sources.Source')
     association = models.ForeignKey('SourceAssociation')
@@ -427,7 +415,7 @@ class ObjectAssociation(RDFRelationship):
     pass
 
 
-class OrganisationAssociatedSource(models.Model):
+class OrganisationAssociatedSource(StandardMetadata):
     organisation = models.ForeignKey('Organisation')
     source = models.ForeignKey('sources.Source')
     association = models.ForeignKey('SourceAssociation')
