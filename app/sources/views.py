@@ -121,11 +121,20 @@ class AddSourceView(CreateView):
     def dispatch(self, *args, **kwargs):
         return super(AddSourceView, self).dispatch(*args, **kwargs)
 
+    # This lets us get the user in the form
+    def get_form_kwargs(self):
+        kwargs = super(AddSourceView, self).get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
     def associate_people(self, people, association):
         for person in people:
-            assoc_link = PersonAssociatedSource(person=person,
-                source=self.object, association=association)
-            assoc_link.save()
+            assoc_link, created = PersonAssociatedSource.objects.get_or_create(
+                                            person=person,
+                                            source=self.object,
+                                            association=association,
+                                            defaults={'added_by': self.request.user}
+                                            )
 
     def associate_creators(self, creators, role):
         for creator in creators:
@@ -179,8 +188,8 @@ class AddSourceView(CreateView):
         main_people = form.cleaned_data['main_people']
         related_people = form.cleaned_data['related_people']
         #organisations = form.cleaned_data['organisations']
-        primary_topic = PersonAssociation.objects.get(label='primary topic of')
-        topic = PersonAssociation.objects.get(label='topic of')
+        primary_topic = SourceAssociation.objects.get(label='primary topic of')
+        topic = SourceAssociation.objects.get(label='topic of')
         self.associate_people(main_people, primary_topic)
         self.associate_people(related_people, topic)
         #for organisation in organisations:
@@ -227,6 +236,65 @@ class AddSourceView(CreateView):
             url = reverse_lazy('source-update', args=[self.object.id])
         return url
 
+    def get_naa_record(self, barcode):
+        current_user = self.request.user
+        system_user = User.objects.get(username='system')
+        rs = RSItemClient()
+        rsseries = RSSeriesClient()
+        item_details = rs.get_summary(barcode)
+        dates = item_details['contents_dates']
+        citation = '{}, {}'.format(
+                                item_details['series'],
+                                item_details['control_symbol']
+                            )
+        if item_details['digitised_status'] == True:
+            item_url = 'http://dhistory.org/archives/naa/{}/'.format(barcode)
+        else:
+            item_url = 'http://www.naa.gov.au/cgi-bin/Search?O=I&Number={}'.format(barcode)
+        series_details = rsseries.get_summary(item_details['series'])
+        repository, created = Repository.objects.get_or_create(
+                                    name='National Archives of Australia',
+                                    defaults={'added_by': system_user}
+                                    )
+        series_type = SourceType.objects.get(label='series')
+        series, created = Source.objects.get_or_create(
+                repository_item_id=item_details['series'],
+                source_type=series_type,
+                repository=repository,
+                defaults={
+                    'added_by': system_user,
+                    'title': series_details['title'],
+                    'url': 'http://www.naa.gov.au/cgi-bin/Search?Number={}'.format(item_details['series'])
+                }
+
+            )
+        item_type = SourceType.objects.get(label='item')
+        item, created = Source.objects.get_or_create(
+                collection=series,
+                source_type=item_type,
+                collection_item_id=item_details['control_symbol'],
+                repository_item_id=item_details['identifier'],
+                repository=repository,
+                defaults={
+                    'title': item_details['title'],
+                    'publication_date': dates['start_date']['date'],
+                    'publication_date_month': dates['start_date']['month'],
+                    'publication_date_day': dates['start_date']['day'],
+                    'publication_date_end': dates['end_date']['date'],
+                    'publication_date_end_month': dates['end_date']['month'],
+                    'publication_date_end_day': dates['end_date']['day'],
+                    'pages': item_details['digitised_pages'],
+                    'citation': citation,
+                    'url': item_url,
+                    'rdf_url': 'http://dhistory.org/archives/naa/items/{}/#file'.format(barcode)
+                }
+
+            )
+        if created:
+            assign('sources.change_source', current_user, item)
+            assign('sources.delete_source', current_user, item)
+        return item
+
     def get_moa_page(self, form):
         ''' If it's an NAA WWI service record, automatically check for a MoA page. '''
         try:
@@ -235,7 +303,8 @@ class AddSourceView(CreateView):
             barcode = re.search(r'\/(\d+)\/$', self.object.url).group(1)
         person = self.object.main_people()[0]
         moa = MOAClient()
-        user = User.objects.get(username='system')
+        current_user = self.request.user
+        system_user = User.objects.get(username='system')
         try:
             details = moa.get_details(barcode)
         except (URLError, HTTPError):
@@ -250,7 +319,7 @@ class AddSourceView(CreateView):
                                     url='http://mappingouranzacs.naa.gov.au',
                                     publisher='National Archives of Australia',
                                     source_type=website_type,
-                                    added_by=user)
+                                    added_by=system_user)
             moa_page, created = Source.objects.get_or_create(
                                     title='{} {}'.format(
                                                         details['other_names'],
@@ -259,54 +328,107 @@ class AddSourceView(CreateView):
                                     url=moa.MOA_URL.format(barcode),
                                     source_type=webpage_type,
                                     collection=moa_site,
-                                    added_by=user
+                                    defaults={'added_by': current_user}
                                     )
-            primary_topic = PersonAssociation.objects.get(label='primary topic of')
-            PersonAssociatedSource.objects.create(person=person,
-                source=moa_page, association=primary_topic)
+            if created:
+                assign('sources.change_source', current_user, moa_page)
+                assign('sources.delete_source', current_user, moa_page)
+            primary_topic = SourceAssociation.objects.get(label='primary topic of')
+            person_source, created = PersonAssociatedSource.objects.get_or_create(
+                                        person=person,
+                                        source=moa_page,
+                                        association=primary_topic,
+                                        defaults={'added_by': current_user})
+            if created:
+                assign('people.change_personassociatedsource', current_user, person_source)
+                assign('people.delete_personassociatedsource', current_user, person_source)
             person_name, created = AlternativePersonName.objects.get_or_create(
                                         person=person,
                                         family_name=details['family_name'],
-                                        other_names=details['other_names']
+                                        other_names=details['other_names'],
+                                        defaults={'added_by': current_user}
                                     )
-            person_name.source.add(self.object)
+            if created:
+                assign('people.change_alternativepersonname', current_user, person_name)
+                assign('people.delete_alternativepersonname', current_user, person_name)
+            person_name.sources.add(self.object)
             person_name.save()
             birth_place, created = Place.objects.get_or_create(
                                 display_name=details['place_of_birth'],
-                                added_by=user
+                                defaults={'added_by': current_user}
                                 )
+            if created:
+                assign('places.change_place', current_user, birth_place)
+                assign('places.delete_place', current_user, birth_place)
             birth, created = Birth.objects.get_or_create(
                             label='Born at {}'.format(birth_place),
                             person=person,
                             location=birth_place,
-                            added_by=user,
+                            defaults={'added_by': current_user}
                         )
+            if created:
+                assign('people.change_birth', current_user, birth)
+                assign('people.delete_birth', current_user, birth)
             birth.sources.add(self.object)
             birth.save()
             enlistment_type = LifeEventType.objects.get(label='enlistment')
             enlistment_place, created = Place.objects.get_or_create(
                                 display_name=details['place_of_enlistment'],
-                                added_by=user
+                                defaults={'added_by': current_user}
                                 )
+            if created:
+                assign('places.change_place', current_user, enlistment_place)
+                assign('places.delete_place', current_user, enlistment_place)
             enlistment, created = LifeEvent.objects.get_or_create(
                             label='Enlisted at {}'.format(enlistment_place),
-                            event_type=enlistment_type,
+                            type_of_event=enlistment_type,
                             person=person,
-                            location=enlistment_place,
-                            added_by=user
+                            defaults={'added_by': current_user}
                         )
+            if created:
+                assign('people.change_lifeevent', current_user, enlistment)
+                assign('people.delete_lifeevent', current_user, enlistment)
             enlistment.sources.add(self.object)
             enlistment.save()
-
+            location_association = EventLocationAssociation.objects.get(label='happened in')
+            event_location, created = EventLocation.objects.get_or_create(
+                    lifeevent=enlistment,
+                    location=enlistment_place,
+                    association=location_association,
+                    defaults={'added_by': current_user}
+                )
+            if created:
+                assign('people.change_eventlocation', current_user, event_location)
+                assign('people.delete_eventlocation', current_user, event_location)
             if details['ww2_file']['barcode']:
-                self.get_naa_record(details['ww2_file']['barcode'])
+                item = self.get_naa_record(details['ww2_file']['barcode'])
+                person_source, created = PersonAssociatedSource.objects.get_or_create(
+                                        person=person,
+                                        source=item,
+                                        association=primary_topic,
+                                        defaults={'added_by': current_user})
+                if created:
+                    assign('people.change_personassociatedsource', current_user, person_source)
+                    assign('people.delete_personassociatedsource', current_user, person_source)
             if details['see_also']['barcode']:
-                self.get_naa_record(details['see_also']['barcode'])
+                item = self.get_naa_record(details['see_also']['barcode'])
+                person_source, created = PersonAssociatedSource.objects.get_or_create(
+                                        person=person,
+                                        source=item,
+                                        association=primary_topic,
+                                        defaults={'added_by': current_user})
+                if created:
+                    assign('people.change_personassociatedsource', current_user, person_source)
+                    assign('people.delete_personassociatedsource', current_user, person_source)
             if details['also_known_as']:
                 alt_name, created = AlternativePersonName.get_or_create(
                         person=person,
                         display_name=details['also_known_as'],
+                        defaults={'added_by': current_user}
                     )
+                if created:
+                    assign('people.change_alternativepersonname', current_user, alt_name)
+                    assign('people.delete_alternativepersonname', current_user, alt_name)
                 alt_name.source.add(self.object)
             if details['next_of_kin']:
                 try:
@@ -316,15 +438,23 @@ class AddSourceView(CreateView):
                 else:
                     related_person = Person.objects.create(
                         display_name=relation_name,
-                        mosman_related=False,
-                        added_by=user
+                        status='non-service',
+                        added_by=current_user
                         )
-                    relation_type, created = PersonAssociation.objects.get_or_create(label=relation)
-                    PersonAssociatedPerson.objects.create(
+                    assign('people.change_person', current_user, related_person)
+                    assign('people.delete_person', current_user, related_person)
+                    relation_type, created = PersonAssociation.objects.get_or_create(
+                                                    label=relation
+                                                    )
+                    related_person, created = PersonAssociatedPerson.objects.get_or_create(
                         person=person,
                         associated_person=related_person,
-                        association=relation_type
+                        association=relation_type,
+                        defaults={'added_by': current_user}
                         )
+                    if created:
+                        assign('people.change_personassociatedperson', current_user, related_person)
+                        assign('people.delete_personassociatedperson', current_user, related_person)
             return True
 
 
@@ -417,6 +547,12 @@ class AddSourcePersonView(CreateView):
     template_name = 'sources/add_source_creator.html'
     form_class = AddSourcePersonForm
     model = SourcePerson
+
+    # Use this instead the Guardian Permission mixin -
+    # it doesn't seem to like CreateView
+    @method_decorator(permission_required('people.add_sourceperson'))
+    def dispatch(self, *args, **kwargs):
+        return super(AddSourcePersonView, self).dispatch(*args, **kwargs)
 
     def get_initial(self):
         initial = {}

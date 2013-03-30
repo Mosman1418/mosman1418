@@ -67,7 +67,7 @@ class Person(GenericPerson):
         return self.__class__.__name__
 
 
-class AlternativePersonName(models.Model):
+class AlternativePersonName(StandardMetadata):
     person = models.ForeignKey('Person')
     family_name = models.CharField(max_length=100, blank=True)
     other_names = models.CharField(max_length=100, blank=True)
@@ -264,6 +264,11 @@ class Organisation(Group):
 
 class Repository(Group):
     daa_id = models.URLField(blank=True)
+    name = models.CharField(max_length=250)
+    short_name = models.CharField(max_length=100, null=True, blank=True)
+
+    def __unicode__(self):
+        return self.name
 
 
 class PeopleImage(models.Model):

@@ -142,6 +142,10 @@ class AddSourceForm(ModelForm, DateSelectMixin):
                 required=False,
                 widget=forms.Select(attrs={'readonly': 'readonly'}))
 
+    def __init__(self, user, *args, **kwargs):
+        super(AddSourceForm, self).__init__(*args, **kwargs)
+        self.user = user
+
     def clean(self):
         cleaned_data = super(AddSourceForm, self).clean()
         publication_date = cleaned_data['publication_date']
@@ -200,9 +204,15 @@ class AddSourceForm(ModelForm, DateSelectMixin):
         return cleaned_data
 
     def get_naa_record(self, cleaned_data):
+        current_user = self.user
+        system_user = User.objects.get(username='system')
+        print current_user
         url = cleaned_data['url']
         try:
-            barcode = re.search(r'Barcode=(\d+)', url).group(1)
+            if 'dhistory' in url:
+                barcode = re.search(r'naa\/items\/(\d+)', url).group(1)
+            else:
+                barcode = re.search(r'Barcode=(\d+)', url).group(1)
         except AttributeError:
             self._errors['url'] = self.error_class(['Not a valid NAA url'])
             return cleaned_data
@@ -215,16 +225,23 @@ class AddSourceForm(ModelForm, DateSelectMixin):
                                 item_details['control_symbol']
                             )
         if item_details['digitised_status'] == True:
-            item_url = 'http://dhistory.org/archives/naa/{}/'.format(item_details['identifier'])
+            item_url = 'http://dhistory.org/archives/naa/{}/'.format(barcode)
+        else:
+            item_url = 'http://www.naa.gov.au/cgi-bin/Search?O=I&Number={}'.format(barcode)
         series_details = rsseries.get_summary(item_details['series'])
-        repository = Organisation.objects.get(name='National Archives of Australia')
+        repository, created = Repository.objects.get_or_create(
+                                    name='National Archives of Australia',
+                                    defaults={'added_by': system_user}
+                                    )
         series_type = SourceType.objects.get(label='series')
         series, created = Source.objects.get_or_create(
                 repository_item_id=item_details['series'],
                 source_type=series_type,
                 repository=repository,
                 defaults={
-                    'title': series_details['title']
+                    'added_by': system_user,
+                    'title': series_details['title'],
+                    'url': 'http://www.naa.gov.au/cgi-bin/Search?Number={}'.format(item_details['series'])
                 }
 
             )
@@ -245,6 +262,7 @@ class AddSourceForm(ModelForm, DateSelectMixin):
         cleaned_data['citation'] = citation
         cleaned_data['repository'] = repository
         cleaned_data['url'] = item_url
+        cleaned_data['rdf_url'] = 'http://dhistory.org/archives/naa/items/{}/#file'.format(barcode)
         if 'title' in self._errors:
             del self._errors['title']
         if 'source_type' in self._errors:
