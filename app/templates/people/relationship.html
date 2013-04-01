@@ -3,23 +3,27 @@
         <div class="row">
             {% with current='people' %}{% include '_sidenav.html' %}{% endwith %}
             <div class="span8">
-                <h1>Birth record</h1>
+                <h1>Relationship</h1>
                 <p>Details for <a href="{{ content.person.get_absolute_url }}">{{ content.person }}</a></p>
                 <dl class="dl-horizontal">
+                    <dt>Related person</dt>
+                    <dd>
+                        <a href="{{ content.associated_person.get_absolute_url }}">
+                            {{ content.associated_person }}
+                        </a>
+                    </dd>
+                    <dt>Relationship</dt>
+                    <dd>{{ content.association }}</dd>
                     {% if content.start_earliest %}
-                        <dt>Date</dt>
+                        <dt>Start date</dt>
                         <dd>
-                            {% if content.start_latest %}
-                                Between {{ content.start_earliest }} and {{ content.start_latest }}
-                            {% else %}
-                                {{ content.start_earliest }}
-                            {% endif %}
+                            {{ content.start_earliest }}
                         </dd>
                     {% endif %}
-                    {% if content.location %}
-                        <dt>Location</dt>
+                    {% if content.start_earliest %}
+                        <dt>End date</dt>
                         <dd>
-                            <a href="{{ content.location.get_absolute_url }}">{{ content.location }}</a>
+                            {{ content.end_earliest }}
                         </dd>
                     {% endif %}
                     {% if content.sources.all %}

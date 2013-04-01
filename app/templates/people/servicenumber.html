@@ -1,27 +1,15 @@
 {% extends 'base.html' %}
+{% load guardian_tags %}
 {% block content %}
+    {% get_obj_perms request.user for content as 'perms' %}
         <div class="row">
             {% with current='people' %}{% include '_sidenav.html' %}{% endwith %}
             <div class="span8">
-                <h1>Birth record</h1>
+                <h1>Service number</h1>
                 <p>Details for <a href="{{ content.person.get_absolute_url }}">{{ content.person }}</a></p>
                 <dl class="dl-horizontal">
-                    {% if content.start_earliest %}
-                        <dt>Date</dt>
-                        <dd>
-                            {% if content.start_latest %}
-                                Between {{ content.start_earliest }} and {{ content.start_latest }}
-                            {% else %}
-                                {{ content.start_earliest }}
-                            {% endif %}
-                        </dd>
-                    {% endif %}
-                    {% if content.location %}
-                        <dt>Location</dt>
-                        <dd>
-                            <a href="{{ content.location.get_absolute_url }}">{{ content.location }}</a>
-                        </dd>
-                    {% endif %}
+                    <dt>Service number</dt>
+                    <dd>{{ content.service_number }}</dd>
                     {% if content.sources.all %}
                         <dt>Documented by</dt>
                         {% with list=content.sources.all %}
@@ -29,6 +17,13 @@
                         {% endwith %}
                     {% endif %}
                 </dl>
+            </div>
+            <div class="span2">
+                {% if 'change_servicenumber' in perms %}
+                <p>
+                    <a class="btn btn-primary btn-medium" href="{% url servicenumber-update content.id%}">Update</a>
+                </p>
+                {% endif %}
             </div>
         </div>
 

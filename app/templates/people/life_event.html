@@ -4,37 +4,59 @@
             {% with current='people' %}{% include '_sidenav.html' %}{% endwith %}
             <div class="span8">
                 <h1>Life event</h1>
-                <h2><a href="{% url person-view content.person.id %}">{{ content.person }}</a></h2>
-                <h3>{{ content.label }}</h3>
-                {% if content.earliest_start %}
-                    <h4>Date</h4>
-                    <p>
-                        {% if content.latest_start %}
-                            Between {{ content.earliest_start }} and {{ content.latest_start }}
-                        {% else %}
-                            {{ content.earliest_start }}
-                        {% endif %}
-                    </p>
-                {% endif %}
+                <p>Details for <a href="{{ content.person.get_absolute_url }}">{{ content.person }}</a></p>
+                <dl class="dl-horizontal">
+                    <dt>Label</dt>
+                    <dd>{{ content.label }}</dd>
+                    {% if content.start_earliest and content.end_earliest %}
+                        <dt>Start date</dt>
+                        <dd>
+                            {% if content.start_latest %}
+                                Between {{ content.start_earliest }} and {{ content.start_latest }}
+                            {% else %}
+                                {{ content.start_earliest }}
+                            {% endif %}
+                        </dd>
+                        <dt>End date</dt>
+                        <dd>
+                            {% if content.end_latest %}
+                                Between {{ content.end_earliest }} and {{ content.end_latest }}
+                            {% else %}
+                                {{ content.end_earliest }}
+                            {% endif %}
+                        </dd>
+                    {% elif content.start_earliest %}
+                        <dt>Date</dt>
+                        <dd>
+                            {% if content.start_latest %}
+                                Between {{ content.start_earliest }} and {{ content.start_latest }}
+                            {% else %}
+                                {{ content.start_earliest }}
+                            {% endif %}
+                        </dd>
+                    {% endif %}
 
-                {% if content.location %}
-                    <h4>Location</h4>
-                    <p>
-                        <a href="{{ content.get_absolute_url }}">{{ content.location }}</a>
-                    </p>
-                {% endif %}
+                    {% if content.eventlocation_set.all %}
+                        <dt>Location{{ content.eventlocation_set.all|pluralize }}</dt>
+                        <dd>
+                            <ul>
+                                {% for location in content.eventlocation_set.all %}
+                                    <li>
+                                        {{ location.association }}
+                                        <a href="{{ location.location.get_absolute_url}}">{{ location.location }}</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </dd>
 
-                {% if content.sources %}
-                    <h4>Documented by</h4>
-                    <ul>
-                        {% for source in content.sources.all %}
-                            <li>
-                                {% include 'sources/_source_summary.html' %}
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-
+                    {% endif %}
+                    {% if content.sources.all %}
+                        <dt>Documented by</dt>
+                        {% with list=content.sources.all %}
+                            {% include '_dd_item_list.html' %}
+                        {% endwith %}
+                    {% endif %}
+                </dl>
             </div>
         </div>
 

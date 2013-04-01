@@ -6,10 +6,13 @@ from bs4 import BeautifulSoup
 
 from django import forms
 from django.forms import ModelForm
+from django.forms.models import inlineformset_factory
 from django_select2 import *
+from ckeditor.widgets import CKEditorWidget
 
 from app.sources.models import *
 from app.people.models import *
+from app.generic.forms import DateSelectMixin, ShortDateForm
 
 from django.forms.extras.widgets import SelectDateWidget
 from calendar import monthrange
@@ -17,7 +20,7 @@ from calendar import monthrange
 from rstools.client import RSItemClient, RSSeriesClient
 from moatools.client import MOAClient
 from awmtools.client import RollClient, EmbarkationClient, RedCrossClient, HonoursClient, CollectionClient
-
+from cwgctools.client import CWGCClient
 
 TROVE_API_KEY = 'ierj9cpsh7f5u7kg'
 
@@ -26,57 +29,6 @@ YEARS = [year for year in range(1850, 2013)]
 
 class NewSelectDateWidget(SelectDateWidget):
     none_value = (0, 'unknown')
-
-
-class DateSelectMixin(object):
-    def clean_date(self, date, type):
-        if date:
-            year, month, day = date.split('-')
-            if int(month) == 0:
-                if type == 'start':
-                    month = '1'
-                    day = '1'
-                elif type == 'end':
-                    month = '12'
-                    day = '31'
-            else:
-                if int(day) == 0:
-                    if type == 'start':
-                        day = '1'
-                    elif type == 'end':
-                        day = monthrange(int(year), int(month))[1]
-            date = '%s-%s-%s' % (year, month, day)
-        else:
-            date = None
-        return date
-
-    def clean_month(self, date, type):
-        if date:
-            year, month, day = date.split('-')
-            status = False if int(month) == 0 else True
-        else:
-            status = False
-        return status
-
-    def clean_day(self, date, type):
-        if date:
-            year, month, day = date.split('-')
-            status = False if int(day) == 0 else True
-        else:
-            status = False
-        return status
-
-
-class PeopleMultiChoices2(AutoSelect2MultipleField):
-
-    def get_val_txt(self, value):
-        person = Person.objects.get(id=value)
-        return '{}, {}'.format(person.family_name, person.other_names)
-
-    def get_results(self, request, term, page, context):
-        people = Person.objects.values_list('id', 'family_name', 'other_names').filter(family_name__istartswith=term).order_by('family_name')
-        results = [(id, '%s, %s' % (family_name, other_names)) for id, family_name, other_names in people]
-        return (NO_ERR_RESP, False, results)
 
 
 class PeopleMultiChoices(AutoModelSelect2MultipleField):
@@ -103,44 +55,109 @@ class AuthorMultiChoices(AutoModelSelect2MultipleField):
     search_fields = ['family_name__istartswith', ]
 
 
+class SourcesMultiChoice(AutoModelSelect2MultipleField):
+    queryset = Source.objects
+    search_fields = ['title__icontains', ]
+
+
+class SourceImageForm(ModelForm):
+    class Meta:
+        model = SourceImage
+        exclude = ('added_by',)
+        widgets = {
+            'page': forms.TextInput(attrs={'class': 'input-mini'})
+        }
+
+
+ImageFormSet = inlineformset_factory(Source, SourceImage, form=SourceImageForm, extra=1)
+
+
 class AddSourceForm(ModelForm, DateSelectMixin):
     categories = (
-            ('website', 'website'),
-            ('webpage', 'webpage'),
-            ('trove', 'Trove newspaper article'),
-            ('naa', 'National Archives of Australia file or document'),
-            ('awm', 'Australian War Memorial database record'),
-            ('cwgc', 'Commonwealth War Graves Commission database record')
-        )
+        ('website', 'website'),
+        ('webpage', 'webpage'),
+        ('letter', 'letter'),
+        ('diary', 'diary'),
+        ('trove', 'Trove newspaper article'),
+        ('naa', 'National Archives of Australia file or document'),
+        ('awm', 'Australian War Memorial database record'),
+        ('cwgc', 'Commonwealth War Graves Commission database record')
+    )
+    publication_date = forms.CharField(widget=NewSelectDateWidget(
+        attrs={'class': 'input-small'},
+        years=YEARS), required=False)
+    publication_date_end = forms.CharField(widget=NewSelectDateWidget(
+        attrs={'class': 'input-small'},
+        years=YEARS), required=False)
     main_people = PeopleMultiChoices(required=False)
-    related_people = PeopleMultiChoices(required=False)
+    other_people = PeopleMultiChoices(required=False)
     category = forms.ChoiceField(choices=categories)
     collection = CollectionChoice(required=False)
     repository = RepositoryChoice(required=False)
     authors = AuthorMultiChoices(required=False)
     editors = AuthorMultiChoices(required=False)
-    birth_record = forms.ModelChoiceField(
-                queryset=Birth.objects.all(),
-                required=False,
-                widget=forms.Select(attrs={'readonly': 'readonly'})
-        )
-    death_record = forms.ModelChoiceField(
-                queryset=Death.objects.all(),
-                required=False,
-                widget=forms.Select(attrs={'readonly': 'readonly'})
-        )
-    associated_people = forms.ModelChoiceField(
-                queryset=PersonAssociatedPerson.objects.all(),
-                required=False,
-                widget=forms.Select(attrs={'readonly': 'readonly'}))
+    person = forms.ModelChoiceField(
+        queryset=Person.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'readonly': 'readonly'})
+    )
+    mainperson = forms.ModelChoiceField(
+        queryset=Person.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'readonly': 'readonly'})
+    )
+    organisation = forms.ModelChoiceField(
+        queryset=Organisation.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'readonly': 'readonly'})
+    )
+    birth = forms.ModelChoiceField(
+        queryset=Birth.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'readonly': 'readonly'})
+    )
+    death = forms.ModelChoiceField(
+        queryset=Death.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'readonly': 'readonly'})
+    )
+    lifeevent = forms.ModelChoiceField(
+        queryset=LifeEvent.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'readonly': 'readonly'})
+    )
+    name = forms.ModelChoiceField(
+        queryset=AlternativePersonName.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'readonly': 'readonly'})
+    )
+    rank = forms.ModelChoiceField(
+        queryset=Rank.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'readonly': 'readonly'})
+    )
+    servicenumber = forms.ModelChoiceField(
+        queryset=ServiceNumber.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'readonly': 'readonly'})
+    )
+    relationship = forms.ModelChoiceField(
+        queryset=PersonAssociatedPerson.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'readonly': 'readonly'}))
     address = forms.ModelChoiceField(
-                queryset=PersonAddress.objects.all(),
-                required=False,
-                widget=forms.Select(attrs={'readonly': 'readonly'}))
-    person_organisation = forms.ModelChoiceField(
-                queryset=PersonAssociatedOrganisation.objects.all(),
-                required=False,
-                widget=forms.Select(attrs={'readonly': 'readonly'}))
+        queryset=PersonAddress.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'readonly': 'readonly'}))
+    membership = forms.ModelChoiceField(
+        queryset=PersonAssociatedOrganisation.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'readonly': 'readonly'}))
+    story = forms.ModelChoiceField(
+        queryset=Story.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'readonly': 'readonly'})
+    )
 
     def __init__(self, user, *args, **kwargs):
         super(AddSourceForm, self).__init__(*args, **kwargs)
@@ -158,7 +175,7 @@ class AddSourceForm(ModelForm, DateSelectMixin):
         cleaned_data['publication_date_end'] = self.clean_date(publication_date_end, 'end')
         if 'category' in cleaned_data:
             category = cleaned_data['category']
-            if category == 'trove' or category == 'naa' or category == 'awm':
+            if category == 'trove' or category == 'naa' or category == 'awm' or category == 'cwgc':
                 if 'url' not in cleaned_data:
                     self._errors['url'] = self.error_class(['A url is required'])
                 else:
@@ -168,6 +185,8 @@ class AddSourceForm(ModelForm, DateSelectMixin):
                         cleaned_data = self.get_naa_record(cleaned_data)
                     elif category == 'awm':
                         cleaned_data = self.get_awm_record(cleaned_data)
+                    elif category == 'cwgc':
+                        cleaned_data = self.get_cwgc_record(cleaned_data)
         return cleaned_data
 
     def get_trove_newspaper(self, cleaned_data):
@@ -192,8 +211,8 @@ class AddSourceForm(ModelForm, DateSelectMixin):
         cleaned_data['collection_title'] = data['article']['title']['value']
         date = datetime.datetime(*map(int, re.split('[^\d]', data['article']['date'])))
         cleaned_data['publication_date'] = date
-        cleaned_data['publication_date_month'] = True
-        cleaned_data['publication_date_day'] = True
+        cleaned_data['publication_date_month_known'] = True
+        cleaned_data['publication_date_day_known'] = True
         cleaned_data['pages'] = data['article']['page']
         cleaned_data['url'] = data['article']['troveUrl']
         cleaned_data['source_type'] = source_type
@@ -206,7 +225,6 @@ class AddSourceForm(ModelForm, DateSelectMixin):
     def get_naa_record(self, cleaned_data):
         current_user = self.user
         system_user = User.objects.get(username='system')
-        print current_user
         url = cleaned_data['url']
         try:
             if 'dhistory' in url:
@@ -221,30 +239,30 @@ class AddSourceForm(ModelForm, DateSelectMixin):
         item_details = rs.get_summary(barcode)
         dates = item_details['contents_dates']
         citation = '{}, {}'.format(
-                                item_details['series'],
-                                item_details['control_symbol']
-                            )
-        if item_details['digitised_status'] == True:
-            item_url = 'http://dhistory.org/archives/naa/{}/'.format(barcode)
+            item_details['series'],
+            item_details['control_symbol']
+        )
+        if item_details['digitised_status'] is True:
+            item_url = 'http://dhistory.org/archives/naa/items/{}/'.format(barcode)
         else:
             item_url = 'http://www.naa.gov.au/cgi-bin/Search?O=I&Number={}'.format(barcode)
         series_details = rsseries.get_summary(item_details['series'])
         repository, created = Repository.objects.get_or_create(
-                                    name='National Archives of Australia',
-                                    defaults={'added_by': system_user}
-                                    )
+            name='National Archives of Australia',
+            defaults={'added_by': system_user}
+        )
         series_type = SourceType.objects.get(label='series')
         series, created = Source.objects.get_or_create(
-                repository_item_id=item_details['series'],
-                source_type=series_type,
-                repository=repository,
-                defaults={
-                    'added_by': system_user,
-                    'title': series_details['title'],
-                    'url': 'http://www.naa.gov.au/cgi-bin/Search?Number={}'.format(item_details['series'])
-                }
+            repository_item_id=item_details['series'],
+            source_type=series_type,
+            repository=repository,
+            defaults={
+                'added_by': system_user,
+                'title': series_details['title'],
+                'url': 'http://www.naa.gov.au/cgi-bin/Search?Number={}'.format(item_details['series'])
+            }
 
-            )
+        )
         item_type = SourceType.objects.get(label='item')
 
         cleaned_data['collection'] = series
@@ -270,20 +288,49 @@ class AddSourceForm(ModelForm, DateSelectMixin):
         return cleaned_data
 
     def get_awm_record(self, cleaned_data):
+        system_user = User.objects.get(username='system')
         url = cleaned_data['url']
-        if 'roll_of_honour' in url:
-            collection = Source.objects.get(title='Roll of Honour')
-            details = self.process_roll_of_honour(url)
-        elif 'embarkation' in url:
-            collection = Source.objects.get(title='First World War Embarkation Roll')
-            details = self.process_embarkation_roll
-        elif 'wounded_and_missing' in url:
-            collection = Source.objects.get(title='First World War Red Cross Wounded and Missing')
-            details = self.process_red_cross(url)
-        elif 'honours_and_awards' in url:
-            collection = Source.objects.get(title='Honours and Awards')
-            details = self.process_honours(url)
+        publisher = 'Australian War Memorial'
+        website_type = SourceType.objects.get(label='website')
         webpage_type = SourceType.objects.get(label='webpage')
+        if 'roll_of_honour' in url:
+            collection, created = Source.objects.get_or_create(
+                title='Roll of Honour',
+                publisher=publisher,
+                source_type=website_type,
+                url='http://www.awm.gov.au/research/people/roll_of_honour/',
+                defaults={'added_by': system_user}
+            )
+            awm = RollClient()
+        elif 'embarkation' in url:
+            collection, created = Source.objects.get_or_create(
+                title='First World War Embarkation Roll',
+                publisher=publisher,
+                source_type=website_type,
+                url='http://www.awm.gov.au/research/people/nominal_rolls/first_world_war_embarkation/',
+                defaults={'added_by': system_user}
+            )
+            awm = EmbarkationClient()
+        elif 'wounded_and_missing' in url:
+            collection, created = Source.objects.get_or_create(
+                title='First World War Red Cross Wounded and Missing',
+                publisher=publisher,
+                source_type=website_type,
+                url='http://www.awm.gov.au/research/people/wounded_and_missing/',
+                defaults={'added_by': system_user}
+            )
+            awm = RedCrossClient()
+        elif 'honours_and_awards' in url:
+            collection, created = Source.objects.get_or_create(
+                title='Honours and Awards',
+                publisher=publisher,
+                source_type=website_type,
+                url='http://www.awm.gov.au/research/people/honours_and_awards/',
+                defaults={'added_by': system_user}
+            )
+            awm = HonoursClient()
+        details = awm.get_details(url=url)
+        cleaned_data['details'] = details
         cleaned_data['title'] = details['title']
         cleaned_data['source_type'] = webpage_type
         cleaned_data['collection'] = collection
@@ -294,52 +341,51 @@ class AddSourceForm(ModelForm, DateSelectMixin):
             del self._errors['source_type']
         return cleaned_data
 
-    def process_roll_of_honour(self, url):
-        awm = RollClient()
-        details = awm.get_details(url=url)
-        # Specific stuff
-        return details
-
-    def process_embarkation_roll(self, url):
-        awm = EmbarkationClient()
-        details = awm.get_details(url=url)
-        # Specific stuff
-
-        return details
-
-    def process_red_cross(self, url):
-        awm = RedCrossClient()
-        details = awm.get_details(url=url)
-        # Specific stuff
-
-        return details
-
-    def process_honours(self, url):
-        awm = HonoursClient()
-        details = awm.get_details(url=url)
-        # Specific stuff
-
-        return details
+    def get_cwgc_record(self, cleaned_data):
+        system_user = User.objects.get(username='system')
+        url = cleaned_data['url']
+        publisher = 'Commonwealth War Graves Commission'
+        website_type = SourceType.objects.get(label='website')
+        webpage_type = SourceType.objects.get(label='webpage')
+        cwgc = CWGCClient()
+        url = cleaned_data['url']
+        details = cwgc.get_details(url)
+        collection, created = Source.objects.get_or_create(
+            title='Find War Dead',
+            publisher=publisher,
+            source_type=website_type,
+            url='http://www.cwgc.org/find-war-dead.aspx',
+            defaults={'added_by': system_user}
+        )
+        cleaned_data['details'] = details
+        cleaned_data['title'] = 'Find War Dead &ndash; {}'.format(details['name'].title())
+        cleaned_data['source_type'] = webpage_type
+        cleaned_data['collection'] = collection
+        cleaned_data['url'] = url
+        if 'title' in self._errors:
+            del self._errors['title']
+        if 'source_type' in self._errors:
+            del self._errors['source_type']
+        return cleaned_data
 
     class Meta:
         model = Source
-        exclude = ('added_by', 'source_type', 'citation', 'rdf_url', 'json_url')
+        exclude = ('added_by')
         widgets = {
-                    'title': forms.TextInput(attrs={'class': 'input-xxlarge'}),
-                    'publication_date': NewSelectDateWidget(attrs={'class': 'input-small'}, years=YEARS),
-                    'publication_date_month_known': forms.HiddenInput,
-                    'publication_date_day_known': forms.HiddenInput,
-                    'publication_date_end_month_known': forms.HiddenInput,
-                    'publication_date_end_day_known': forms.HiddenInput,
-                    'publication_date_end': NewSelectDateWidget(attrs={'class': 'input-small'}, years=YEARS),
-                    'url': forms.TextInput(attrs={'class': 'input-xxlarge'}),
-                }
+            'title': forms.TextInput(attrs={'class': 'input-xxlarge'}),
+            'url': forms.TextInput(attrs={'class': 'input-xxlarge'}),
+        }
 
 
 class UpdateSourceForm(ModelForm, DateSelectMixin):
-
+    publication_date = forms.CharField(widget=NewSelectDateWidget(
+        attrs={'class': 'input-small'},
+        years=YEARS), required=False)
+    publication_date_end = forms.CharField(widget=NewSelectDateWidget(
+        attrs={'class': 'input-small'},
+        years=YEARS), required=False)
     main_people = PeopleMultiChoices(required=False)
-    related_people = PeopleMultiChoices(required=False)
+    other_people = PeopleMultiChoices(required=False)
     collection = CollectionChoice(required=False)
     repository = RepositoryChoice(required=False)
     authors = AuthorMultiChoices(required=False)
@@ -359,18 +405,11 @@ class UpdateSourceForm(ModelForm, DateSelectMixin):
 
     class Meta:
         model = Source
-        exclude = ('added_by', 'source_type', 'citation', 'rdf_url', 'json_url')
+        exclude = ('added_by')
         widgets = {
-                    'title': forms.TextInput(attrs={'class': 'input-xxlarge'}),
-                    'publication_date': NewSelectDateWidget(attrs={'class': 'input-small'}, years=YEARS),
-                    'publication_date_month_known': forms.HiddenInput,
-                    'publication_date_day_known': forms.HiddenInput,
-                    'publication_date_end_month_known': forms.HiddenInput,
-                    'publication_date_end_day_known': forms.HiddenInput,
-                    'publication_date_end': NewSelectDateWidget(attrs={'class': 'input-small'}, years=YEARS),
-                    'url': forms.TextInput(attrs={'class': 'input-xxlarge'}),
-                }
-
+            'title': forms.TextInput(attrs={'class': 'input-xlarge'}),
+            'url': forms.TextInput(attrs={'class': 'input-xlarge'}),
+        }
 
 
 class AddSourcePersonForm(ModelForm):
@@ -381,5 +420,20 @@ class AddSourcePersonForm(ModelForm):
         model = SourcePerson
         exclude = ('person', 'added_by')
         widgets = {
-                    'source': forms.Select(attrs={'readonly': True})
-                }
+            'source': forms.Select(attrs={'readonly': True})
+        }
+
+
+class AddStoryForm(ShortDateForm):
+    person = forms.ModelChoiceField(
+        queryset=Person.objects.filter(status='confirmed'),
+        required=False,
+        widget=forms.Select(attrs={'readonly': 'readonly'}))
+    sources = SourcesMultiChoice(required=False)
+
+    class Meta:
+        model = Story
+        exclude = ('added_by')
+        widgets = {
+            'text': CKEditorWidget(attrs={'class': 'input-xlarge'}),
+        }

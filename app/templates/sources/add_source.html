@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load django_select2_tags %}
+{% load thumbnail %}
 {% block title %}Log in{% endblock %}
 {% block extra_scripts %}
 {% import_django_select2_js %}
@@ -11,9 +12,9 @@
 {% block content %}
     <div class="row">
         {% with current='images' %}{% include '_sidenav.html' %}{% endwith %}
-        <div class="span10">
+        <div class="span8">
             <h2>{% if link_id %}Edit{% else %}Add{% endif %} a source</h2>
-            <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">{% csrf_token %}
+            <form action="." method="post" enctype="multipart/form-data" class="form-horizontal">{% csrf_token %}
                 {% if form.errors %}
     <!-- Error messaging -->
     <div id="errors">
@@ -29,23 +30,53 @@
     </div>
     <!-- /Error messaging -->
 {% endif %}
-                {% if 'birth_record' in form.initial.keys %}
-                    {% with label='Birth record' field=form.birth_record %}
+                {% if 'person' in form.initial.keys %}
+                    {% with label='About this person' field=form.person %}
                         {% include '_form_field.html' %}
                     {% endwith %}
                 {% endif %}
-                {% if 'death_record' in form.initial.keys %}
-                    {% with label='Death record' field=form.death_record %}
+                {% if 'mainperson' in form.initial.keys %}
+                    {% with label='About this person' field=form.mainperson %}
                         {% include '_form_field.html' %}
                     {% endwith %}
                 {% endif %}
-                {% if 'associated_people' in form.initial.keys %}
-                    {% with label='Documenting relationship' field=form.associated_people %}
+                {% if 'birth' in form.initial.keys %}
+                    {% with label='Birth record' field=form.birth %}
                         {% include '_form_field.html' %}
                     {% endwith %}
                 {% endif %}
-                {% if 'person_organisation' in form.initial.keys %}
-                    {% with label='Documenting relationship' field=form.person_organisation %}
+                {% if 'death' in form.initial.keys %}
+                    {% with label='Death record' field=form.death %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                {% endif %}
+                {% if 'lifeevent' in form.initial.keys %}
+                    {% with label='Death record' field=form.lifeevent %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                {% endif %}
+                {% if 'rank' in form.initial.keys %}
+                    {% with label='Documenting rank' field=form.rank %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                {% endif %}
+                {% if 'name' in form.initial.keys %}
+                    {% with label='Documenting name' field=form.name %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                {% endif %}
+                {% if 'servicenumber' in form.initial.keys %}
+                    {% with label='Documenting service number' field=form.servicenumber %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                {% endif %}
+                {% if 'relationship' in form.initial.keys %}
+                    {% with label='Documenting relationship' field=form.relationship %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                {% endif %}
+                {% if 'membership' in form.initial.keys %}
+                    {% with label='Documenting membership' field=form.membership %}
                         {% include '_form_field.html' %}
                     {% endwith %}
                 {% endif %}
@@ -54,6 +85,12 @@
                         {% include '_form_field.html' %}
                     {% endwith %}
                 {% endif %}
+                {% if 'story' in form.initial.keys %}
+                    {% with label='Documenting story' field=form.story %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                {% endif %}
+
                 {% if source.id %}
                     {% with label='Source type' field=form.source_type extra='url'%}
                         {% include '_form_field.html' %}
@@ -63,6 +100,7 @@
                         {% include '_form_field.html' %}
                     {% endwith %}
                 {% endif %}
+
                 {% with label='Title' field=form.title %}
                     {% include '_form_field.html' %}
                 {% endwith %}
@@ -72,13 +110,9 @@
                 {% with label='Publication date' field=form.publication_date %}
                     {% include '_form_field.html' %}
                 {% endwith %}
-                {{ form.publication_date_month_known }}
-                {{ form.publication_date_day_known }}
                 {% with label='Publication date end' field=form.publication_date_end %}
                     {% include '_form_field.html' %}
                 {% endwith %}
-                {{ form.publication_date_end_month_known }}
-                {{ form.publication_date_end_day_known }}
                 <div class="form-field date_type control-group">
                     <div class="controls">
                         <label class="radio inline">
@@ -89,55 +123,87 @@
                         </label>
                     </div>
                 </div>
-                <fieldset id="creators">
-                    <legend>Creators</legend>
-                    {% with label='Authors' field=form.authors %}
-                        {% include '_form_field.html' %}
-                    {% endwith %}
-                    {% with label='Editors' field=form.editors %}
-                        {% include '_form_field.html' %}
-                    {% endwith %}
-                </fieldset>
-                <fieldset id="collection">
-                    <legend>Part of</legend>
-                    {% with label='Collection' field=form.collection %}
-                        {% include '_form_field.html' %}
-                    {% endwith %}
-                    {% with label='Collection title' field=form.collection_title %}
-                        {% include '_form_field.html' %}
-                    {% endwith %}
-                    {% with label='Repository' field=form.repository %}
-                        {% include '_form_field.html' %}
-                    {% endwith %}
-                    {% with label='Collection identifier' field=form.collection_item_id %}
-                        {% include '_form_field.html' %}
-                    {% endwith %}
-                    {% with label='Repository identifier' field=form.repository_item_id %}
-                        {% include '_form_field.html' %}
-                    {% endwith %}
-                    {% with label='Pages' field=form.pages %}
-                        {% include '_form_field.html' %}
-                    {% endwith %}
-                </fieldset>
-                <fieldset id="publication">
-                    <legend>Publisher</legend>
-                    {% with label='Publisher' field=form.publisher %}
-                        {% include '_form_field.html' %}
-                    {% endwith %}
-                    {% with label='Place of publication' field=form.publication_place %}
-                        {% include '_form_field.html' %}
-                    {% endwith %}
-                </fieldset>
-                <fieldset id="subjects">
-                    <legend>Subjects</legend>
-                    {% if 'birth_record' not in form.initial.keys and 'death_record' not in form.initial.keys %}
+
+                {% if source.id %}
+                    <fieldset>
+                    <legend>Images</legend>
+                    {% for image in images.forms %}
+                        {{ image.id }}
+                        <div class="form-field control-group">
+                            <label class="control-label">Image</label>
+                            <div class="controls">
+                                {% if image.instance.image %}
+                                    <div class="pull-right">
+                                        {% thumbnail image.instance.image 150x150  as im %}
+                                        <a href="{{ image.instance.image.url }}"><img src="{{ im.url }}"></a>
+                                    </div>
+                                {% endif %}
+                                <p>{{ image.image }}</p>
+                                <p>Order: {{ image.page }}</p>
+                                <p>Delete: {% if image.instance.pk %}{{ image.DELETE }}{% endif %}</p>
+                                <span id="{{ field.auto_id }}_help" class="help-block">{{ help }}</span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    {{ images.management_form }}
+                    </fieldset>
+                    <fieldset id="creators">
+                        <legend>Creators</legend>
+                        {% with label='Authors' field=form.authors %}
+                            {% include '_form_field.html' %}
+                        {% endwith %}
+                        {% with label='Editors' field=form.editors %}
+                            {% include '_form_field.html' %}
+                        {% endwith %}
+                    </fieldset>
+                    <fieldset id="collection">
+                        <legend>Part of</legend>
+                        {% with label='Collection' field=form.collection %}
+                            {% include '_form_field.html' %}
+                        {% endwith %}
+                        {% with label='Collection title' field=form.collection_title %}
+                            {% include '_form_field.html' %}
+                        {% endwith %}
+                        {% with label='Repository' field=form.repository %}
+                            {% include '_form_field.html' %}
+                        {% endwith %}
+                        {% with label='Collection identifier' field=form.collection_item_id %}
+                            {% include '_form_field.html' %}
+                        {% endwith %}
+                        {% with label='Repository identifier' field=form.repository_item_id %}
+                            {% include '_form_field.html' %}
+                        {% endwith %}
+                        {% with label='Pages' field=form.pages %}
+                            {% include '_form_field.html' %}
+                        {% endwith %}
+                    </fieldset>
+                    <fieldset id="publication">
+                        <legend>Publisher</legend>
+                        {% with label='Publisher' field=form.publisher %}
+                            {% include '_form_field.html' %}
+                        {% endwith %}
+                        {% with label='Place of publication' field=form.publication_place %}
+                            {% include '_form_field.html' %}
+                        {% endwith %}
+                    </fieldset>
+                    <fieldset id="subjects">
+                        <legend>Subjects</legend>
                         {% with label='Main people' field=form.main_people %}
                             {% include '_form_field.html' %}
                         {% endwith %}
-                    {% endif %}
-                </fieldset>
+                        {% with label='Other people' field=form.other_people %}
+                            {% include '_form_field.html' %}
+                        {% endwith %}
+                    </fieldset>
+                {% endif %}
                 <div class="form-actions">
-                    <input class="btn btn-primary" type="submit" value="Save">
+                    {% if source.id %}
+                        <input class="btn btn-primary" name="continue" type="submit" value="Save &amp; continue editing">
+                        <input class="btn btn-primary" name="finished" type="submit" value="Finished">
+                        <a class="btn btn-primary btn-danger" href="{% url source-delete source.id %}">Delete</a>
+                    {% else %}
+                        <input class="btn btn-primary" name="next" type="submit" value="Next">
+                    {% endif %}
                 </div>
             </form>
         </div>

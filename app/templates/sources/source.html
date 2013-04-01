@@ -1,100 +1,110 @@
 {% extends 'base.html' %}
+{% load thumbnail %}
 {% block content %}
         <div class="row">
             {% with current='sources' %}{% include '_sidenav.html' %}{% endwith %}
             <div class="span8">
                 <h1>Source</h1>
-                <h2>{{ content }}</h2>
-                <p>
-                    <span class="label">Type</span>
-                    {{ content.source_type }}
-                </p>
-                {% if content.sourceperson_set.all %}
-                    <h4>Creators</h4>
-                    <ul>
-                    {% for creator in content.sourceperson_set.all %}
-                        <li>{{ creator.person }} ({{ creator.role }})</li>
-                    {% endfor %}
-                    </ul>
-                {% endif %}
-                {% if content.repository %}
-                    <p>
-                        <span class="label">Repository</span>
-                        {{ content.repository }}
-                    </p>
-                {% endif %}
-                {% if content.collection %}
-                    <p>
-                        <span class="label">Part of</span>
-                        <a href="{{ content.collection.get_absolute_url }}">{{ content.collection.title }}</a> ({{ content.collection.source_type }})
-                    </p>
-                {% endif %}
-                {% if content.collection_title %}
-                    <p>
-                        <span class="label">Part of</span>
-                        {{ content.collection_title }}</a>
-                    </p>
-                {% endif %}
-                {% if content.collection_item_id %}
-                    <p>
-                        <span class="label">Identifier</span>
-                        {{ content.collection_item_id }}
-                    </p>
-                {% endif %}
-                {% if content.repository_item_id %}
-                    <p>
-                        <span class="label">Identifier</span>
-                        {{ content.repository_item_id }}
-                    </p>
-                {% endif %}
-                {% if content.display_publisher %}
-                    <p>
-                        <span class="label">Publisher</span>
-
-                        {{ content.display_publisher }}
-                    </p>
-                {% endif %}
-                {% if content.publication_place %}
-                    <p>
-                        <span class="label">Place of publication</span>
-                        {{ content.publication_place }}
-                    </p>
-                {% endif %}
-                {% if content.start_date %}
-                    <p>
-                        <span class="label">Date</span>
-                        {{ content.start_date }}
-                        {% if content.end_date %}
-                            &ndash; {{ content.end_date }}
-                        {% endif %}
-                    </p>
-                {% endif %}
-                {% if content.pages %}
-                    <p><span class="label">Page{{ content.pages|pluralize}}:</span> {{ content.pages }}</p>
-                {% endif %}
-                {% if content.url %}
-                    <p>
-                        <span class="label">Web</span>
-                        {{ content.url|urlize }}
-                    </p>
-                {% endif %}
-                {% if content.collection_source.all %}
-                    <h4>Includes</h4>
-                    <ul>
-                    {% for part in content.collection_source.all %}
-                        <li><a href="{{ part.get_absolute_url }}">{{ part }}</a></li>
-                    {% endfor %}
-                </ul>
-                {% endif %}
-                {% if content.main_people %}
-                <h4>Main subject{{ content.main_people|pluralize }}</h4>
-                <ul>
-                {% for subject in content.main_people %}
-                    <li><a href="{% url person-view subject.id %}">{{ subject }}</a></li>
-                {% endfor %}
-                </ul>
-
-                {% endif %}
+                <h2>{{ content|safe }}</h2>
+                <dl class="dl-horizontal">
+                    <dt>Type</dt>
+                    <dd>{{ content.source_type }}</dd>
+                    {% if content.sourceperson_set.all %}
+                        <dt>Creators</dt>
+                        <dd>
+                            <ul>
+                            {% for creator in content.sourceperson_set.all %}
+                                <li>{{ creator.person }} ({{ creator.role }})</li>
+                            {% endfor %}
+                            </ul>
+                        </dd>
+                    {% endif %}
+                    {% if content.repository %}
+                        <dt>Repository</dt>
+                        <dd>{{ content.repository }}</dd>
+                    {% endif %}
+                    {% if content.collection %}
+                        <dt>Part of</dt>
+                        <dd><a href="{{ content.collection.get_absolute_url }}">{{ content.collection.title }}</a> ({{ content.collection.source_type }})</dd>
+                    {% endif %}
+                    {% if content.collection_title %}
+                        <dt>Part of</dt>
+                        <dd>{{ content.collection_title }}</dd>
+                    {% endif %}
+                    {% if content.collection_item_id %}
+                        <dt>Identifier</dt>
+                        <dd>{{ content.collection_item_id }}</dd>
+                    {% endif %}
+                    {% if content.repository_item_id %}
+                        <dt>Identifier</dt>
+                        <dd>{{ content.repository_item_id }}</dd>
+                    {% endif %}
+                    {% if content.display_publisher %}
+                        <dt>Publisher</dt>
+                        <dd>{{ content.display_publisher }}</dd>
+                    {% endif %}
+                    {% if content.publication_place %}
+                        <dt>Place of publication</dt>
+                        <dd>{{ content.publication_place }}</dd>
+                    {% endif %}
+                    {% if content.start_date %}
+                        <dt>Date</dt>
+                        <dd>
+                            {{ content.start_date }}
+                            {% if content.end_date %}
+                                &ndash; {{ content.end_date }}
+                            {% endif %}
+                        </dd>
+                    {% endif %}
+                    {% if content.pages %}
+                        <dt>Page{{ content.pages|pluralize}}</dt>
+                        <dd>{{ content.pages }}</dd>
+                    {% endif %}
+                    {% if content.url %}
+                        <dt>Web</dt>
+                        <dd><a href="{{ content.url }}">{{ content.url|truncatechars:50 }}</a></dd>
+                    {% endif %}
+                    {% if content.collection_source.all %}
+                        <dt>Includes</dt>
+                        <dd>
+                            <ul>
+                            {% for part in content.collection_source.all %}
+                                <li><a href="{{ part.get_absolute_url }}">{{ part }}</a></li>
+                            {% endfor %}
+                            </ul>
+                        </dd>
+                    {% endif %}
+                    {% if content.main_subjects %}
+                    <dt>Main subject{{ content.main_subjects|pluralize }}</dt>
+                    <dd>
+                        <ul>
+                        {% for subject in content.main_subjects %}
+                            <li><a href="{{ subject.get_absolute_url }}">{{ subject|safe }}</a></li>
+                        {% endfor %}
+                        </ul>
+                    </dd>
+                    {% endif %}
+                    {% if content.other_subjects %}
+                    <dt>Other subject{{ content.other_subjects|pluralize }}</dt>
+                    <dd>
+                        <ul>
+                        {% for subject in content.other_subjects %}
+                            <li><a href="{{ subject.get_absolute_url }}">{{ subject|safe }}</a></li>
+                        {% endfor %}
+                        </ul>
+                    </dd>
+                    {% endif %}
+                    {% if content.evidence_for %}
+                    <dt>Evidence for</dt>
+                    <dd>
+                        <ul>
+                        {% for evidence in content.evidence_for %}
+                            <li><a href="{{ evidence.get_absolute_url }}">{{ evidence|safe }}</a></li>
+                        {% endfor %}
+                        </ul>
+                    </dd>
+                    {% endif %}
+                </dl>
             </div>
         </div>
 {% endblock %}

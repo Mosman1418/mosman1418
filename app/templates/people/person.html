@@ -14,84 +14,105 @@
                     {% endif %}
                 </div>
                 {% endif %}
+                <dl class="dl-horizontal">
+                    {% if content.alternativepersonname_set.all %}
+                        <dt>Name{{ content.alternativepersonname_set.all|pluralize }} recorded</dt>
+                        {% with list=content.alternativepersonname_set.all %}
+                            {% include '_dd_item_list.html' %}
+                        {% endwith %}
+                    {% endif %}
+                    {% if content.servicenumber_set.all %}
+                        <dt>Service number{{ content.servicenumber_set.all|pluralize }}</dt>
+                        {% with list=content.servicenumber_set.all %}
+                            {% include '_dd_item_list.html' %}
+                        {% endwith %}
+                    {% endif %}
+                    {% if content.rank_set.all %}
+                        <dt>Rank{{ content.rank_set.all|pluralize }}</dt>
+                        {% with list=content.rank_set.all %}
+                            {% include '_dd_item_list.html' %}
+                        {% endwith %}
+                    {% endif %}
+                    {% if content.birth_set.all %}
+                        <dt>Birth record{{ content.birth_set.all|pluralize }}</dt>
+                        {% with list=content.birth_set.all %}
+                            {% include '_dd_item_list.html' %}
+                        {% endwith %}
+                    {% endif %}
+                    {% if content.death_set.all %}
+                        <dt>Death record{{ content.death_set.all|pluralize }}</dt>
+                        {% with list=content.death_set.all %}
+                            {% include '_dd_item_list.html' %}
+                        {% endwith %}
+                    {% endif %}
+                    {% if content.lifeevent_set.all %}
+                        <dt>Life event{{ content.lifeevent_set.all|pluralize }}</dt>
+                        {% with list=content.lifeevent_set.all %}
+                            {% include '_dd_item_list.html' %}
+                        {% endwith %}
+                    {% endif %}
+                    {% if content.personassociatedperson_set.all %}
+                        <dt>Relationship{{ content.personassociatedperson_set.all|pluralize }}</dt>
+                        {% with list=content.personassociatedperson_set.all %}
+                            {% include '_dd_item_list.html' %}
+                        {% endwith %}
+                    {% endif %}
+                    {% if content.personassociatedorganisation_set.all %}
+                        <dt>Organisation{{ content.personassociatedorganisation_set.all|pluralize }}</dt>
+                        {% with list=content.personassociatedorganisation_set.all %}
+                            {% include '_dd_item_list.html' %}
+                        {% endwith %}
+                    {% endif %}
+                    {% if content.main_sources %}
+                        <dt>Main source{{ content.main_sources|pluralize }}</dt>
+                        {% with list=content.main_sources %}
+                            {% include '_dd_item_list.html' %}
+                        {% endwith %}
+                    {% endif %}
+                    {% if content.other_sources %}
+                        <dt>Other source{{ content.other_sources|pluralize }}</dt>
+                        {% with list=content.other_sources %}
+                            {% include '_dd_item_list.html' %}
+                        {% endwith %}
+                    {% endif %}
+                    {% if content.stories.all %}
+                        <h4>Stories</h4>
+                        {% for story in content.stories.all %}
+                        <article>
+                            <h5>{{ story.title }}</h5>
+                            {{ story.text|linebreaks|truncatewords_html:100 }}
+                            <p><a href="{{ story.get_absolute_url }}">More</a></p>
+                        </article>
+                        {% endfor %}
+                    {% endif %}
 
-                <h4>Birth</h4>
-                {% if content.birth_set.all %}
-                    <h5>What the sources tell us</h5>
+
+                    {% if content.memorialname_set.all %}
+                    <h4>Commemorations</h4>
                     <ul>
-                    {% for birth in content.birth_set.all %}
-                            <li>
-                                <a href="{{ birth.get_absolute_url }}">
-                                    {{ birth }}
-                                </a>
-                            </li>
-                    {% endfor %}
+                        {% for memorialname in content.memorialname_set.all %}
+                            <li>{{ memorialname.name }} on the {% if memorialname.memorial_part %}<a href="{{ memorialname.memorial.get_absolute_url }}#part-{{ memorialname.memorial_part.id }}">{{ memorialname.memorial_part.label }}</a> of the {% endif %}<a href="{{ memorialname.memorial.get_absolute_url }}">{{ memorialname.memorial }}</a></li>
+                        {% endfor %}
                     </ul>
-                {% endif %}
-                {% if content.lifeevent_set.all %}
-                    <h4>Life events</h4>
-                    <ul>
-                    {% for event in content.lifeevent_set.all %}
-                        <li><a href="{{ event.get_absolute_url }}">{{ event }}</a></li>
-                    {% endfor %}
-                    </ul>
-                {% endif %}
-                {% if content.stories.all %}
-                    <h4>Stories</h4>
-                    {% for story in content.stories.all %}
-                    <article>
-                        <h5>{{ story.title }}</h5>
-                        {{ story.text|linebreaks|truncatewords_html:100 }}
-                        <p><a href="{{ story.get_absolute_url }}">More</a></p>
-                    </article>
-                    {% endfor %}
-                {% endif %}
-
-                {% if content.main_sources %}
-                <h4>Main sources of information</h4>
-                <ul>
-                    {% for source in content.main_sources %}
-                         <li><a href="{{ source.get_absolute_url }}">{{ source.title }}</a> ({{ source.source_type}})</li>
-                    {% endfor %}
-                </ul>
-                {% endif %}
-
-                {% if content.other_sources %}
-                <h4>Other sources of information</h4>
-                <ul>
-                    {% for source in content.other_sources %}
-                        {% if source.source_type.label == "item" %}
-                         <li>{{ source.repository }}: <a href="{{ source.get_absolute_url }}">{{ source.citation }}</a> (file)</li>
-                        {% endif %}
-                    {% endfor %}
-                </ul>
-                {% endif %}
-
-                {% if content.memorialname_set.all %}
-                <h4>Commemorations</h4>
-                <ul>
-                    {% for memorialname in content.memorialname_set.all %}
-                        <li>{{ memorialname.name }} on the {% if memorialname.memorial_part %}<a href="{{ memorialname.memorial.get_absolute_url }}#part-{{ memorialname.memorial_part.id }}">{{ memorialname.memorial_part.label }}</a> of the {% endif %}<a href="{{ memorialname.memorial.get_absolute_url }}">{{ memorialname.memorial }}</a></li>
-                    {% endfor %}
-                </ul>
-                {% endif %}
+                    {% endif %}
+                </dl>
 
             </div>
             <div class="span2">
                 <h5>Contribute</h5>
-                {% if perms.people.person %}
+                {% if 'change_person' in perms %}
                 <p>
                     <a class="btn btn-primary btn-medium" href="{% url person-update content.id%}">Update</a>
                 </p>
                 {% endif %}
                 <p>
-                    <a class="btn btn-primary btn-medium" href="{% url person_add_story 'person' content.id%}">Add a story</a>
+                    <a class="btn btn-primary btn-medium" href="{% url story-add-entity 'person' content.id%}">Add a story</a>
                 </p>
                 <p>
                     <a class="btn btn-primary btn-medium" href="{% url person_add_image 'person' content.id%}">Add an image</a>
                 </p>
                 <p>
-                    <a class="btn btn-primary btn-medium" href="{% url source-add-person 'person' content.id%}">Add a link</a>
+                    <a class="btn btn-primary btn-medium" href="{% url source-add-entity 'mainperson' content.id%}">Add a link</a>
                 </p>
             </div>
         </div>

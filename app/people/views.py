@@ -364,6 +364,66 @@ class OrganisationListView(LinkedDataListView):
         return graph
 
 
+class RankView(LinkedDataView):
+    model = Rank
+    path = '/people/ranks/%s'
+    template_name = 'people/rank'
+
+    def make_graph(self, entity):
+        namespaces = {}
+        graph = Graph()
+        schemas = RDFSchema.objects.all()
+        for schema in schemas:
+            namespace = Namespace(schema.uri)
+            graph.bind(schema.prefix, namespace)
+            namespaces[schema.prefix] = namespace
+        host_ns = Namespace('http://%s' % (Site.objects.get_current().domain))
+        this_person = URIRef(host_ns[entity.get_absolute_url()])
+        graph.add((this_person, namespaces['rdf']['type'], namespaces['foaf']['Person']))
+        graph.add((this_person, namespaces['rdfs']['label'], Literal(str(entity))))
+        return graph
+
+
+class ServiceNumberView(LinkedDataView):
+    model = ServiceNumber
+    path = '/people/servicenumbers/%s'
+    template_name = 'people/servicenumber'
+
+    def make_graph(self, entity):
+        namespaces = {}
+        graph = Graph()
+        schemas = RDFSchema.objects.all()
+        for schema in schemas:
+            namespace = Namespace(schema.uri)
+            graph.bind(schema.prefix, namespace)
+            namespaces[schema.prefix] = namespace
+        host_ns = Namespace('http://%s' % (Site.objects.get_current().domain))
+        this_person = URIRef(host_ns[entity.person.get_absolute_url()])
+        graph.add((this_person, namespaces['rdf']['type'], namespaces['foaf']['Person']))
+        graph.add((this_person, namespaces['dc']['identifier'], Literal(str(entity.service_number))))
+        return graph
+
+
+class PersonRelationshipView(LinkedDataView):
+    model = PersonAssociatedPerson
+    path = '/people/relationships/%s'
+    template_name = 'people/relationship'
+
+    def make_graph(self, entity):
+        namespaces = {}
+        graph = Graph()
+        schemas = RDFSchema.objects.all()
+        for schema in schemas:
+            namespace = Namespace(schema.uri)
+            graph.bind(schema.prefix, namespace)
+            namespaces[schema.prefix] = namespace
+        host_ns = Namespace('http://%s' % (Site.objects.get_current().domain))
+        this_person = URIRef(host_ns[entity.get_absolute_url()])
+        graph.add((this_person, namespaces['rdf']['type'], namespaces['foaf']['Person']))
+        graph.add((this_person, namespaces['rdfs']['label'], Literal(str(entity))))
+        return graph
+
+
 class SuggestPerson(CreateView):
     '''
     A logged-in user can suggest a service person for inclusion.
@@ -1131,6 +1191,126 @@ class DeletePersonAddress(PermissionRequiredMixin, DeleteView):
     def delete(self, request, *args, **kwargs):
         self.person_pk = self.get_object().person.pk
         return super(DeletePersonAddress, self).delete(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse_lazy('person-update', args=[self.person_pk])
+
+
+class AddRank(CreateView):
+    model = Rank
+    form_class = AddRankForm
+
+    # Use this instead the Guardian Permission mixin -
+    # it doesn't seem to like CreateView
+    @method_decorator(permission_required('people.add_rank'))
+    def dispatch(self, *args, **kwargs):
+        return super(AddRank, self).dispatch(*args, **kwargs)
+
+    def get_initial(self):
+        person_id = self.kwargs.get('person_id', None)
+        initial = {'person': person_id}
+        return initial
+
+    def form_valid(self, form):
+        rank = form.save(commit=False)
+        rank.added_by = self.request.user
+        rank.save()
+        assign('people.change_rank', self.request.user, rank)
+        assign('people.delete_rank', self.request.user, rank)
+        return HttpResponseRedirect(reverse('person-update', args=[rank.person.id]))
+
+
+class UpdateRank(PermissionRequiredMixin, UpdateView):
+    model = Rank
+    form_class = AddRankForm
+    permission_required = 'people.change_rank'
+
+    def prepare_date(self, name):
+        date = getattr(self.object, name)
+        name = name[:-5]
+        if date:
+            year = date.year
+            month = date.month
+            day = date.day
+            if getattr(self.object, '{}_month'.format(name)) is False:
+                month = 0
+            if getattr(self.object, '{}_day'.format(name)) is False:
+                day = 0
+            date = '{}-{}-{}'.format(year, month, day)
+        return date
+
+    def get_initial(self):
+        initial = {}
+        initial['start_earliest_date'] = self.prepare_date('start_earliest_date')
+        initial['end_earliest_date'] = self.prepare_date('end_earliest_date')
+        return initial
+
+    def get_success_url(self):
+        if 'continue' in self.request.POST:
+            url = reverse_lazy('rank-update', args=[self.object.id])
+        else:
+            url = reverse_lazy('person-update', args=[self.object.person.id])
+        return url
+
+
+class DeleteRank(PermissionRequiredMixin, DeleteView):
+    model = Rank
+    template_name = 'people/confirm_delete.html'
+    permission_required = 'people.delete_rank'
+
+    def delete(self, request, *args, **kwargs):
+        self.person_pk = self.get_object().person.pk
+        return super(DeleteRank, self).delete(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse_lazy('person-update', args=[self.person_pk])
+
+
+class AddServiceNumber(CreateView):
+    model = ServiceNumber
+    form_class = AddServiceNumberForm
+
+    # Use this instead the Guardian Permission mixin -
+    # it doesn't seem to like CreateView
+    @method_decorator(permission_required('people.add_servicenumber'))
+    def dispatch(self, *args, **kwargs):
+        return super(AddServiceNumber, self).dispatch(*args, **kwargs)
+
+    def get_initial(self):
+        person_id = self.kwargs.get('person_id', None)
+        initial = {'person': person_id}
+        return initial
+
+    def form_valid(self, form):
+        obj = form.save(commit=False)
+        obj.added_by = self.request.user
+        obj.save()
+        assign('people.change_servicenumber', self.request.user, servicenumber)
+        assign('people.delete_servicenumber', self.request.user, servicenumber)
+        return HttpResponseRedirect(reverse('servicenumber-update', args=[obj.id]))
+
+
+class UpdateServiceNumber(PermissionRequiredMixin, UpdateView):
+    model = ServiceNumber
+    form_class = AddServiceNumberForm
+    permission_required = 'people.change_servicenumber'
+
+    def get_success_url(self):
+        if 'continue' in self.request.POST:
+            url = reverse_lazy('servicenumber-update', args=[self.object.id])
+        else:
+            url = reverse_lazy('person-update', args=[self.object.person.id])
+        return url
+
+
+class DeleteServiceNumber(PermissionRequiredMixin, DeleteView):
+    model = ServiceNumber
+    template_name = 'people/confirm_delete.html'
+    permission_required = 'people.delete_servicenumber'
+
+    def delete(self, request, *args, **kwargs):
+        self.person_pk = self.get_object().person.pk
+        return super(DeleteServiceNumber, self).delete(request, *args, **kwargs)
 
     def get_success_url(self):
         return reverse_lazy('person-update', args=[self.person_pk])

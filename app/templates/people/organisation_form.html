@@ -31,9 +31,6 @@
                 {% endif %}
                 <fieldset>
                     <legend>Basic details</legend>
-                    {% with label='Name to display' field=form.display_name %}
-                        {% include '_form_field.html' %}
-                    {% endwith %}
                     {% with label='Name' field=form.name %}
                         {% include '_form_field.html' %}
                     {% endwith %}

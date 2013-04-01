@@ -10,6 +10,17 @@ class Place(Place):
     state = models.CharField(max_length=50, blank=True)
     country = models.CharField(max_length=50, blank=True)
     geonames_id = models.URLField(blank=True)
+    sources = models.ManyToManyField('sources.Source', blank=True, null=True)
+
+    def __unicode__(self):
+        if self.display_name:
+            summary = self.display_name
+        else:
+            summary = '{}{}'.format(
+                    self.place_name,
+                    ', {}'.format(self.country) if self.country else ''
+                )
+        return summary
 
 
 class Address(StandardMetadata):

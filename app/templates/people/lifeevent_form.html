@@ -101,7 +101,7 @@
                                 </div>
                             {% endif %}
                             <div class="controls">
-                                {{ form.sources }} <a href="{% url source-add-event event_id=lifeevent.id event_type='lifeevents' %}" class="btn btn-mini">Create a new source</a>
+                                {{ form.sources }} <a href="{% url source-add-entity 'lifeevent' lifeevent.id %}" class="btn btn-mini">Create a new source</a>
                             </div>
                         </div>
                     </fieldset>

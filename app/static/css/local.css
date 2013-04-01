@@ -3,3 +3,9 @@ body {padding-top: 80px;}
 .form-buttons { margin-top: 40px; }
 .radio.inline { white-space: nowrap; }
 .date_type { margin-top: -20px;}
+.select2-container-multi .select2-choices .select2-search-choice { font-size: small;}
+h1.entity-type {
+    text-transform: uppercase;
+    font-size: 140%;
+    line-height: 26px;
+}

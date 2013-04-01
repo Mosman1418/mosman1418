@@ -9,6 +9,9 @@
 <link href="{{ STATIC_URL }}css/select2.css" rel="stylesheet">
 {% endblock %}
 {% block content %}
+    {% if person %}
+        {% get_obj_perms request.user for person as 'perms' %}
+    {% endif %}
     <div class="row">
         {% with current='people' %}{% include '_sidenav.html' %}{% endwith %}
         <div class="span10">
@@ -22,7 +25,6 @@
                 {% endif %}
             </h2>
             {% if person %}
-                {% get_obj_perms request.user for person as 'perms' %}
                 {% if person.status == 'pending' %}
                     <div class="alert">
                         This entry is awaiting approval.
@@ -61,58 +63,60 @@
                 {% endif %}
                 <fieldset>
                     <legend>Basic details</legend>
-                    {% with label='Name to display' field=form.display_name %}
-                        {% include '_form_field.html' %}
-                    {% endwith %}
-                    {% with label='Family name' field=form.family_name %}
-                        {% include '_form_field.html' %}
-                    {% endwith %}
-                    {% with label='Other names' field=form.other_names %}
-                        {% include '_form_field.html' %}
-                    {% endwith %}
-                    {% with label='Birth date' field=form.birth_earliest_date %}
-                        {% include '_form_field.html' %}
-                    {% endwith %}
-                    {{ form.birth_earliest_date_month_known }}
-                    {{ form.birth_earliest_date_day_known }}
-                    {% with label='Latest possible date' field=form.birth_latest_date %}
-                        {% include '_form_field.html' %}
-                    {% endwith %}
-                    {{ form.birth_latest_date_month_known }}
-                    {{ form.birth_latest_date_day_known }}
-                    <div class="form-field date_type control-group">
-                        <div class="controls">
-                            <label class="radio inline">
-                               <input type="radio" name="birth_date_type" checked="checked" value="single"> Single date
-                            </label>
-                            <label class="radio inline">
-                               <input type="radio" name="birth_date_type" value="range"> Date range
-                            </label>
+
+                        {% with label='Name to display' field=form.display_name %}
+                            {% include '_form_field.html' %}
+                        {% endwith %}
+                        {% with label='Family name' field=form.family_name %}
+                            {% include '_form_field.html' %}
+                        {% endwith %}
+                        {% with label='Other names' field=form.other_names %}
+                            {% include '_form_field.html' %}
+                        {% endwith %}
+                        {% with label='Birth date' field=form.birth_earliest_date %}
+                            {% include '_form_field.html' %}
+                        {% endwith %}
+                        {{ form.birth_earliest_date_month_known }}
+                        {{ form.birth_earliest_date_day_known }}
+                        {% with label='Latest possible date' field=form.birth_latest_date %}
+                            {% include '_form_field.html' %}
+                        {% endwith %}
+                        {{ form.birth_latest_date_month_known }}
+                        {{ form.birth_latest_date_day_known }}
+                        <div class="form-field date_type control-group">
+                            <div class="controls">
+                                <label class="radio inline">
+                                   <input type="radio" name="birth_date_type" checked="checked" value="single"> Single date
+                                </label>
+                                <label class="radio inline">
+                                   <input type="radio" name="birth_date_type" value="range"> Date range
+                                </label>
+                            </div>
                         </div>
-                    </div>
-                    {% with label='Death date' field=form.death_earliest_date %}
-                        {% include '_form_field.html' %}
-                    {% endwith %}
-                    {{ form.death_earliest_date_month_known }}
-                    {{ form.death_earliest_date_day_known }}
-                    {% with label='Latest possible date' field=form.death_latest_date %}
-                        {% include '_form_field.html' %}
-                    {% endwith %}
-                    {{ form.death_latest_date_month_known }}
-                    {{ form.death_latest_date_day_known }}
-                    <div class="form-field date_type control-group">
-                        <div class="controls">
-                            <label class="radio inline">
-                               <input type="radio" name="death_date_type" checked="checked" value="single"> Single date
-                            </label>
-                            <label class="radio inline">
-                               <input type="radio" name="death_date_type" value="range"> Date range
-                            </label>
+                        {% with label='Death date' field=form.death_earliest_date %}
+                            {% include '_form_field.html' %}
+                        {% endwith %}
+                        {{ form.death_earliest_date_month_known }}
+                        {{ form.death_earliest_date_day_known }}
+                        {% with label='Latest possible date' field=form.death_latest_date %}
+                            {% include '_form_field.html' %}
+                        {% endwith %}
+                        {{ form.death_latest_date_month_known }}
+                        {{ form.death_latest_date_day_known }}
+                        <div class="form-field date_type control-group">
+                            <div class="controls">
+                                <label class="radio inline">
+                                   <input type="radio" name="death_date_type" checked="checked" value="single"> Single date
+                                </label>
+                                <label class="radio inline">
+                                   <input type="radio" name="death_date_type" value="range"> Date range
+                                </label>
+                            </div>
                         </div>
-                    </div>
-                    {% with label='Biographical note' field=form.biography %}
-                        {% include '_form_field.html' %}
-                    {% endwith %}
+                        {% with label='Biographical note' field=form.biography %}
+                            {% include '_form_field.html' %}
+                        {% endwith %}
+
                     {% if person.id %}
                         <div class="form-field control-group">
                             <label class="control-label">Recorded names</label>
@@ -130,6 +134,42 @@
                                 {% endfor %}
                                 </ul>
                                 <a class="btn btn-small btn-primary" href="{% url altname-add person.id %}">Add name record</a>
+                            </div>
+                        </div>
+                        <div class="form-field control-group">
+                            <label class="control-label">Recorded ranks</label>
+                            <div class="controls">
+                                <ul>
+                                {% for rank in person.rank_set.all %}
+                                    <li>
+                                        <a href="{{ rank.get_absolute_url }}">
+                                            {{ rank.summary }}
+                                        </a>
+                                        <a class="btn btn-mini" href="{% url rank-update rank.id %}">Update</a>
+                                    </li>
+                                {% empty %}
+                                    <li>No ranks recorded</li>
+                                {% endfor %}
+                                </ul>
+                                <a class="btn btn-small btn-primary" href="{% url rank-add person.id %}">Add rank</a>
+                            </div>
+                        </div>
+                        <div class="form-field control-group">
+                            <label class="control-label">Service numbers</label>
+                            <div class="controls">
+                                <ul>
+                                {% for number in person.servicenumber_set.all %}
+                                    <li>
+                                        <a href="{{ number.get_absolute_url }}">
+                                            {{ number.summary }}
+                                        </a>
+                                        <a class="btn btn-mini" href="{% url servicenumber-update number.id %}">Update</a>
+                                    </li>
+                                {% empty %}
+                                    <li>No service numbers recorded</li>
+                                {% endfor %}
+                                </ul>
+                                <a class="btn btn-small btn-primary" href="{% url servicenumber-add person.id %}">Add service number</a>
                             </div>
                         </div>
                     {% endif %}
@@ -255,6 +295,46 @@
                             {% endfor %}
                             </ul>
                             <a class="btn btn-small btn-primary" href="{% url personorganisation-add person.id %}">Add related organisation</a>
+                        </div>
+                    </div>
+
+                </fieldset>
+                <fieldset>
+                    <legend>Sources</legend>
+                    <div class="form-field control-group">
+                        <label class="control-label">Main subject of</label>
+                        <div class="controls">
+                            <ul>
+                            {% for source in person.main_sources %}
+                                <li>
+                                    <a href="{{ source.get_absolute_url }}">
+                                        {{ source|safe|truncatewords:10 }}
+                                    </a>
+                                    <a class="btn btn-mini" href="{% url source-update source.id %}">Update</a>
+                                </li>
+                            {% empty %}
+                                <li>No main sources</li>
+                            {% endfor %}
+                            </ul>
+                            <a class="btn btn-small btn-primary" href="{% url source-add-entity 'mainperson' person.id %}">Add main source</a>
+                        </div>
+                    </div>
+                    <div class="form-field control-group">
+                        <label class="control-label">Subject of</label>
+                        <div class="controls">
+                            <ul>
+                            {% for source in person.other_sources %}
+                                <li>
+                                    <a href="{{ source.get_absolute_url }}">
+                                        {{ source|safe|truncatewords:10 }}
+                                    </a>
+                                    <a class="btn btn-mini" href="{% url source-update source.id %}">Update</a>
+                                </li>
+                            {% empty %}
+                                <li>No other sources</li>
+                            {% endfor %}
+                            </ul>
+                            <a class="btn btn-small btn-primary" href="{% url source-add-entity 'person' person.id %}">Add other source</a>
                         </div>
                     </div>
 

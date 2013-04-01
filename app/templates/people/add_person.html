@@ -13,16 +13,6 @@
         <div class="span10">
             <h2>Add a person</h2>
             <form action="" method="post">{% csrf_token %}
-                {% if form.errors %}
-    <div class="alert alert-error">
-        <button type="button" class="close" data-dismiss="alert">×</button>
-        {% for field in form %}
-            {% if field.errors %}
-            <li>{{ field.label }}: {{ field.errors|striptags }}</li>
-            {% endif %}
-        {% endfor %}
-    </div>
-{% endif %}
                 <div class="form-field">
                     <label for="id_display_name">Display name:</label>
                     {% if form.display_name.errors %}

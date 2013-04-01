@@ -12,47 +12,39 @@
     <div class="row">
         {% with current='none' %}{% include '_sidenav.html' %}{% endwith %}
         <div class="span10">
-            <h2>{% if personaddress.id %}Update{% else %}Add{% endif %} a person&rsquo;s address</h2>
+            <h2>{% if personaddress.id %}Update{% else %}Add{% endif %} a person&rsquo;s rank</h2>
             <form action="" method="post" class="form-horizontal">{% csrf_token %}
 
                 {% with label='Person' field=form.person %}
                     {% include '_form_field.html' %}
                 {% endwith %}
-                {% if 'person' in form.initial.keys %}
-                    {% url address-add-entity 'person' form.initial.person as addaddress %}
-                {% elif personaddress.id %}
-                    {% url address-add-entity 'personaddress' personaddress.id as addaddress %}
-                {% endif %}
-                {% with label='Address' field=form.address create_url=addaddress create_type='address' %}
+                {% with label='Rank' field=form.rank %}
                     {% include '_form_field.html' %}
                 {% endwith %}
-                {% if personaddress.id %}
-                    <fieldset>
-                        <legend>Dates</legend>
-                        {% with label='Start date' field=form.start_earliest_date %}
-                            {% include '_form_field.html' %}
-                        {% endwith %}
-                        {{ form.start_earliest_month_known }}
-                        {{ form.start_earliest_day_known }}
-                        {% with label='End date' field=form.end_earliest_date %}
-                            {% include '_form_field.html' %}
-                        {% endwith %}
-                        {{ form.end_earliest_month_known }}
-                        {{ form.end_earliest_day_known }}
-                    </fieldset>
+
+                <fieldset>
+                    <legend>Dates</legend>
+                    {% with label='Start date' field=form.start_earliest_date %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                    {% with label='End date' field=form.end_earliest_date %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                </fieldset>
+                {% if rank.id %}
                     <fieldset>
                         <legend>Sources</legend>
-                        {% url source-add-entity 'address' personaddress.id as addsource %}
+                        {% url source-add-entity 'rank' rank.id as addsource %}
                         {% with label='Sources' field=form.sources create_url=addsource create_type='source' %}
                             {% include '_form_field.html' %}
                         {% endwith %}
                     </fieldset>
                 {% endif %}
                 <div class="form-actions">
-                    {% if personaddress.id %}
+                    {% if rank.id %}
                         <input class="btn btn-primary" name="continue" type="submit" value="Save &amp; continue editing">
                         <input class="btn btn-primary" name="finished" type="submit" value="Finished">
-                        <a class="btn btn-primary btn-danger" href="{% url personaddress-delete personaddress.id %}">Delete</a>
+                        <a class="btn btn-primary btn-danger" href="{% url rank-delete rank.id %}">Delete</a>
                     {% else %}
                         <input class="btn btn-primary" name="next" type="submit" value="Next">
                     {% endif %}

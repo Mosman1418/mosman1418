@@ -4,14 +4,14 @@ from django.db import models
 from django.core.urlresolvers import reverse
 
 from app.linkeddata.models import RDFClass, RDFRelationship, RDFType
-from app.generic.models import StandardMetadata
+from app.generic.models import StandardMetadata, ShortDateMixin
 
 # Create your models here.
 
 
 class Source(StandardMetadata):
     title = models.TextField(blank=True, null=True)
-    source_type = models.ForeignKey('SourceType')  # include rdf?
+    source_type = models.ForeignKey('SourceType', blank=True, null=True)  # include rdf?
     creators = models.ManyToManyField('people.Person', through='SourcePerson', blank=True, null=True)
     publisher = models.CharField(max_length=100, blank=True, null=True)
     publication_place = models.CharField(max_length=100, blank=True, null=True)
@@ -44,12 +44,49 @@ class Source(StandardMetadata):
         return [creator.person for creator in creators]
 
     def main_people(self):
-        relations = self.personassociatedsource_set.filter(association__label='primary topic of')
-        return [relation.person for relation in relations]
+        return [relation.person for relation in
+                self.personassociatedsource_set
+                .filter(association__label='primary topic of')]
 
     def other_people(self):
-        relations = self.personassociatedsource_set.filter(association__label='topic of')
-        return [relation.person for relation in relations]
+        return [relation.person for relation in
+                self.personassociatedsource_set
+                .filter(association__label='topic of')]
+
+    def main_subjects(self):
+        people = [relation.person for relation in
+                    self.personassociatedsource_set
+                        .filter(association__label='primary topic of')]
+        orgs = [
+            relation.organisation for relation in
+            self.organisationassociatedsource_set
+            .filter(association__label='primary topic of')
+        ]
+        places = list(self.place_set.all())
+        stories = list(self.story_set.all())
+        return people + orgs + places + stories
+
+    def other_subjects(self):
+        people = [relation.person for relation in
+                    self.personassociatedsource_set
+                    .filter(association__label='topic of')]
+        orgs = [relation.organisation for relation in
+                    self.organisationassociatedsource_set
+                    .filter(association__label='topic of')]
+        return people + orgs
+
+    def evidence_for(self):
+        entities = []
+        entities.extend(list(self.alternativepersonname_set.all()))
+        entities.extend(list(self.rank_set.all()))
+        entities.extend(list(self.servicenumber_set.all()))
+        entities.extend(list(self.birth_set.all()))
+        entities.extend(list(self.death_set.all()))
+        entities.extend(list(self.lifeevent_set.all()))
+        entities.extend(list(self.personassociatedperson_set.all()))
+        entities.extend(list(self.personassociatedorganisation_set.all()))
+        entities.extend(list(self.personaddress_set.all()))
+        return entities
 
     def formatted_date(self, date_name):
         months = calendar.month_name
@@ -82,6 +119,29 @@ class Source(StandardMetadata):
 
     def get_absolute_url(self):
         return reverse('source-view', args=[str(self.id)])
+
+
+class Story(StandardMetadata, ShortDateMixin):
+    title = models.CharField(max_length=200)
+    text = models.TextField()
+    sources = models.ManyToManyField('sources.Source', blank=True, null=True)
+
+    def subjects(self):
+        people = list(self.person_set.all())
+        organisations = list(self.organisation_set.all())
+        return people + organisations
+
+    def __unicode__(self):
+        return self.title
+
+    def get_absolute_url(self):
+        return reverse('story-view', args=[self.id])
+
+
+class SourceImage(models.Model):
+    source = models.ForeignKey(Source)
+    page = models.IntegerField(blank=True, null=True)
+    image = models.ImageField(upload_to='images')
 
 
 class SourcePerson(models.Model):

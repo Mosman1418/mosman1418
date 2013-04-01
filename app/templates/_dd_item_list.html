@@ -1,0 +1,15 @@
+                        <dd>
+                            <ul>
+                            {% for item in list %}
+                                    <li>
+                                        <a href="{{ item.get_absolute_url }}">
+                                            {% if item.summary %}
+                                                {{ item.summary|safe }}
+                                            {% else %}
+                                                {{ item|safe }}
+                                            {% endif %}
+                                        </a>
+                                    </li>
+                            {% endfor %}
+                            </ul>
+                        </dd>

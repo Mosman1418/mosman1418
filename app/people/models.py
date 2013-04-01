@@ -18,7 +18,7 @@ class Person(GenericPerson):
     associated_objects = models.ManyToManyField('objects.Object', blank=True, null=True, through='PersonAssociatedObject')
     associated_sources = models.ManyToManyField('sources.Source', blank=True, null=True, through='PersonAssociatedSource')
     images = models.ManyToManyField('PeopleImage', blank=True, null=True)
-    stories = models.ManyToManyField('PeopleStory', blank=True, null=True)
+    stories = models.ManyToManyField('sources.Story', blank=True, null=True)
     public = models.BooleanField(default=False)  # Display on website
     status = models.CharField(max_length=15, choices=(
                                                 ('confirmed', 'confirmed'),
@@ -67,6 +67,57 @@ class Person(GenericPerson):
         return self.__class__.__name__
 
 
+class Rank(StandardMetadata, ShortDateMixin):
+    person = models.ForeignKey('Person')
+    rank = models.CharField(max_length=100)
+    sources = models.ManyToManyField('sources.Source', blank=True, null=True)
+
+    def __unicode__(self):
+        return '{} held rank of {}{}'.format(
+                self.person,
+                self.rank,
+                ' ({})'.format(self.date_summary()) if self.date_summary() else ''
+            )
+
+    def summary(self):
+        return 'held rank of {}{}'.format(
+                self.rank,
+                ' ({})'.format(self.date_summary()) if self.date_summary() else ''
+            )
+
+    def date_summary(self):
+        start = self.start_earliest()
+        end = self.end_earliest()
+        dates = []
+        if start:
+            dates.append(start)
+        if end:
+            dates.append(end)
+        if len(dates) > 0:
+            summary = ' &ndash; '.join(dates)
+        else:
+            summary = ''
+        return summary
+
+    def get_absolute_url(self):
+        return reverse('rank-view', args=[self.id])
+
+
+class ServiceNumber(StandardMetadata):
+    person = models.ForeignKey('Person')
+    service_number = models.CharField(max_length=100)
+    sources = models.ManyToManyField('sources.Source', blank=True, null=True)
+
+    def __unicode__(self):
+        return '{}: service number {}'.format(self.person, self.service_number)
+
+    def summary(self):
+        return 'Service number {}'.format(self.service_number)
+
+    def get_absolute_url(self):
+        return reverse('servicenumber-view', args=[self.id])
+
+
 class AlternativePersonName(StandardMetadata):
     person = models.ForeignKey('Person')
     family_name = models.CharField(max_length=100, blank=True)
@@ -102,7 +153,11 @@ class LifeEvent(Event):
         return '{}: {} ({})'.format(self.person, self.label, self.date_summary())
 
     def summary(self):
-        return '{} ({})'.format(self.label, self.date_summary())
+        if self.date_summary():
+            summary = '{} ({})'.format(self.label, self.date_summary())
+        else:
+            summary = self.label
+        return summary
 
     def get_absolute_url(self):
         return reverse('lifeevent-view', args=[str(self.id)])
@@ -204,6 +259,8 @@ class Birth(Event):
 class Death(Event):
     person = models.ForeignKey('people.Person')
     location = models.ForeignKey('places.Place', blank=True, null=True)
+    cause_of_death = models.CharField(max_length=200, blank=True, null=True)
+    burial_place = models.ForeignKey('places.Place', blank=True, null=True, related_name='burial_place')
     sources = models.ManyToManyField('sources.Source', blank=True, null=True)
 
     def __unicode__(self):
@@ -233,6 +290,8 @@ class Death(Event):
                 summary += ' in {}'.format(self.location)
         elif self.location:
             summary = 'In {}'.format(self.location.__unicode__())
+        elif self.burial_place:
+            summary = 'Buried at {}'.format(self.burial_place)
         return summary
 
     def get_absolute_url(self):
@@ -256,10 +315,10 @@ class Organisation(Group):
     mosman_related = models.BooleanField(default=True)  # Appear in main people lists (not just authors)
     associated_sources = models.ManyToManyField('sources.Source', blank=True, null=True, through='OrganisationAssociatedSource')
     images = models.ManyToManyField('PeopleImage', blank=True, null=True)
-    stories = models.ManyToManyField('PeopleStory', blank=True, null=True)
+    stories = models.ManyToManyField('sources.Story', blank=True, null=True)
 
     def __unicode__(self):
-        return self.name
+        return self.name if self.name else self.display_name
 
 
 class Repository(Group):
@@ -268,7 +327,7 @@ class Repository(Group):
     short_name = models.CharField(max_length=100, null=True, blank=True)
 
     def __unicode__(self):
-        return self.name
+        return self.name if self.name else self.display_name
 
 
 class PeopleImage(models.Model):
@@ -359,13 +418,13 @@ class PersonAssociatedPerson(StandardMetadata, ShortDateMixin):
         return self.__class__.__name__
 
     def get_absolute_url(self):
-        return reverse('persontoperson-view', args=[str(self.id)])
+        return reverse('person-relationship-view', args=[str(self.id)])
 
 
 class PersonAssociatedOrganisation(StandardMetadata, ShortDateMixin):
     person = models.ForeignKey('Person')
     organisation = models.ForeignKey('Organisation')
-    association = models.ForeignKey('OrgAssociation', null=True, blank=True)
+    association = models.ForeignKey('PersonOrgAssociation', null=True, blank=True)
     sources = models.ManyToManyField('sources.Source', blank=True, null=True)
 
     def __unicode__(self):
@@ -413,6 +472,10 @@ class EventAssociation(RDFRelationship):
 
 
 class OrgAssociation(RDFRelationship):
+    pass
+
+
+class PersonOrgAssociation(RDFRelationship):
     pass
 
 

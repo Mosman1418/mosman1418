@@ -3,6 +3,8 @@ from django.forms import ModelForm
 from django.forms.extras.widgets import SelectDateWidget
 from calendar import monthrange
 
+YEARS = [year for year in range(1850, 2013)]
+
 
 class NewSelectDateWidget(SelectDateWidget):
     none_value = (0, 'unknown')
@@ -109,13 +111,11 @@ class DateSelectMixin(object):
         return date
 
     def clean_month(self, date, type):
-        print date
         if date:
             year, month, day = date.split('-')
             status = False if int(month) == 0 else True
         else:
             status = False
-        print status
         return status
 
     def clean_day(self, date, type):
@@ -125,6 +125,27 @@ class DateSelectMixin(object):
         else:
             status = False
         return status
+
+
+class ShortDateForm(ModelForm, DateSelectMixin):
+    start_earliest_date = forms.CharField(widget=NewSelectDateWidget(
+        attrs={'class': 'input-small'},
+        years=YEARS), required=False)
+    end_earliest_date = forms.CharField(widget=NewSelectDateWidget(
+        attrs={'class': 'input-small'},
+        years=YEARS), required=False)
+
+    def clean(self):
+        cleaned_data = super(ShortDateForm, self).clean()
+        start_earliest_date = cleaned_data['start_earliest_date']
+        cleaned_data['start_earliest_month'] = self.clean_month(start_earliest_date, 'start')
+        cleaned_data['start_earliest_day'] = self.clean_day(start_earliest_date, 'start')
+        cleaned_data['start_earliest_date'] = self.clean_date(start_earliest_date, 'start')
+        end_earliest_date = cleaned_data['end_earliest_date']
+        cleaned_data['end_earliest_month'] = self.clean_month(end_earliest_date, 'start')
+        cleaned_data['end_earliest_day'] = self.clean_day(end_earliest_date, 'start')
+        cleaned_data['end_earliest_date'] = self.clean_date(end_earliest_date, 'start')
+        return cleaned_data
 
 
 class AddEventForm(ModelForm, DateSelectMixin):

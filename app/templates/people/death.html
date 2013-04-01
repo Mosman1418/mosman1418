@@ -5,34 +5,42 @@
             <div class="span8">
                 <h1>Death record</h1>
                 <p>Details for <a href="{{ content.person.get_absolute_url }}">{{ content.person }}</a></p>
-                {% if content.earliest_start %}
-                    <h4>Date</h4>
-                    <p>
-                        {% if content.latest_start %}
-                            Between {{ content.earliest_start }} and {{ content.latest_start }}
-                        {% else %}
-                            {{ content.earliest_start }}
-                        {% endif %}
-                    </p>
-                {% endif %}
-
-                {% if content.location %}
-                    <h4>Location</h4>
-                    <p>
-                        {{ content.location }}
-                    </p>
-                {% endif %}
-
-                {% if content.sources %}
-                    <h4>Documented by</h4>
-                    <ul>
-                        {% for source in content.sources.all %}
-                            <li>
-                                {{ source.title }}
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
+                <dl class="dl-horizontal">
+                    {% if content.start_earliest %}
+                        <dt>Date</dt>
+                        <dd>
+                            {% if content.start_latest %}
+                                Between {{ content.start_earliest }} and {{ content.start_latest }}
+                            {% else %}
+                                {{ content.start_earliest }}
+                            {% endif %}
+                        </dd>
+                    {% endif %}
+                    {% if content.location %}
+                        <dt>Location</dt>
+                        <dd>
+                            <a href="{{ content.location.get_absolute_url }}">{{ content.location }}</a>
+                        </dd>
+                    {% endif %}
+                    {% if content.cause_of_death %}
+                        <dt>Cause of death</dt>
+                        <dd>
+                            {{ content.cause_of_death }}
+                        </dd>
+                    {% endif %}
+                    {% if content.burial_place %}
+                        <dt>Place of burial</dt>
+                        <dd>
+                            <a href="{{ content.burial_place.get_absolute_url }}">{{ content.burial_place }}</a>
+                        </dd>
+                    {% endif %}
+                    {% if content.sources.all %}
+                        <dt>Documented by</dt>
+                        {% with list=content.sources.all %}
+                            {% include '_dd_item_list.html' %}
+                        {% endwith %}
+                    {% endif %}
+                </dl>
 
             </div>
         </div>

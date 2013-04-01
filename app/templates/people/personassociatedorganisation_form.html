@@ -43,10 +43,13 @@
                         {{ form.end_earliest_month_known }}
                         {{ form.end_earliest_day_known }}
                     </fieldset>
-                    {% url source-add-association 'personorganisation' personassociatedorganisation.id as addsource %}
-                    {% with label='Sources' field=form.sources create_url=addsource create_type='source' %}
-                        {% include '_form_field.html' %}
-                    {% endwith %}
+                    <fieldset>
+                        <legend>Sources</legend>
+                        {% url source-add-entity 'membership' personassociatedorganisation.id as addsource %}
+                        {% with label='Sources' field=form.sources create_url=addsource create_type='source' %}
+                            {% include '_form_field.html' %}
+                        {% endwith %}
+                    </fieldset>
                 {% endif %}
                 <div class="form-actions">
                     {% if personassociatedorganisation.id %}

@@ -2,7 +2,7 @@
 {% block title %}Confirm deletion{% endblock %}
 {% block content %}
     <div class="row">
-        {% with current='people' %}{% include '_sidenav.html' %}{% endwith %}
+        {% with current='sources' %}{% include '_sidenav.html' %}{% endwith %}
         <div class="span10">
             <h2>Confirm deletion</h2>
             <form action="" method="post">{% csrf_token %}

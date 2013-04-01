@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 {% load django_select2_tags %}
 {% block title %}Log in{% endblock %}
+{% block head_scripts %}
+<script src="{{ STATIC_URL }}ckeditor/ckeditor/ckeditor.js"></script>
+{% endblock %}
 {% block extra_scripts %}
 {% import_django_select2_js %}
 <script src="{{ STATIC_URL }}js/add-birth.js"></script>
@@ -12,43 +15,42 @@
     <div class="row">
         {% with current='none' %}{% include '_sidenav.html' %}{% endwith %}
         <div class="span10">
-            <h2>{% if personassociatedperson.id %}Update{% else %}Add{% endif %} a related person</h2>
+            <h2>{% if story.id %}Update{% else %}Add{% endif %} a story</h2>
             <form action="" method="post" class="form-horizontal">{% csrf_token %}
-
-                {% with label='Person' field=form.person %}
-                    {% include '_form_field.html' %}
-                {% endwith %}
-                {% with label='Relation' field=form.association %}
-                    {% include '_form_field.html' %}
-                {% endwith %}
-                {% if personassociatedperson.id %}
-                    {% url person-add-person personassociatedperson.id as addperson %}
-                    {% with label='Related person' field=form.associated_person create_url=addperson create_type='person' %}
+                {% if 'person' in form.initial.keys %}
+                    {% with label='Person' field=form.person %}
                         {% include '_form_field.html' %}
                     {% endwith %}
-                    <fieldset>
-                        <legend>Dates</legend>
-                        {% with label='Start date' field=form.start_earliest_date %}
-                            {% include '_form_field.html' %}
-                        {% endwith %}
-                        {% with label='End date' field=form.end_earliest_date %}
-                            {% include '_form_field.html' %}
-                        {% endwith %}
-                    </fieldset>
-
+                {% endif %}
+                {% with label='Title' field=form.title %}
+                    {% include '_form_field.html' %}
+                {% endwith %}
+                {% with label='Story' field=form.text %}
+                    {% include '_form_field.html' %}
+                {% endwith %}
+                <fieldset>
+                    <legend>Dates</legend>
+                    {% with label='Start date' field=form.start_earliest_date %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                    {% with label='End date' field=form.end_earliest_date %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                </fieldset>
+                {% if story.id %}
                     <fieldset>
                         <legend>Sources</legend>
-                        {% url source-add-entity 'relationship' personassociatedperson.id as addsource %}
+                        {% url source-add-entity 'story' story.id as addsource %}
                         {% with label='Sources' field=form.sources create_url=addsource create_type='source' %}
                             {% include '_form_field.html' %}
                         {% endwith %}
                     </fieldset>
                 {% endif %}
                 <div class="form-actions">
-                    {% if personassociatedperson.id %}
+                    {% if story.id %}
                         <input class="btn btn-primary" name="continue" type="submit" value="Save &amp; continue editing">
                         <input class="btn btn-primary" name="finished" type="submit" value="Finished">
-                        <a class="btn btn-primary btn-danger" href="{% url persontoperson-delete personassociatedperson.id %}">Delete</a>
+                        <a class="btn btn-primary btn-danger" href="{% url story-delete story.id %}">Delete</a>
                     {% else %}
                         <input class="btn btn-primary" name="next" type="submit" value="Next">
                     {% endif %}

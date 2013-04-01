@@ -95,6 +95,27 @@ class DateSelectMixin(object):
         return status
 
 
+class ShortDateForm(ModelForm, DateSelectMixin):
+    start_earliest_date = forms.CharField(widget=NewSelectDateWidget(
+                                attrs={'class': 'input-small'},
+                                years=YEARS), required=False)
+    end_earliest_date = forms.CharField(widget=NewSelectDateWidget(
+                                attrs={'class': 'input-small'},
+                                years=YEARS), required=False)
+
+    def clean(self):
+        cleaned_data = super(ShortDateForm, self).clean()
+        start_earliest_date = cleaned_data['start_earliest_date']
+        cleaned_data['start_earliest_month'] = self.clean_month(start_earliest_date, 'start')
+        cleaned_data['start_earliest_day'] = self.clean_day(start_earliest_date, 'start')
+        cleaned_data['start_earliest_date'] = self.clean_date(start_earliest_date, 'start')
+        end_earliest_date = cleaned_data['end_earliest_date']
+        cleaned_data['end_earliest_month'] = self.clean_month(end_earliest_date, 'start')
+        cleaned_data['end_earliest_day'] = self.clean_day(end_earliest_date, 'start')
+        cleaned_data['end_earliest_date'] = self.clean_date(end_earliest_date, 'start')
+        return cleaned_data
+
+
 class AddPersonForm(ModelForm, DateSelectMixin):
     # These are CharFields so they don't get vaildated as dates
     related_person = forms.ModelChoiceField(
@@ -191,14 +212,14 @@ class AddLifeEventForm(AddEventForm):
         model = LifeEvent
         exclude = ('added_by',)
         widgets = {
-                    'start_earliest_month_known': forms.HiddenInput,
-                    'start_earliest_day_known': forms.HiddenInput,
-                    'start_latest_month_known': forms.HiddenInput,
-                    'start_latest_day_known': forms.HiddenInput,
-                    'end_earliest_month_known': forms.HiddenInput,
-                    'end_earliest_day_known': forms.HiddenInput,
-                    'end_latest_month_known': forms.HiddenInput,
-                    'end_latest_day_known': forms.HiddenInput,
+                    'start_earliest_month': forms.HiddenInput,
+                    'start_earliest_day': forms.HiddenInput,
+                    'start_latest_month': forms.HiddenInput,
+                    'start_latest_day': forms.HiddenInput,
+                    'end_earliest_month': forms.HiddenInput,
+                    'end_earliest_day': forms.HiddenInput,
+                    'end_latest_month': forms.HiddenInput,
+                    'end_latest_day': forms.HiddenInput,
                     'description': forms.Textarea(attrs={
                                                 'class': 'input-large',
                                                 'rows': '4'})
@@ -233,6 +254,32 @@ class AddDeathForm(AddEventForm):
         exclude = ('added_by',)
 
 
+class AddRankForm(ShortDateForm):
+    person = forms.ModelChoiceField(
+                queryset=Person.objects.all(),
+                required=False,
+                widget=forms.Select(attrs={'readonly': 'readonly'})
+                )
+    sources = SourcesMultiChoice(required=False)
+
+    class Meta:
+        model = Rank
+        exclude = ('added_by',)
+
+
+class AddServiceNumberForm(ModelForm):
+    person = forms.ModelChoiceField(
+                queryset=Person.objects.all(),
+                required=False,
+                widget=forms.Select(attrs={'readonly': 'readonly'})
+                )
+    sources = SourcesMultiChoice(required=False)
+
+    class Meta:
+        model = ServiceNumber
+        exclude = ('added_by',)
+
+
 class AddOrganisationForm(ModelForm):
     person = forms.ModelChoiceField(
                 queryset=Person.objects.all(),
@@ -250,42 +297,14 @@ class AddOrganisationForm(ModelForm):
         exclude = ('added_by',)
 
 
-class AddAssociatedPersonForm(ModelForm, DateSelectMixin):
+class AddAssociatedPersonForm(ShortDateForm):
     person = PersonChoice()
     associated_person = PersonChoice(required=False)
-    start_earliest_date = forms.CharField(widget=NewSelectDateWidget(
-                                attrs={'class': 'input-small'},
-                                years=YEARS), required=False)
-    end_earliest_date = forms.CharField(widget=NewSelectDateWidget(
-                                attrs={'class': 'input-small'},
-                                years=YEARS), required=False)
     sources = SourcesMultiChoice(required=False)
-
-    def clean(self):
-        cleaned_data = super(AddAssociatedPersonForm, self).clean()
-        start_earliest_date = cleaned_data['start_earliest_date']
-        cleaned_data['start_earliest_month_known'] = self.clean_month(start_earliest_date, 'start')
-        cleaned_data['start_earliest_day_known'] = self.clean_day(start_earliest_date, 'start')
-        cleaned_data['start_earliest_date'] = self.clean_date(start_earliest_date, 'start')
-        end_earliest_date = cleaned_data['end_earliest_date']
-        cleaned_data['end_earliest_month_known'] = self.clean_month(end_earliest_date, 'start')
-        cleaned_data['end_earliest_day_known'] = self.clean_day(end_earliest_date, 'start')
-        cleaned_data['end_earliest_date'] = self.clean_date(end_earliest_date, 'start')
-        return cleaned_data
 
     class Meta:
         model = PersonAssociatedPerson
         exclude = ('added_by',)
-        widgets = {
-                    'start_earliest_month_known': forms.HiddenInput,
-                    'start_earliest_day_known': forms.HiddenInput,
-                    'start_latest_month_known': forms.HiddenInput,
-                    'start_latest_day_known': forms.HiddenInput,
-                    'end_earliest_month_known': forms.HiddenInput,
-                    'end_earliest_day_known': forms.HiddenInput,
-                    'end_latest_month_known': forms.HiddenInput,
-                    'end_latest_day_known': forms.HiddenInput,
-                }
 
 
 class AddAssociatedOrganisationForm(ModelForm, DateSelectMixin):

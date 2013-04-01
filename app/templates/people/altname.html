@@ -5,32 +5,30 @@
             <div class="span8">
                 <h1>Name record</h1>
                 <p>Details for <a href="{% url person-view content.person.id %}">{{ content.person }}</a></p>
-                <h4>Display name</h4>
-                <p>{{ content.display_name}}</p>
-                {% if content.family_name %}
-                    <h4>Family name</h4>
-                    <p>{{ content.family_name}}</p>
-                {% endif %}
-                {% if content.other_names %}
-                    <h4>Other names</h4>
-                    <p>{{ content.other_names}}</p>
-                {% endif %}
-                {% if content.nickname %}
-                    <h4>Known as (nickname)</h4>
-                    <p>{{ content.nickname}}</p>
-                {% endif %}
-
-                {% if content.sources %}
-                    <h4>Documented by</h4>
-                    <ul>
-                        {% for source in content.sources.all %}
-                            <li>
-                                {{ source.title }}
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-
+                <dl class="dl-horizontal">
+                    {% if content.display_name %}
+                        <dt>Name for display</dt>
+                        <dd>{{ content.display_name}}</dd>
+                    {% endif %}
+                    {% if content.family_name %}
+                        <dt>Family name</dt>
+                        <dd>{{ content.family_name}}</dd>
+                    {% endif %}
+                    {% if content.other_names %}
+                        <dt>Other names</dt>
+                        <dd>{{ content.other_names}}</dd>
+                    {% endif %}
+                    {% if content.nickname %}
+                        <dt>Known as (nickname)</dt>
+                        <dd>{{ content.nickname}}</dd>
+                    {% endif %}
+                    {% if content.sources %}
+                        <dt>Documented by</dt>
+                        {% with list=content.sources.all %}
+                            {% include '_dd_item_list.html' %}
+                        {% endwith %}
+                    {% endif %}
+                </dl>
             </div>
         </div>
 

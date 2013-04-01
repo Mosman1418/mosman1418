@@ -40,14 +40,15 @@
                             </div>
                         {% endif %}
                         <div class="controls">
-                            {{ form.sources }} <a href="{% url source-add-event event_id=death.id event_type='deaths' %}" class="btn btn-mini">Create a new source</a>
+                            {{ form.sources }} <a href="{% url source-add-entity 'death' death.id %}" class="btn btn-mini">Create a new source</a>
                         </div>
                     </div>
                 {% endif %}
                 <div class="form-actions">
-                    {% if birth.id %}
+                    {% if death.id %}
                         <input class="btn btn-primary" name="continue" type="submit" value="Save &amp; continue editing">
                         <input class="btn btn-primary" name="finished" type="submit" value="Finished">
+                        <a class="btn btn-primary btn-danger" href="{% url death-delete death.id %}">Delete</a>
                     {% else %}
                         <input class="btn btn-primary" name="next" type="submit" value="Next">
                     {% endif %}
