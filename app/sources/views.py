@@ -985,7 +985,8 @@ class UpdateSourceView(PermissionRequiredMixin, UpdateView):
                 PersonAssociatedSource.objects.create(
                     person=person,
                     source=self.object,
-                    association=association)
+                    association=association,
+                    added_by=self.object.added_by)
         # Delete the deleted
         links = PersonAssociatedSource.objects.filter(
             source=self.object,
