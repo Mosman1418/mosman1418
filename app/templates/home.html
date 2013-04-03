@@ -1,12 +1,17 @@
 {% extends 'base.html' %}
+{% load thumbnail %}
 {% block content %}
 <div class="row">
     {% with current='people' %}{% include '_sidenav.html' %}{% endwith %}
-    <div class="span10">
+    <div class="span8">
         <div class="hero-unit">
-        <h1>&lsquo;Doing our bit&rsquo;</h1>
-        <p class="lead">Mosman 1914&ndash;1918</p>
+            <h1>&lsquo;Doing our bit&rsquo;</h1>
+            <p class="lead">Mosman 1914&ndash;1918</p>
         </div>
+    </div>
+    <div class="span2">
+            {% thumbnail image.sourceimage_set.all.0.image 400x400 as im %}
+            <img src="{{ im.url }}">
     </div>
 </div>
 <div class="row">

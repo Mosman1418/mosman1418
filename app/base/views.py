@@ -1,7 +1,7 @@
 # Create your views here.
 
 from django.views.generic import TemplateView
-from app.sources.models import Story
+from app.sources.models import *
 
 
 class HomeView(TemplateView):
@@ -10,4 +10,5 @@ class HomeView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(HomeView, self).get_context_data(**kwargs)
         context['stories'] = Story.objects.all().order_by('-date_created')[:5]
+        context['image'] = Source.objects.get(title='P.W. Wintle')
         return context
