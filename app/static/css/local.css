@@ -9,3 +9,15 @@ h1.entity-type {
     font-size: 140%;
     line-height: 26px;
 }
+p.lead {
+    margin-left: 10em;
+}
+
+a.quote {
+    color: #333;
+}
+
+a.quote:hover blockquote {
+    color: #333;
+    border-right: 5px solid #e78b24;
+}

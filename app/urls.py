@@ -6,6 +6,7 @@ from app.people.views import *
 from app.sources.views import *
 from app.places.views import *
 from app.memorials.views import MemorialView
+from app.base.views import *
 
 admin.autodiscover()
 
@@ -161,6 +162,7 @@ urlpatterns += patterns('app.memorials.views',
     url(r'^memorials/(?P<id>\d+)/$', MemorialView.as_view(), name='memorial_view'),
 )
 urlpatterns += patterns('',
+    url(r'^$', HomeView.as_view(), name='home'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^accounts/', include('registration.backends.default.urls')),
     (r'^ckeditor/', include('ckeditor.urls')),

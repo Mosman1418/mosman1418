@@ -1285,8 +1285,8 @@ class AddServiceNumber(CreateView):
         obj = form.save(commit=False)
         obj.added_by = self.request.user
         obj.save()
-        assign('people.change_servicenumber', self.request.user, servicenumber)
-        assign('people.delete_servicenumber', self.request.user, servicenumber)
+        assign('people.change_servicenumber', self.request.user, obj)
+        assign('people.delete_servicenumber', self.request.user, obj)
         return HttpResponseRedirect(reverse('servicenumber-update', args=[obj.id]))
 
 

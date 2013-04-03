@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row">
+    {% with current='people' %}{% include '_sidenav.html' %}{% endwith %}
+    <div class="span10">
+        <div class="hero-unit">
+        <h1>&lsquo;Doing our bit&rsquo;</h1>
+        <p class="lead">Mosman 1914&ndash;1918</p>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="span8 offset2 clearfix">
+    {% for story in stories %}
+    <a class="quote" href="{{ story.get_absolute_url }}">
+        <blockquote class="pull-right">
+            {{ story.text|safe|truncatewords_html:20 }}
+            <small>contributed by {{ story.added_by }} on {{ story.date_created|date:"g F Y" }}</small>
+        </blockquote>
+    </a>
+
+    {% endfor %}
+    </div>
+</div>
+
+{% endblock %}
