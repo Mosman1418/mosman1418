@@ -9,8 +9,14 @@ h1.entity-type {
     font-size: 140%;
     line-height: 26px;
 }
+
+h1.home {
+
+
+}
+
 p.lead {
-    margin-left: 10em;
+    margin-left: 2em;
 }
 
 a.quote {
@@ -20,4 +26,14 @@ a.quote {
 a.quote:hover blockquote {
     color: #333;
     border-right: 5px solid #e78b24;
+}
+.home-stories {
+margin-top: 2em;
+
+}
+
+img.photo {
+    -webkit-box-shadow:0 0 20px #333;
+    -moz-box-shadow: 0 0 20px #333;
+    box-shadow:0 0 20px #333;
 }

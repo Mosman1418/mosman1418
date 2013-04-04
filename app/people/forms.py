@@ -9,7 +9,7 @@ from django.conf import settings
 from django.forms.models import inlineformset_factory
 from django_select2 import *
 
-from app.generic.forms import AddEventForm
+from app.generic.forms import AddEventForm, DateSelectMixin, ShortDateForm
 from app.places.forms import AddAddressForm
 
 
@@ -52,68 +52,6 @@ class SourcesMultiChoice(AutoModelSelect2MultipleField):
 class EventLocationsMultiChoice(AutoModelSelect2MultipleField):
     queryset = EventLocation.objects
     search_fields = ['label__icontains', ]
-
-
-class DateSelectMixin(object):
-    def clean_date(self, date, type):
-        if date:
-            year, month, day = date.split('-')
-            if int(month) == 0:
-                if type == 'start':
-                    month = '1'
-                    day = '1'
-                elif type == 'end':
-                    month = '12'
-                    day = '31'
-            else:
-                if int(day) == 0:
-                    if type == 'start':
-                        day = '1'
-                    elif type == 'end':
-                        day = monthrange(int(year), int(month))[1]
-            date = '%s-%s-%s' % (year, month, day)
-        else:
-            date = None
-        return date
-
-    def clean_month(self, date, type):
-        print date
-        if date:
-            year, month, day = date.split('-')
-            status = False if int(month) == 0 else True
-        else:
-            status = False
-        print status
-        return status
-
-    def clean_day(self, date, type):
-        if date:
-            year, month, day = date.split('-')
-            status = False if int(day) == 0 else True
-        else:
-            status = False
-        return status
-
-
-class ShortDateForm(ModelForm, DateSelectMixin):
-    start_earliest_date = forms.CharField(widget=NewSelectDateWidget(
-                                attrs={'class': 'input-small'},
-                                years=YEARS), required=False)
-    end_earliest_date = forms.CharField(widget=NewSelectDateWidget(
-                                attrs={'class': 'input-small'},
-                                years=YEARS), required=False)
-
-    def clean(self):
-        cleaned_data = super(ShortDateForm, self).clean()
-        start_earliest_date = cleaned_data['start_earliest_date']
-        cleaned_data['start_earliest_month'] = self.clean_month(start_earliest_date, 'start')
-        cleaned_data['start_earliest_day'] = self.clean_day(start_earliest_date, 'start')
-        cleaned_data['start_earliest_date'] = self.clean_date(start_earliest_date, 'start')
-        end_earliest_date = cleaned_data['end_earliest_date']
-        cleaned_data['end_earliest_month'] = self.clean_month(end_earliest_date, 'start')
-        cleaned_data['end_earliest_day'] = self.clean_day(end_earliest_date, 'start')
-        cleaned_data['end_earliest_date'] = self.clean_date(end_earliest_date, 'start')
-        return cleaned_data
 
 
 class AddPersonForm(ModelForm, DateSelectMixin):
