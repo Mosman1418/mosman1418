@@ -1,6 +1,8 @@
 $(function(){
-    $("#wall").isotope({
-            itemSelector: '.cell',
-            layoutMode: 'masonry'
-        });
+    $("#wall").imagesLoaded( function(){
+        $("#wall").isotope({
+                itemSelector: '.cell',
+                layoutMode: 'masonry'
+            });
+    });
 });
