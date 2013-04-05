@@ -13,7 +13,7 @@
                 {% for source in content %}
                     {% with image=source.sourceimage_set.all.0 %}
                     <li class="cell span2">
-                        <a class="thumbnail" href="{{ image.get_absolute_url }}">
+                        <a class="thumbnail" href="{{ source.get_absolute_url }}">
                             {% thumbnail image.image 160x0 as im %}
                             <img src="{{ im.url }}" width="160" height="{{ im.height }}">
                         </a>
