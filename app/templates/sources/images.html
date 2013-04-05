@@ -1,26 +1,24 @@
 {% extends 'base.html' %}
 {% load thumbnail %}
+{% block extra_scripts %}
+<script src="{{ STATIC_URL }}js/jquery.isotope.min.js"></script>
+<script src="{{ STATIC_URL }}js/list-images.js"></script>
+{% endblock %}
 {% block content %}
         <div class="row">
-            {% with current='sources' %}{% include '_sidenav.html' %}{% endwith %}
-            <div class="span8">
-                <h1>Sources</h1>
-                <ul class="media-list">
+            {% with current='images' %}{% include '_sidenav.html' %}{% endwith %}
+            <div class="span10">
+                <h1>Images</h1>
+                <ul id="wall" class="thumbnails">
                 {% for source in content %}
-                    <li class="media">
-                        <a href="{{ source.get_absolute_url }}" class="thumb-container pull-left">
-                        {% if source.sourceimage_set.all %}
-                            {% thumbnail source.sourceimage_set.all.0.image 50x50 crop="True" as im %}
-                            <img src="{{ im.url }}">
-                        {% else %}
-                        <i class="icon-book icon-large icon-muted"></i>
-                        {% endif %}
+                    {% with image=source.sourceimage_set.all.0 %}
+                    <li class="cell span2">
+                        <a class="thumbnail" href="{{ image.get_absolute_url }}">
+                            {% thumbnail image.image 160x0 as im %}
+                            <img src="{{ im.url }}" width="160" height="{{ im.height }}">
                         </a>
-                        <div class="media-body">
-                        <a href="{{ source.get_absolute_url }}" class="">{{ source|safe }}</a><br>
-                        <small>{{ source.source_type }}</small>
-                        </div>
                     </li>
+                    {% endwith %}
                 {% endfor %}
                     </ul>
                 <ul class="pager">

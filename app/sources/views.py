@@ -77,6 +77,28 @@ class SourceListView(LinkedDataListView):
         return graph
 
 
+class ImageListView(LinkedDataListView):
+    model = Source
+    path = '/images/results'
+    template_name = 'sources/images'
+    queryset = Source.objects.exclude(sourceimage=None)
+
+    def make_graph(self, entities):
+        namespaces = {}
+        graph = Graph()
+        schemas = RDFSchema.objects.all()
+        for schema in schemas:
+            namespace = Namespace(schema.uri)
+            graph.bind(schema.prefix, namespace)
+            namespaces[schema.prefix] = namespace
+        host_ns = Namespace('http://%s' % (Site.objects.get_current().domain))
+        for entity in entities:
+            this_entity = URIRef(host_ns[entity.get_absolute_url()])
+            graph.add((this_entity, namespaces['rdf']['type'], namespaces['bibo']['Note']))
+            graph.add((this_entity, namespaces['rdfs']['label'], Literal(str(entity))))
+        return graph
+
+
 def show_sources(request):
     results = Source.objects.all().order_by('title')
     paginator = Paginator(results, 25)

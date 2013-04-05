@@ -37,3 +37,15 @@ img.photo {
     -moz-box-shadow: 0 0 20px #333;
     box-shadow:0 0 20px #333;
 }
+
+.thumb-container {
+    width: 50px;
+    text-align: center;
+    display: block;
+}
+
+li.media {
+border-top: 1px solid #d7d7d7;
+padding-top: 10px;
+
+}

@@ -81,7 +81,7 @@ class Thing(StandardMetadata):
 
 
 class Person(StandardMetadata):
-    display_name = models.CharField(max_length=200)
+    display_name = models.CharField(max_length=200, blank=True, null=True)
     biography = models.TextField(blank=True, null=True)
     birth_earliest_date = models.DateField(null=True, blank=True)
     birth_earliest_month_known = models.BooleanField(default=False)

@@ -64,42 +64,39 @@
                         {% endwith %}
                     {% endif %}
                     {% if content.main_sources %}
-                        <dt>Main source{{ content.main_sources|pluralize }}</dt>
+                        <dt>Main sources</dt>
                         {% with list=content.main_sources %}
                             {% include '_dd_item_list.html' %}
                         {% endwith %}
                     {% endif %}
                     {% if content.other_sources %}
-                        <dt>Other source{{ content.other_sources|pluralize }}</dt>
+                        <dt>Other sources</dt>
                         {% with list=content.other_sources %}
                             {% include '_dd_item_list.html' %}
                         {% endwith %}
                     {% endif %}
                     {% if content.stories.all %}
-                        <h4>Stories</h4>
-                        {% for story in content.stories.all %}
-                        <article>
-                            <h5>{{ story.title }}</h5>
-                            {{ story.text|linebreaks|truncatewords_html:100 }}
-                            <p><a href="{{ story.get_absolute_url }}">More</a></p>
-                        </article>
-                        {% endfor %}
+                        <dt>Stories</dt>
+                        {% with list=content.stories %}
+                            {% include '_dd_item_list.html' %}
+                        {% endwith %}
                     {% endif %}
 
 
                     {% if content.memorialname_set.all %}
-                    <h4>Commemorations</h4>
-                    <ul>
-                        {% for memorialname in content.memorialname_set.all %}
-                            <li>{{ memorialname.name }} on the {% if memorialname.memorial_part %}<a href="{{ memorialname.memorial.get_absolute_url }}#part-{{ memorialname.memorial_part.id }}">{{ memorialname.memorial_part.label }}</a> of the {% endif %}<a href="{{ memorialname.memorial.get_absolute_url }}">{{ memorialname.memorial }}</a></li>
-                        {% endfor %}
-                    </ul>
+                        <dt>Commemorations</dt>
+                        <dd>
+                            <ul>
+                                {% for memorialname in content.memorialname_set.all %}
+                                    <li>{{ memorialname.name }} on the {% if memorialname.memorial_part %}<a href="{{ memorialname.memorial.get_absolute_url }}#part-{{ memorialname.memorial_part.id }}">{{ memorialname.memorial_part.label }}</a> of the {% endif %}<a href="{{ memorialname.memorial.get_absolute_url }}">{{ memorialname.memorial }}</a></li>
+                                {% endfor %}
+                            </ul>
+                    </dd>
                     {% endif %}
                 </dl>
 
             </div>
             <div class="span2">
-                <h5>Contribute</h5>
                 {% if 'change_person' in perms %}
                 <p>
                     <a class="btn btn-primary btn-medium" href="{% url person-update content.id%}">Update</a>
@@ -120,11 +117,13 @@
 {% block footer %}
 <div class="row">
     <div class="span8 offset2">
+        <small>
         Identifer: <a href="{{ identifier }}">{{ identifier }}</a> |
         <a href="{{ id_path }}.html/">HTML</a> |
         <a href="{{ id_path }}.rdf/">RDF+XML</a> |
         <a href="{{ id_path }}.ttl/">Turtle</a> |
         <a href="{{ id_path }}.json/">JSON</a>
+        </small>
     </div>
 </div>
 {% endblock %}

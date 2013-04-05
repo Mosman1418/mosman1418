@@ -33,6 +33,9 @@ urlpatterns = patterns('app.sources.views',
     url(r'^sources/add/(?P<source_type>(collection|part))/(?P<source_id>\d+)/$', AddSourceView.as_view(), name='source-add-source'),
     url(r'^sources/(?P<pk>\d+)/delete/$', DeleteSource.as_view(), name='source-delete'),
 
+    url(r'^images/$', ImageListView.as_view(), name="image-list"),
+    url(r'^images/results\.(?P<format>(html|rdf|json|ttl))/$', ImageListView.as_view()),
+
     url(r'^stories/$', StoryListView.as_view(), name="story-list"),
     url(r'^stories/results\.(?P<format>(html|rdf|json|ttl))/$', StoryListView.as_view()),
     url(r'^stories/(?P<id>\d+)\.(?P<format>(html|rdf|json|ttl))/$', StoryView.as_view()),
