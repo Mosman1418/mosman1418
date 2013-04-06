@@ -26,13 +26,13 @@
                 <ul class="pager">
                     <li>
                         {% if content.has_previous %}
-                            <a href="/people/?{% if queries %}{{ queries.urlencode }}&amp;{% endif %}page={{ content.previous_page_number }}">Previous</a>
+                            <a href="/people/{% if letter %}{{ letter }}/{% endif %}?{% if queries %}{{ queries.urlencode }}&amp;{% endif %}page={{ content.previous_page_number }}">Previous</a>
                         {% else %}
                             Previous
                         {% endif %}
                     </li>                    <li>
                         {% if content.has_next %}
-                            <a href="/people/?{% if queries %}{{ queries.urlencode }}&amp;{% endif %}page={{ content.next_page_number }}">Next</a>
+                            <a href="/people/{% if letter %}{{ letter }}/{% endif %}?{% if queries %}{{ queries.urlencode }}&amp;{% endif %}page={{ content.next_page_number }}">Next</a>
                         {% else %}
                             Next
                         {% endif %}

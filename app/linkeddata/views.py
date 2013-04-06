@@ -159,6 +159,7 @@ class LinkedDataListView(LinkedDataView):
             except EmptyPage:
                 content = paginator.page(paginator.num_pages)
             context['content'] = content
+            context['letter'] = letter
             return self.render_to_format(request, context, self.template_name, format)
         else:
             context['queries'] = request.GET.urlencode()
