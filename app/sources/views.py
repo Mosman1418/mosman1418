@@ -81,7 +81,7 @@ class ImageListView(LinkedDataListView):
     model = Source
     path = '/images/results'
     template_name = 'sources/images'
-    queryset = Source.objects.exclude(sourceimage=None)
+    queryset = Source.objects.exclude(sourceimage=None).filter(source_type__label='photograph')
 
     def make_graph(self, entities):
         namespaces = {}

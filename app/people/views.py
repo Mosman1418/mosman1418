@@ -120,8 +120,9 @@ class PersonView(LinkedDataView):
 
 class PersonListView(LinkedDataListView):
     model = Person
-    path = '/people/results'
+    path = '/people/{}results'
     template_name = 'people/people'
+    browse_field = 'family_name'
     queryset = Person.objects.filter(status='confirmed')
 
     def make_graph(self, entities):

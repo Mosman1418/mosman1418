@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 {% load thumbnail %}
+{% load guardian_tags %}
 {% block content %}
+    {% get_obj_perms request.user for content as 'perms' %}
         <div class="row">
             {% with current='sources' %}{% include '_sidenav.html' %}{% endwith %}
             <div class="span8">
@@ -105,6 +107,13 @@
                     </dd>
                     {% endif %}
                 </dl>
+            </div>
+            <div class="span2">
+                {% if 'change_source' in perms %}
+                <p>
+                    <a class="btn btn-primary btn-medium" href="{% url source-update content.id%}">Update</a>
+                </p>
+                {% endif %}
             </div>
         </div>
 {% endblock %}

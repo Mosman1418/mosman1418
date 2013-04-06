@@ -125,14 +125,25 @@ class LinkedDataView(ContentNegotiatedView):
 
 
 class LinkedDataListView(LinkedDataView):
+    browse_field = None
 
-    def get(self, request, format=None):
+    def get(self, request, letter=None, format=None):
         context = {}
+        self.path = self.path.format('{}/'.format(letter) if letter else '')
         if format:
             if self.queryset:
                 results = self.queryset
+                if letter and self.browse_field:
+                    filter = '{}__istartswith'.format(self.browse_field)
+                    results = results.filter(**{filter: letter})
             else:
-                results = self.model.objects.select_related().all()
+                if letter and self.browse_field:
+                    filter = '{}__istartswith'.format(self.browse_field)
+                    results = self.model.objects.select_related().filter(**{filter: letter})
+                else:
+                    results = self.model.objects.select_related().all()
+            if self.browse_field:
+                results = results.order_by(self.browse_field)
             paginator = Paginator(results, 25)
             page = request.GET.get('page', '1')
             try:
