@@ -43,22 +43,24 @@ class Person(GenericPerson):
         return '%s, %s' % (self.family_name, self.other_names)
 
     def main_sources(self):
-        relations = self.personassociatedsource_set.filter(
-                                    association__label='primary topic of'
-                                    )
+        relations = (self.personassociatedsource_set
+                     .filter(association__label='primary topic of'))
         return [relation.source for relation in relations]
 
     def other_sources(self):
-        relations = self.personassociatedsource_set.filter(
-                                    association__label='topic of'
-                                    )
+        relations = (self.personassociatedsource_set
+                     .filter(association__label='topic of'))
         return [relation.source for relation in relations]
+
+    def photos(self):
+        photos = (self.personassociatedsource_set
+                  .filter(association__label='primary topic of')
+                  .filter(source__source_type__label='photograph'))
+        return [photo.source for photo in photos]
 
     class Meta:
         ordering = ['family_name', 'other_names']
-        permissions = (
-                ('approve_person', 'Approve person'),
-            )
+        permissions = (('approve_person', 'Approve person'),)
 
     def get_absolute_url(self):
         return reverse('person-view', args=[str(self.id)])

@@ -1,28 +1,38 @@
 {% extends 'base.html' %}
+{% load thumbnail %}
 {% block content %}
         <div class="row">
             {% with current='people' %}{% include '_sidenav.html' %}{% endwith %}
             <div class="span8">
                 <h1>People {% if status == 'pending' %}awaiting approval{% endif %}</h1>
-                <ul>
+                <ul class="media-list">
                 {% for person in content %}
-                    <li>
-                        <a href="{{ person.get_absolute_url }}">
-                            {{ person }}
+                    <li class="media">
+                        <a href="{{ person.get_absolute_url }}" class="thumb-container pull-left">
+                        {% if person.photos %}
+                            {% thumbnail person.photos.0.sourceimage_set.all.0.image 50x50 crop="True" as im %}
+                            <img src="{{ im.url }}">
+                        {% else %}
+                        <i class="icon-user icon-large icon-muted"></i>
+                        {% endif %}
                         </a>
+                        <div class="media-body">
+                        <a href="{{ person.get_absolute_url }}" class="">{{ person|safe }}</a><br>
+                        <small></small>
+                        </div>
                     </li>
                 {% endfor %}
                 </ul>
                 <ul class="pager">
                     <li>
                         {% if content.has_previous %}
-                            <a href="/people/?page={{ content.previous_page_number }}">Previous</a>
+                            <a href="/people/?{% if queries %}{{ queries.urlencode }}&amp;{% endif %}page={{ content.previous_page_number }}">Previous</a>
                         {% else %}
                             Previous
                         {% endif %}
                     </li>                    <li>
                         {% if content.has_next %}
-                            <a href="/people/?page={{ content.next_page_number }}">Next</a>
+                            <a href="/people/?{% if queries %}{{ queries.urlencode }}&amp;{% endif %}page={{ content.next_page_number }}">Next</a>
                         {% else %}
                             Next
                         {% endif %}

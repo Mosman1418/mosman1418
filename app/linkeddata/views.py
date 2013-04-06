@@ -74,7 +74,8 @@ class LinkedDataView(ContentNegotiatedView):
             if key == 'location' and response.renderer:
                 location = '%s.%s/' % (value, response.renderer.format)
                 try:
-                    location += '?page=%s' % context['page']
+                    #location += '?page=%s' % context['page']
+                    location += '?{}'.format(context['queries'])
                 except KeyError:
                     pass
                 response[key] = location
@@ -129,6 +130,10 @@ class LinkedDataListView(LinkedDataView):
 
     def get(self, request, letter=None, format=None):
         context = {}
+        queries_without_page = request.GET.copy()
+        if 'page' in queries_without_page:
+            del queries_without_page['page']
+        context['queries'] = queries_without_page
         self.path = self.path.format('{}/'.format(letter) if letter else '')
         if format:
             if self.queryset:
@@ -144,7 +149,8 @@ class LinkedDataListView(LinkedDataView):
                     results = self.model.objects.select_related().all()
             if self.browse_field:
                 results = results.order_by(self.browse_field)
-            paginator = Paginator(results, 25)
+            count = request.GET.get('count', '25')
+            paginator = Paginator(results, count)
             page = request.GET.get('page', '1')
             try:
                 content = paginator.page(page)
@@ -155,7 +161,7 @@ class LinkedDataListView(LinkedDataView):
             context['content'] = content
             return self.render_to_format(request, context, self.template_name, format)
         else:
-            context['page'] = request.GET.get('page', '1')
+            context['queries'] = request.GET.urlencode()
             context['status_code'] = 303
             context['additional_headers'] = {'location': self.path}
             context['content'] = None
@@ -163,7 +169,7 @@ class LinkedDataListView(LinkedDataView):
 
     @renderer(format='html', mimetypes=('text/html', 'application/xhtml+xml'), name='HTML', priority=1)
     def render_html(self, request, context, template_name):
-        if context['content'] != None:
+        if context['content'] is not None:
             template_name = self.join_template_name(template_name, 'html')
             identifier = 'http://%s%s/' % (Site.objects.get_current().domain, self.path)
             context['identifier'] = identifier
