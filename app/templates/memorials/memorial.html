@@ -13,8 +13,8 @@
                     <h1>{{ content.name }}</h1>
                     {% if content.address %}
                     <p>{{ content.address }}</p>
-                    <p><a href="{% url memorial-names-list content.id %}">{{ content.memorialname_set.all|length }} names recorded</a><p>
                     {% endif %}
+                    <p><a href="{% url memorial-names-list content.id %}">{{ content.memorialname_set.all|length }} names recorded</a><p>
 
                     <dl class="dl-horizontal">
                     {% if content.memorialpart_set.all %}
