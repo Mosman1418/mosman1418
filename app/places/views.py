@@ -84,6 +84,7 @@ class AddPlace(CreateView):
         place = form.save(commit=False)
         place.added_by = self.request.user
         place.save()
+        self.object = place
         birth = form.cleaned_data.get('birth_event', None)
         death = form.cleaned_data.get('death_event', None)
         life_event = form.cleaned_data.get('life_event', None)
@@ -109,9 +110,16 @@ class AddPlace(CreateView):
 
 
 class UpdatePlace(UpdateView):
-    template_name = 'people/add_place.html'
+    template_name = 'places/add_place.html'
     form_class = AddPlaceForm
     model = Place
+
+    def get_success_url(self):
+        if 'continue' in self.request.POST:
+            url = reverse_lazy('place-update', args=[self.object.id])
+        else:
+            url = reverse_lazy('place-view', args=[self.object.id])
+        return url
 
 
 class DeletePlace(DeleteView):

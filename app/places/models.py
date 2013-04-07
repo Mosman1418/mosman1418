@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.urlresolvers import reverse
 
 from app.generic.models import Place, StandardMetadata
 
@@ -9,18 +10,21 @@ class Place(Place):
     place_name = models.CharField(max_length=100, blank=True)
     state = models.CharField(max_length=50, blank=True)
     country = models.CharField(max_length=50, blank=True)
-    geonames_id = models.URLField(blank=True)
+    geonames_id = models.IntegerField(blank=True, null=True)
     sources = models.ManyToManyField('sources.Source', blank=True, null=True)
 
     def __unicode__(self):
         if self.display_name:
             summary = self.display_name
         else:
-            summary = '{}{}'.format(
-                    self.place_name,
-                    ', {}'.format(self.country) if self.country else ''
-                )
+            summary = '{}{}'.format(self.place_name,
+                                    ', {}'.format(self.country)
+                                    if self.country else ''
+                                    )
         return summary
+
+    def get_absolute_url(self):
+        reverse('place-view', args=[self.id])
 
 
 class Address(StandardMetadata):
@@ -38,11 +42,14 @@ class Address(StandardMetadata):
         else:
             street = None
         return '{building}{number}{street}, {place}'.format(
-                            building='{}, '.format(self.building_name) if self.building_name else '',
-                            number='{} '.format(self.street_number) if self.street_number else '',
-                            street='{} '.format(street) if street else '',
-                            place=self.place
-                        )
+            building='{}, '.format(self.building_name) if self.building_name else '',
+            number='{} '.format(self.street_number) if self.street_number else '',
+            street='{} '.format(street) if street else '',
+            place=self.place
+        )
+
+    def get_absolute_url(self):
+        reverse('address-view', args=[self.id])
 
 
 class MosmanStreet(StandardMetadata):

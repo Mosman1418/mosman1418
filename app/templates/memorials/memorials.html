@@ -5,6 +5,10 @@
         <div class="row">
             {% with current='memorials' %}{% include '_sidenav.html' %}{% endwith %}
             <div class="span8">
+                <ul class="breadcrumb hidden-phone">
+                    <li><a href="/">Home</a> <span class="divider">/</span></li>
+                    <li class="active">Memorials</li>
+                </ul>
                 <h1 class="page-header">Memorials</h1>
                 <ul class="media-list">
                 {% for memorial in content %}
@@ -18,7 +22,12 @@
                         {% endif %}
                         </a>
                         <div class="media-body">
-                        <a href="{{ memorial.get_absolute_url }}" class="">{{ memorial|safe }}</a><br>
+                        <a href="{{ memorial.get_absolute_url }}" class="">{{ memorial|safe }}</a>
+                        {% if memorial.address %}
+                            <br>
+                            <small>{{ memorial.address }}</small>
+                        {% endif %}
+                        <br>
                         <small>{{ memorial.memorialname_set.count }} names</small>
                         </div>
                     </li>

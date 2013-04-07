@@ -8,7 +8,14 @@
         <div class="row">
             {% with current='memorials' %}{% include '_sidenav.html' %}{% endwith %}
             <div class="span8">
+                <ul class="breadcrumb hidden-phone">
+                    <li><a href="/">Home</a> <span class="divider">/</span></li>
+                    <li><a href="{% url memorial-list %}">Memorials</a> <span class="divider">/</span></li>
+                    <li><a href="{{ content.get_absolute_url }}">{{ content }}</a><span class="divider">/</span></li>
+                    <li class="active">Images</li>
+                </ul>
                 <h1 class="page-header">{{ content }} <small>images</small></h1>
+
                 <ul id="wall" class="thumbnails">
                 {% for source in content.photos %}
                     {% with image=source.sourceimage_set.all.0 %}

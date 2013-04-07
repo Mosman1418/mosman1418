@@ -10,6 +10,7 @@ class Memorial(StandardMetadata):
     location = models.ForeignKey('places.Place', blank=True, null=True, related_name='memorial_location')
     description = models.TextField(blank=True)
     inscription = models.TextField(blank=True)
+    address = models.ForeignKey('places.Address', blank=True, null=True)
     associated_people = models.ManyToManyField('people.Person', through='MemorialAssociatedPerson')
     associated_organisations = models.ManyToManyField('people.Organisation', through='MemorialAssociatedOrganisation')
     associated_places = models.ManyToManyField('places.Place', through='MemorialAssociatedPlace')
@@ -69,6 +70,14 @@ class MemorialName(StandardMetadata):
     def __unicode__(self):
         return self.name
 
+    def position(self):
+        position = []
+        if self.row:
+            position.append('row {}'.format(self.row))
+        if self.column:
+            position.append('column {}'.format(self.column))
+        return ', '.join(position)
+
 
 class MemorialAssociatedPerson(models.Model):
     memorial = models.ForeignKey('Memorial')
@@ -100,7 +109,7 @@ class MemorialAssociatedEvent(models.Model):
 class MemorialAssociatedPlace(models.Model):
     memorial = models.ForeignKey('Memorial')
     place = models.ForeignKey('places.Place')
-    association = models.ForeignKey('MemorialAssociation')
+    association = models.ForeignKey('MemorialPlaceAssociation')
 
     def __unicode__(self):
         return self.place.__unicode__()
@@ -125,6 +134,14 @@ class MemorialAssociatedSource(models.Model):
 
 
 class MemorialSourceAssociation(models.Model):
+    label = models.CharField(max_length=50, blank=True, null=True)
+    rdf_property = models.ManyToManyField(RDFProperty, blank=True)
+
+    def __unicode__(self):
+        return self.label
+
+
+class MemorialPlaceAssociation(models.Model):
     label = models.CharField(max_length=50, blank=True, null=True)
     rdf_property = models.ManyToManyField(RDFProperty, blank=True)
 

@@ -2,6 +2,8 @@
 <div class="pagination pagination-small">
     {% if letter %}
         {% url entity_link letter as base_url %}
+    {% elif entity_id %}
+        {% url entity_link entity_id as base_url %}
     {% else %}
         {% url entity_link as base_url %}
     {% endif %}

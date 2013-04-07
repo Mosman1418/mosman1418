@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load thumbnail %}
+{% load nav_extras %}
+{% block extra_scripts %}
+{% endblock %}
+{% block content %}
+        <div class="row">
+            {% with current='memorials' %}{% include '_sidenav.html' %}{% endwith %}
+            <div class="span8">
+                <ul class="breadcrumb hidden-phone">
+                    <li><a href="/">Home</a> <span class="divider">/</span></li>
+                    <li><a href="{% url memorial-list %}">Memorials</a> <span class="divider">/</span></li>
+                    <li><a href="{{ memorial.get_absolute_url }}">{{ memorial }}</a><span class="divider">/</span></li>
+                    <li class="active">Names</li>
+                </ul>
+                <h1 class="page-header">{{ memorial }} <small>names</small></h1>
+
+                {% paginate 'memorial-names' 5 %}
+                <ul class="media-list">
+                {% for name in content %}
+                    <li class="media">
+                        <a href="{{ name.person.get_absolute_url }}" class="thumb-container pull-left">
+                        {% if name.person.photos %}
+                            {% thumbnail name.person.photos.0.sourceimage_set.all.0.image 50x50 crop="True" as im %}
+                            <img src="{{ im.url }}">
+                        {% else %}
+                        <i class="icon-user icon-large icon-muted"></i>
+                        {% endif %}
+                        </a>
+                        <div class="media-body">
+                        <h5>{{ name.name }}
+                        ( <a href="{{ person.get_absolute_url }}" class="">{{ name.person|safe }}</a> )</h5>
+                        <small>
+                            {% if name.memorial_part %}
+                                {{ name.memorial_part }}
+                            {% endif %}
+                            {% if name.position and name.memorial_part %}
+                                &ndash;
+                            {% endif %}
+                            {% if name.position %}
+                                {{ name.position }}
+                            {% endif %}
+                        </small>
+                        </div>
+                    </li>
+                {% endfor %}
+                </ul>
+                {% paginate 'memorial-names' 5 %}
+
+            </div>
+        </div>
+{% endblock %}

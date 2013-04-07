@@ -5,7 +5,32 @@
             {% with current='memorials' %}{% include '_sidenav.html' %}{% endwith %}
             <div class="row">
                 <div class="span6">
+                    <ul class="breadcrumb hidden-phone">
+                        <li><a href="/">Home</a> <span class="divider">/</span></li>
+                        <li><a href="{% url memorial-list %}">Memorials</a> <span class="divider">/</span></li>
+                        <li class="active">{{ content }}</li>
+                    </ul>
                     <h1>{{ content.name }}</h1>
+                    {% if content.address %}
+                    <p>{{ content.address }}</p>
+                    <p><a href="{% url memorial-names-list content.id %}">{{ content.memorialname_set.all|length }} names recorded</a><p>
+                    {% endif %}
+
+                    <dl class="dl-horizontal">
+                    {% if content.memorialpart_set.all %}
+                        <dt>Sections</dt>
+                        {% with list=content.memorialpart_set.all %}
+                            {% include '_dd_item_list.html' %}
+                        {% endwith %}
+
+                    {% endif %}
+                    {% if content.main_sources %}
+                        <dt>Main sources</dt>
+                        {% with list=content.main_sources %}
+                            {% include '_dd_item_list.html' %}
+                        {% endwith %}
+                    {% endif %}
+                    </dl>
 
                 </div>
                 <div class="span2">

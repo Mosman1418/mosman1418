@@ -115,7 +115,7 @@ class Group(StandardMetadata, ShortDateMixin):
 
 
 class Place(StandardMetadata):
-    display_name = models.CharField(max_length=200)
+    display_name = models.CharField(max_length=200, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     lat = models.FloatField(blank=True, null=True)
     lon = models.FloatField(blank=True, null=True)

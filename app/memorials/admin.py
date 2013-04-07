@@ -9,14 +9,21 @@ class MemorialSourceInline(admin.TabularInline):
     extra = 1
 
 
+class MemorialPlaceInline(admin.TabularInline):
+    model = MemorialAssociatedPlace
+    extra = 1
+
+
 class MemorialPartInline(admin.TabularInline):
     model = MemorialPart
     extra = 1
 
 
 class MemorialAdmin(admin.ModelAdmin):
-    inlines = (MemorialSourceInline, MemorialPartInline,)
+    inlines = (MemorialSourceInline, MemorialPartInline, MemorialPlaceInline)
 
 admin.site.register(Memorial, MemorialAdmin)
 admin.site.register(MemorialAssociation)
 admin.site.register(MemorialPart)
+admin.site.register(MemorialSourceAssociation)
+admin.site.register(MemorialPlaceAssociation)

@@ -16,6 +16,8 @@ def alpha_browse(entity, active):
 @register.inclusion_tag('_pagination.html', takes_context=True)
 def paginate(context, entity, number):
     letter = context['letter']
+    if 'memorial' in context:
+        entity_id = context['memorial'].id
     if letter:
         entity_link = '{}-alpha-list'.format(entity)
     else:
@@ -33,6 +35,7 @@ def paginate(context, entity, number):
     else:
         pages = pages[current - (number + 1):current + number]
     return {'entity_link': entity_link,
+            'entity_id': entity_id,
             'page': page,
             'pages': pages,
             'letter': letter,
