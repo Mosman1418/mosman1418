@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load thumbnail %}
+{% block extra_scripts %}
+<script src="{{ STATIC_URL }}js/jquery.isotope.min.js"></script>
+<script src="{{ STATIC_URL }}js/list-images.js"></script>
+{% endblock %}
+{% block content %}
+        <div class="row">
+            {% with current='memorials' %}{% include '_sidenav.html' %}{% endwith %}
+            <div class="span8">
+                <h1 class="page-header">{{ content }} <small>images</small></h1>
+                <ul id="wall" class="thumbnails">
+                {% for source in content.photos %}
+                    {% with image=source.sourceimage_set.all.0 %}
+                    <li class="cell span2">
+                        <a class="thumbnail" href="{{ source.get_absolute_url }}">
+                            {% thumbnail image.image 160x0 as im %}
+                            <img src="{{ im.url }}" width="160" height="{{ im.height }}">
+                        </a>
+                    </li>
+                    {% endwith %}
+                {% endfor %}
+                </ul>
+
+            </div>
+        </div>
+{% endblock %}

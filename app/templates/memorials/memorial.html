@@ -1,61 +1,43 @@
 {% extends 'base.html' %}
+{% load thumbnail %}
 {% block content %}
         <div class="row">
-            <div class="span2">
-                <ul class="nav nav-list">
-                    <li class="active"><a href="/memorials/">Memorials</a></li>
-                    <li><a href="/people/">People</a></li>
-                </ul>
-            </div>
-            <div class="span10">
-                <h1>{{ content.name }}</h1>
-                {% if content.memorialpart_set.all %}
-                    <ul class="nav nav-pills">
-                        {% for part in content.memorialpart_set.all %}
-                            <li><a href="#part-{{ part.id }}">{{ part.label }}</a></li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-                {% if content.associated_sources.all %}
-                    <h4>Sources</h4>
-                    <ul>
-                        {% for source in content.associated_sources.all %}
-                            <li><a href="/sources/{{ source.id }}.html/">{{ source }}</a>{% if source.collection %} ({{ source.collection }}){% endif %}</li>
+            {% with current='memorials' %}{% include '_sidenav.html' %}{% endwith %}
+            <div class="row">
+                <div class="span6">
+                    <h1>{{ content.name }}</h1>
 
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-                {% if content.memorialpart_set.all %}
-                    {% for part in content.memorialpart_set.all %}
-                        <h2 id="part-{{ part.id }}">{{ part.label }}</h2>
-                        <div class="inscription">
-                            {{ part.inscription|safe }}
-                        </div>
-                        {% regroup part.memorialname_set.all  by row as rows %}
-                        {% for row in rows %}
-                        <div class="row">
-                            {% for name in row.list %}
-                                <span class="span2"><a href="/people/{{ name.person.id }}.html/">{{ name.name }}</a></span>
-                            {% endfor %}
-                        </div>
-                        {% endfor %}
-                    {% endfor %}
-                {% elif content.memorialname_set.all %}
-                    {% regroup content.memorialname_set.all  by row as rows %}
-                        {% for row in rows %}
-                        <div class="row">
-                            {% for name in row.list %}
-                                <span class="span2"><a href="/people/{{ name.person.id }}.html/">{{ name.name }}</a></span>
-                            {% endfor %}
-                        </div>
-                        {% endfor %}
-                {% endif %}
-                <p>Identifer: <a href="{{ identifier }}">{{ identifier }}</a> |
-                    <a href="{{ id_path }}.html/">HTML</a> |
-                    <a href="{{ id_path }}.rdf/">RDF+XML</a> |
-                    <a href="{{ id_path }}.ttl/">Turtle</a> |
-                    <a href="{{ id_path }}.json/">JSON</a>
-                </p>
+                </div>
+                <div class="span2">
+                    {% if content.photos %}
+                        {% thumbnail content.photos.0.sourceimage_set.all.0.image 160x0 as im %}
+                        <a class="thumbnail" href="{{ content.photos.0.get_absolute_url }}">
+                            <img src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}" alt="content.photos.0.title">
+                        </a>
+                        <p class="pull-right"><small><a href="{% url memorial-photos-view content.id %}">All photos ({{ content.photos|length }})</a></small><p>
+
+                    {% endif %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="span8">
+
+                </div>
             </div>
         </div>
+
+
+{% endblock %}
+{% block footer %}
+<div class="row">
+    <div class="span8 offset2">
+        <small>
+        Identifer: <a href="{{ identifier }}">{{ identifier }}</a> |
+        <a href="{{ id_path }}.html/">HTML</a> |
+        <a href="{{ id_path }}.rdf/">RDF+XML</a> |
+        <a href="{{ id_path }}.ttl/">Turtle</a> |
+        <a href="{{ id_path }}.json/">JSON</a>
+        </small>
+    </div>
+</div>
 {% endblock %}

@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.urlresolvers import reverse
 
 from app.linkeddata.models import RDFProperty
 from app.generic.models import StandardMetadata
@@ -36,7 +37,7 @@ class Memorial(StandardMetadata):
         return [photo.source for photo in photos]
 
     def get_absolute_url(self):
-        return ('memorial-view', [str(self.id)])
+        return reverse('memorial-view', args=[str(self.id)])
 
 
 class MemorialPart(StandardMetadata):
