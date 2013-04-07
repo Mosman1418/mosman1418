@@ -1,10 +1,13 @@
 {% extends 'base.html' %}
 {% load thumbnail %}
+{% load nav_extras %}
 {% block content %}
         <div class="row">
             {% with current='people' %}{% include '_sidenav.html' %}{% endwith %}
             <div class="span8">
                 <h1>People {% if status == 'pending' %}awaiting approval{% endif %}</h1>
+                {% alpha_browse 'people' letter %}
+                {% paginate 'people' 5 %}
                 <ul class="media-list">
                 {% for person in content %}
                     <li class="media">
@@ -23,21 +26,7 @@
                     </li>
                 {% endfor %}
                 </ul>
-                <ul class="pager">
-                    <li>
-                        {% if content.has_previous %}
-                            <a href="/people/{% if letter %}{{ letter }}/{% endif %}?{% if queries %}{{ queries.urlencode }}&amp;{% endif %}page={{ content.previous_page_number }}">Previous</a>
-                        {% else %}
-                            Previous
-                        {% endif %}
-                    </li>                    <li>
-                        {% if content.has_next %}
-                            <a href="/people/{% if letter %}{{ letter }}/{% endif %}?{% if queries %}{{ queries.urlencode }}&amp;{% endif %}page={{ content.next_page_number }}">Next</a>
-                        {% else %}
-                            Next
-                        {% endif %}
-                    </li>
-                </ul>
+                {% paginate 'people' 5 %}
             </div>
         </div>
 {% endblock %}

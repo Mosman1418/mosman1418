@@ -1,0 +1,39 @@
+{% load url from future %}
+<div class="pagination pagination-small">
+    {% if letter %}
+        {% url entity_link letter as base_url %}
+    {% else %}
+        {% url entity_link as base_url %}
+    {% endif %}
+    <ul>
+        <li>
+            <a title="First page" href="{{ base_url }}?{% if queries %}{{ queries.urlencode }}&amp;{% endif %}page=1"><i class="icon-double-angle-left"></i></a>
+        </li>
+        {% if page.has_previous %}
+            <li>
+                <a title="Previous page" href="{{ base_url }}?{% if queries %}{{ queries.urlencode }}&amp;{% endif %}page={{ page.previous_page_number }}"><i class="icon-angle-left"></i></a>
+            </li>
+        {% else %}
+            <li class="disabled">
+                <a href=""><i class="icon-angle-left"></i></a>
+            </li>
+        {% endif %}
+        {% for page_num in pages %}
+            <li class="{% if page_num == page.number %}active{% endif %}">
+                <a href="{{ base_url }}?{% if queries %}{{ queries.urlencode }}&amp;{% endif %}page={{ page_num }}">{{ page_num }}</a>
+            </li>
+        {% endfor %}
+        {% if page.has_next %}
+            <li>
+                <a href="{{ base_url }}?{% if queries %}{{ queries.urlencode }}&amp;{% endif %}page={{ page.next_page_number }}"><i class="icon-angle-right"></i></a>
+            </li>
+        {% else %}
+            <li class="disabled">
+                <a href=""><i class="icon-angle-right"></i></a>
+            </li>
+        {% endif %}
+        <li>
+            <a title="Last page" href="{{ base_url }}?{% if queries %}{{ queries.urlencode }}&amp;{% endif %}page={{ last }}"><i class="icon-double-angle-right"></i></a>
+        </li>
+    </ul>
+</div>

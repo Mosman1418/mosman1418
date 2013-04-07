@@ -1,10 +1,13 @@
 {% extends 'base.html' %}
 {% load thumbnail %}
+{% load nav_extras %}
 {% block content %}
         <div class="row">
             {% with current='sources' %}{% include '_sidenav.html' %}{% endwith %}
             <div class="span8">
                 <h1>Sources</h1>
+                {% alpha_browse 'source' letter %}
+                {% paginate 'source' 5 %}
                 <ul class="media-list">
                 {% for source in content %}
                     <li class="media">
@@ -21,23 +24,11 @@
                         <small>{{ source.source_type }}</small>
                         </div>
                     </li>
+                {% empty %}
+                    <li>No matching sources</li>
                 {% endfor %}
-                    </ul>
-                <ul class="pager">
-                    <li>
-                        {% if content.has_previous %}
-                            <a href="/sources/?page={{ content.previous_page_number }}">Previous</a>
-                        {% else %}
-                            Previous
-                        {% endif %}
-                    </li>                    <li>
-                        {% if content.has_next %}
-                            <a href="/sources/?page={{ content.next_page_number }}">Next</a>
-                        {% else %}
-                            Next
-                        {% endif %}
-                    </li>
                 </ul>
+                {% paginate 'source' 5 %}
             </div>
         </div>
 {% endblock %}

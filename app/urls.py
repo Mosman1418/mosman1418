@@ -23,6 +23,8 @@ admin.autodiscover()
 urlpatterns = patterns('app.sources.views',
     url(r'^sources/$', SourceListView.as_view(), name="source-list"),
     url(r'^sources/results\.(?P<format>(html|rdf|json|ttl))/$', SourceListView.as_view()),
+    url(r'^sources/(?P<letter>[a-zA-Z]{1})/$', SourceListView.as_view(), name="source-alpha-list"),
+    url(r'^sources/(?P<letter>[a-zA-Z]{1})/results\.(?P<format>(html|rdf|json|ttl))/$', SourceListView.as_view()),
     url(r'^sources/(?P<id>\d+)\.(?P<format>(html|rdf|json|ttl))/$', SourceView.as_view()),
     url(r'^sources/(?P<id>\d+)/$', SourceView.as_view(), name='source-view'),
     url(r'^sources/add/$', AddSourceView.as_view(), name='source-add'),

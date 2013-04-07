@@ -57,8 +57,9 @@ class SourceView(LinkedDataView):
 
 class SourceListView(LinkedDataListView):
     model = Source
-    path = '/sources/results'
+    path = '/sources/{}results'
     template_name = 'sources/sources'
+    browse_field = 'title'
     queryset = Source.objects.all()
 
     def make_graph(self, entities):
