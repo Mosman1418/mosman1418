@@ -18,6 +18,8 @@ def paginate(context, entity, number):
     letter = context['letter']
     if 'memorial' in context:
         entity_id = context['memorial'].id
+    else:
+        entity_id = None
     if letter:
         entity_link = '{}-alpha-list'.format(entity)
     else:
