@@ -127,6 +127,7 @@ class LinkedDataView(ContentNegotiatedView):
 
 class LinkedDataListView(LinkedDataView):
     browse_field = None
+    queryset = None
 
     def get(self, request, letter=None, format=None):
         context = {}

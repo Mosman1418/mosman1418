@@ -1,9 +1,10 @@
 from django.db import models
 
 from app.linkeddata.models import RDFProperty
+from app.generic.models import StandardMetadata
 
 
-class Memorial(models.Model):
+class Memorial(StandardMetadata):
     name = models.CharField(max_length=250, blank=True)
     location = models.ForeignKey('places.Place', blank=True, null=True, related_name='memorial_location')
     description = models.TextField(blank=True)
@@ -18,12 +19,27 @@ class Memorial(models.Model):
     def __unicode__(self):
         return self.name
 
-    @models.permalink
+    def main_sources(self):
+        relations = (self.memorialassociatedsource_set
+                     .filter(association__label='primary topic of'))
+        return [relation.source for relation in relations]
+
+    def other_sources(self):
+        relations = (self.memorialassociatedsource_set
+                     .filter(association__label='topic of'))
+        return [relation.source for relation in relations]
+
+    def photos(self):
+        photos = (self.memorialassociatedsource_set
+                  .filter(association__label='primary topic of')
+                  .filter(source__source_type__label='photograph'))
+        return [photo.source for photo in photos]
+
     def get_absolute_url(self):
-        return ('memorial_view', [str(self.id)])
+        return ('memorial-view', [str(self.id)])
 
 
-class MemorialPart(models.Model):
+class MemorialPart(StandardMetadata):
     memorial = models.ForeignKey('Memorial')
     label = models.CharField(max_length=250, blank=True)
     description = models.TextField(blank=True)
@@ -40,7 +56,7 @@ class MemorialImage(models.Model):
     credit = models.CharField(max_length=250)
 
 
-class MemorialName(models.Model):
+class MemorialName(StandardMetadata):
     memorial = models.ForeignKey('Memorial')
     memorial_part = models.ForeignKey('MemorialPart', blank=True, null=True)
     name = models.CharField(max_length=250, blank=True)
@@ -101,10 +117,18 @@ class MemorialAssociatedObject(models.Model):
 class MemorialAssociatedSource(models.Model):
     memorial = models.ForeignKey('Memorial')
     source = models.ForeignKey('sources.Source')
-    association = models.ForeignKey('MemorialAssociation')
+    association = models.ForeignKey('MemorialSourceAssociation')
 
     def __unicode__(self):
         return self.source.__unicode__()
+
+
+class MemorialSourceAssociation(models.Model):
+    label = models.CharField(max_length=50, blank=True, null=True)
+    rdf_property = models.ManyToManyField(RDFProperty, blank=True)
+
+    def __unicode__(self):
+        return self.label
 
 
 class MemorialAssociation(models.Model):

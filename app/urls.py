@@ -5,7 +5,7 @@ from django.conf import settings
 from app.people.views import *
 from app.sources.views import *
 from app.places.views import *
-from app.memorials.views import MemorialView
+from app.memorials.views import *
 from app.base.views import *
 
 admin.autodiscover()
@@ -164,9 +164,10 @@ urlpatterns += patterns('app.people.views',
     url(r'^addresses/add/(?P<entity_type>(person|personaddress))/(?P<entity_id>\d+)/$', AddAddress.as_view(), name='address-add-entity'),
 )
 urlpatterns += patterns('app.memorials.views',
-    url(r'^memorials/$', 'show_memorials'),
+    url(r'^memorials/$', MemorialListView.as_view(), name="memorial-list"),
+    url(r'^memorials/results\.(?P<format>(html|rdf|json|ttl))/$', MemorialListView.as_view()),
     url(r'^memorials/(?P<id>\d+)\.(?P<format>(html|rdf|json|ttl))/$', MemorialView.as_view()),
-    url(r'^memorials/(?P<id>\d+)/$', MemorialView.as_view(), name='memorial_view'),
+    url(r'^memorials/(?P<id>\d+)/$', MemorialView.as_view(), name='memorial-view'),
 )
 urlpatterns += patterns('',
     url(r'^$', HomeView.as_view(), name='home'),

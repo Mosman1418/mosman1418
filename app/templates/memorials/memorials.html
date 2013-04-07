@@ -1,20 +1,26 @@
 {% extends 'base.html' %}
+{% load thumbnail %}
+{% load nav_extras %}
 {% block content %}
         <div class="row">
-            <div class="span2">
-                <ul class="nav nav-list">
-                    <li class="active"><a href="/memorials/">Memorials</a></li>
-                    <li><a href="/people/">People</a></li>
-                </ul>
-            </div>
-            <div class="span10">
+            {% with current='memorials' %}{% include '_sidenav.html' %}{% endwith %}
+            <div class="span8">
                 <h1>Memorials</h1>
-                <ul>
-                {% for memorial in memorials %}
-                    <li>
-                        <a href="/memorials/{{ memorial.id }}">
-                            {{ memorial.name }}
+                <ul class="media-list">
+                {% for memorial in content %}
+                    <li class="media">
+                        <a href="{{ memorial.get_absolute_url }}" class="thumb-container pull-left">
+                        {% if memorial.photos %}
+                            {% thumbnail memorial.photos.0.sourceimage_set.all.0.image 50x50 crop="True" as im %}
+                            <img src="{{ im.url }}">
+                        {% else %}
+                        <i class="icon-reorder icon-large icon-muted"></i>
+                        {% endif %}
                         </a>
+                        <div class="media-body">
+                        <a href="{{ memorial.get_absolute_url }}" class="">{{ memorial|safe }}</a><br>
+                        <small>{{ memorial.memorialname_set.count }} names</small>
+                        </div>
                     </li>
                 {% endfor %}
                 </ul>
