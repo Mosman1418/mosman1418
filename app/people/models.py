@@ -73,6 +73,7 @@ class Rank(StandardMetadata, ShortDateMixin):
     person = models.ForeignKey('Person')
     rank = models.CharField(max_length=100)
     sources = models.ManyToManyField('sources.Source', blank=True, null=True)
+    memorials = models.ManyToManyField('memorials.Memorial', blank=True, null=True)
 
     def __unicode__(self):
         return '{} held rank of {}{}'.format(
@@ -264,6 +265,7 @@ class Death(Event):
     cause_of_death = models.CharField(max_length=200, blank=True, null=True)
     burial_place = models.ForeignKey('places.Place', blank=True, null=True, related_name='burial_place')
     sources = models.ManyToManyField('sources.Source', blank=True, null=True)
+    memorials = models.ManyToManyField('memorials.Memorial', blank=True, null=True)
 
     def __unicode__(self):
         earliest = self.formatted_date('start_earliest')
@@ -294,6 +296,8 @@ class Death(Event):
             summary = 'In {}'.format(self.location.__unicode__())
         elif self.burial_place:
             summary = 'Buried at {}'.format(self.burial_place)
+        elif self.label:
+            summary = self.label
         return summary
 
     def get_absolute_url(self):

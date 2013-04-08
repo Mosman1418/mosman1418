@@ -29,7 +29,7 @@
                         </a>
                         <div class="media-body">
                         <h5>{{ name.name }}
-                        ( <a href="{{ person.get_absolute_url }}" class="">{{ name.person|safe }}</a> )</h5>
+                        ( <a href="{{ name.person.get_absolute_url }}" class="">{{ name.person|safe }}</a> )</h5>
                         <small>
                             {% if name.memorial_part %}
                                 {{ name.memorial_part }}
