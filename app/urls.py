@@ -55,6 +55,8 @@ urlpatterns += patterns('app.people.views',
     url(r'^people/(?P<letter>[a-zA-Z]{1})/results\.(?P<format>(html|rdf|json|ttl))/$', PersonListView.as_view()),
     url(r'^people/(?P<id>\d+)\.(?P<format>(html|rdf|json|ttl))/$', PersonView.as_view()),
     url(r'^people/(?P<id>\d+)/$', PersonView.as_view(), name='person-view'),
+    url(r'^people/(?P<id>\d+)/photos\.(?P<format>(html|rdf|json|ttl))/$', PersonPhotosView.as_view()),
+    url(r'^people/(?P<id>\d+)/photos/$', PersonPhotosView.as_view(), name='person-photos-view'),
 
     url(r'^people/add/$', AddPerson.as_view(), name="person-add"),
     url(r'^people/(?P<pk>\d+)/update/$', UpdatePerson.as_view(), name="person-update"),

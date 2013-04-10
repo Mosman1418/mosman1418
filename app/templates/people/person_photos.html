@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load thumbnail %}
+{% block extra_scripts %}
+<script src="{{ STATIC_URL }}js/jquery.isotope.min.js"></script>
+<script src="{{ STATIC_URL }}js/list-images.js"></script>
+{% endblock %}
+{% block content %}
+        <div class="row">
+            {% with current='people' %}{% include '_sidenav.html' %}{% endwith %}
+            <div class="span8">
+                <ul class="breadcrumb hidden-phone">
+                    <li><a href="/">Home</a> <span class="divider">/</span></li>
+                    <li><a href="{% url people-list %}">People</a> <span class="divider">/</span></li>
+                    <li><a href="{{ content.get_absolute_url }}">{{ content }}</a><span class="divider">/</span></li>
+                    <li class="active">Images</li>
+                </ul>
+                <h1 class="page-header">{{ content }} <small>Images</small></h1>
+
+                <ul id="wall" class="thumbnails">
+                {% for source in content.photos %}
+                    {% with image=source.sourceimage_set.all.0 %}
+                    <li class="cell span2">
+                        <a class="thumbnail" href="{{ source.get_absolute_url }}">
+                            {% thumbnail image.image 160x0 as im %}
+                            <img src="{{ im.url }}" width="160" height="{{ im.height }}">
+                        </a>
+                    </li>
+                    {% endwith %}
+                {% endfor %}
+                </ul>
+
+            </div>
+        </div>
+{% endblock %}

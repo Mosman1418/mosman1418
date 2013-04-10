@@ -78,7 +78,7 @@ class AddSourceForm(ModelForm, DateSelectMixin):
         ('webpage', 'webpage'),
         ('letter', 'letter'),
         ('diary', 'diary'),
-        ('image', 'image'),
+        ('photograph', 'photograph'),
         ('trove', 'Trove newspaper article'),
         ('naa', 'National Archives of Australia file or document'),
         ('awm', 'Australian War Memorial database record'),
