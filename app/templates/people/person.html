@@ -25,10 +25,12 @@
                         {% if content.birth_earliest_date %}
                         <p><b>Born:</b> {{ content.birth_date_summary }}</p>
                         {% endif %}
-                        {% if content.birth_earliest_date %}
+                        {% if content.death_earliest_date %}
                         <p><b>Died:</b> {{ content.death_date_summary }}</p>
                         {% endif %}
-                        {{ content.biography }}
+                        {% if content.biography %}
+                            {{ content.biography }}
+                        {% endif %}
                     </div>
                     <div class="span2">
                         {% if content.photos %}
@@ -116,7 +118,7 @@
                         <dd>
                             <ul>
                                 {% for memorialname in content.memorialname_set.all %}
-                                    <li>{{ memorialname.name }} on the {% if memorialname.memorial_part %}<a href="{{ memorialname.memorial.get_absolute_url }}#part-{{ memorialname.memorial_part.id }}">{{ memorialname.memorial_part.label }}</a> of the {% endif %}<a href="{{ memorialname.memorial.get_absolute_url }}">{{ memorialname.memorial }}</a></li>
+                                    <li>{{ memorialname.name }} on the {% if memorialname.memorial_part %}<a href="{{ memorialname.memorial_part.get_absolute_url }}">{{ memorialname.memorial_part.label }}</a> of the {% endif %}<a href="{{ memorialname.memorial.get_absolute_url }}">{{ memorialname.memorial }}</a></li>
                                 {% endfor %}
                             </ul>
                     </dd>
