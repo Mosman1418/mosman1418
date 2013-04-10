@@ -9,6 +9,8 @@ class Person(GenericPerson):
     family_name = models.CharField(max_length=100)
     other_names = models.CharField(max_length=100, blank=True)
     nickname = models.CharField(max_length=100, blank=True)
+    gender = models.CharField(max_length=10, blank=True, choices=(('male', 'male'), ('female', 'female')))
+    last_rank = models.CharField(max_length=50, blank=True, null=True)
     #roles = models.ManyToManyField('PersonRole')
     addresses = models.ManyToManyField('places.Address', blank=True, null=True, through='PersonAddress')
     associated_places = models.ManyToManyField('places.Place', blank=True, null=True, through='PersonAssociatedPlace')
@@ -128,6 +130,7 @@ class AlternativePersonName(StandardMetadata):
     display_name = models.CharField(max_length=250)
     nickname = models.CharField(max_length=100, blank=True)
     sources = models.ManyToManyField('sources.Source', blank=True, null=True)
+    memorials = models.ManyToManyField('memorials.Memorial', blank=True, null=True)
 
     def __unicode__(self):
         if self.display_name:
@@ -151,6 +154,7 @@ class LifeEvent(Event):
     locations = models.ManyToManyField('places.Place', blank=True, null=True, through='EventLocation')
     sources = models.ManyToManyField('sources.Source', blank=True, null=True)
     type_of_event = models.ForeignKey('people.LifeEventType', blank=True, null=True)
+    memorials = models.ManyToManyField('memorials.Memorial', blank=True, null=True)
 
     def __unicode__(self):
         return '{}: {} ({})'.format(self.person, self.label, self.date_summary())
@@ -296,6 +300,8 @@ class Death(Event):
             summary = 'In {}'.format(self.location.__unicode__())
         elif self.burial_place:
             summary = 'Buried at {}'.format(self.burial_place)
+        elif self.cause_of_death:
+            summary = self.cause_of_death
         elif self.label:
             summary = self.label
         return summary
@@ -432,6 +438,7 @@ class PersonAssociatedOrganisation(StandardMetadata, ShortDateMixin):
     organisation = models.ForeignKey('Organisation')
     association = models.ForeignKey('PersonOrgAssociation', null=True, blank=True)
     sources = models.ManyToManyField('sources.Source', blank=True, null=True)
+    memorials = models.ManyToManyField('memorials.Memorial', blank=True, null=True)
 
     def __unicode__(self):
         if self.organisation:

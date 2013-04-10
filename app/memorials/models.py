@@ -66,6 +66,7 @@ class MemorialName(StandardMetadata):
     row = models.IntegerField(blank=True, null=True)
     column = models.IntegerField(blank=True, null=True)
     person = models.ForeignKey('people.Person', blank=True, null=True)
+    notes = models.TextField(blank=True)
 
     def __unicode__(self):
         return self.name
