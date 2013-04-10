@@ -32,13 +32,13 @@ class Person(GenericPerson):
     admin_note = models.TextField(blank=True, null=True)
 
     def __unicode__(self):
-        if self.display_name:
-            display = self.display_name
-        else:
+        if self.family_name:
             if self.other_names:
                 display = '%s %s' % (self.other_names, self.family_name)
             else:
                 display = self.family_name
+        elif self.display_name:
+            display = self.display_name
         return display
 
     def alpha_name(self):
@@ -59,6 +59,38 @@ class Person(GenericPerson):
                   .filter(association__label='primary topic of')
                   .filter(source__source_type__label='photograph'))
         return [photo.source for photo in photos]
+
+    def date_summary(self):
+        start = self.birth_earliest()
+        end = self.death_earliest()
+        dates = []
+        if start:
+            dates.append(start)
+        if end:
+            dates.append(end)
+        if len(dates) > 0:
+            summary = ' &ndash; '.join(dates)
+        else:
+            summary = ''
+        return summary
+
+    def birth_date_summary(self):
+        if self.birth_latest_date:
+            summary = 'Between {} and {}'.format(self.birth_earliest(), self.birth_latest())
+        elif self.birth_earliest_date:
+            summary = self.birth_earliest()
+        else:
+            summary = ''
+        return summary
+
+    def death_date_summary(self):
+        if self.death_latest_date:
+            summary = 'Between {} and {}'.format(self.death_earliest(), self.death_latest())
+        elif self.death_earliest_date:
+            summary = self.death_earliest()
+        else:
+            summary = ''
+        return summary
 
     class Meta:
         ordering = ['family_name', 'other_names']

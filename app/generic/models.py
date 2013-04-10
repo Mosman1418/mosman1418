@@ -99,6 +99,33 @@ class Person(StandardMetadata):
     class Meta:
         abstract = True
 
+    def formatted_date(self, date_name):
+        months = calendar.month_name
+        date_obj = getattr(self, '{}_date'.format(date_name))
+        month = getattr(self, '{}_month_known'.format(date_name))
+        day = getattr(self, '{}_day_known'.format(date_name))
+        if date_obj and month and day:
+            date_str = '{} {} {}'.format(date_obj.day, months[date_obj.month], date_obj.year)
+        elif date_obj and month:
+            date_str = '{} {}'.format(months[date_obj.month], date_obj.year)
+        elif date_obj:
+            date_str = str(date_obj.year)
+        else:
+            date_str = None
+        return date_str
+
+    def birth_earliest(self):
+        return self.formatted_date('birth_earliest')
+
+    def death_earliest(self):
+        return self.formatted_date('death_earliest')
+
+    def birth_latest(self):
+        return self.formatted_date('birth_latest')
+
+    def death_latest(self):
+        return self.formatted_date('death_latest')
+
     def __unicode__(self):
         return self.display_name
 

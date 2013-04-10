@@ -22,7 +22,13 @@
                 {% endif %}
                 <div class="row">
                     <div class="span6">
-
+                        {% if content.birth_earliest_date %}
+                        <p><b>Born:</b> {{ content.birth_date_summary }}</p>
+                        {% endif %}
+                        {% if content.birth_earliest_date %}
+                        <p><b>Died:</b> {{ content.death_date_summary }}</p>
+                        {% endif %}
+                        {{ content.biography }}
                     </div>
                     <div class="span2">
                         {% if content.photos %}
