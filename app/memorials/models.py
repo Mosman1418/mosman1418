@@ -50,6 +50,9 @@ class MemorialPart(StandardMetadata):
     def __unicode__(self):
         return self.label
 
+    def get_absolute_url(self):
+        return reverse('memorial-part-names-list', args=[str(self.id)])
+
 
 class MemorialImage(models.Model):
     memorial = models.ForeignKey('Memorial')

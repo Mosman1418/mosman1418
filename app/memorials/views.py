@@ -90,6 +90,59 @@ class MemorialNamesView(LinkedDataListView):
         return graph
 
 
+class MemorialPartNamesView(LinkedDataListView):
+    model = MemorialName
+    path = '/memorials/parts/{}/results'
+    template_name = 'memorials/memorial_part'
+
+    def get(self, request, part_id, letter=None, format=None):
+        context = {}
+        queries_without_page = request.GET.copy()
+        if 'page' in queries_without_page:
+            del queries_without_page['page']
+        if 'order_by' in queries_without_page:
+            del queries_without_page['order_by']
+        context['queries'] = queries_without_page
+        context['part'] = MemorialPart.objects.get(id=part_id)
+        self.path = self.path.format(part_id)
+        if format:
+            order_by = request.GET.get('order_by', 'position')
+            results = self.model.objects.select_related().filter(memorial_part=part_id)
+            if order_by == 'family_name':
+                results = results.order_by('person__family_name')
+            count = request.GET.get('count', '25')
+            paginator = Paginator(results, count)
+            page = request.GET.get('page', '1')
+            try:
+                content = paginator.page(page)
+            except PageNotAnInteger:
+                content = paginator.page(1)
+            except EmptyPage:
+                content = paginator.page(paginator.num_pages)
+            context['content'] = content
+            context['letter'] = letter
+            return self.render_to_format(request, context, self.template_name, format)
+        else:
+            context['queries'] = request.GET.urlencode()
+            context['status_code'] = 303
+            context['additional_headers'] = {'location': self.path}
+            context['content'] = None
+            return self.render(request, context, self.template_name)
+
+    def make_graph(self, memorial):
+        namespaces = {}
+        graph = Graph()
+        schemas = RDFSchema.objects.all()
+        for schema in schemas:
+            namespace = Namespace(schema.uri)
+            graph.bind(schema.prefix, namespace)
+            namespaces[schema.prefix] = namespace
+        host_ns = Namespace('http://%s' % (Site.objects.get_current().domain))
+        this_memorial = URIRef(host_ns[memorial.get_absolute_url()])
+        graph.add((this_memorial, namespaces['graves']['monument_title'], Literal(memorial.name)))
+        return graph
+
+
 class MemorialPhotosView(LinkedDataView):
     model = Memorial
     path = '/memorials/%s/photos'

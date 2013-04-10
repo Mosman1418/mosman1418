@@ -56,7 +56,7 @@ def load_memorials_csv():
     user = User.objects.get(username='tim')
     for row in csv_reader:
         if row['display']:
-            if ['Memorial id'] != '1':
+            if row['Memorial id'] != '1':
                 print row['display']
                 if not row['Memorial id'].isdigit():
                     source, created = Source.objects.get_or_create(title=row['Memorial id'], added_by=user)

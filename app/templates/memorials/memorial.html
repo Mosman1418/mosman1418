@@ -4,24 +4,52 @@
         <div class="row">
             {% with current='memorials' %}{% include '_sidenav.html' %}{% endwith %}
             <div class="row">
-                <div class="span6">
+                <div class="span8">
                     <ul class="breadcrumb hidden-phone">
                         <li><a href="/">Home</a> <span class="divider">/</span></li>
                         <li><a href="{% url memorial-list %}">Memorials</a> <span class="divider">/</span></li>
                         <li class="active">{{ content }}</li>
                     </ul>
                     <h1>{{ content.name }}</h1>
-                    {% if content.address %}
-                    <p>{{ content.address }}</p>
-                    {% endif %}
-                    <p><a href="{% url memorial-names-list content.id %}">{{ content.memorialname_set.all|length }} names recorded</a><p>
+                    <div class="row">
+                        <div class="span6">
+                            {% if content.address %}
+                                <p>{{ content.address }}</p>
+                            {% endif %}
+                            <p><a href="{% url memorial-names-list content.id %}">{{ content.memorialname_set.all|length }} names recorded</a></p>
+                        </div>
+                        {% if content.photos %}
+                            {% thumbnail content.photos.0.sourceimage_set.all.0.image 160x0 as im %}
+                            <div class="span2">
+                                <a class="thumbnail" href="{{ content.photos.0.get_absolute_url }}">
+                                    <img src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}" alt="content.photos.0.title">
+                                </a>
+                                <p class="pull-right"><small><a href="{% url memorial-photos-view content.id %}">All photos ({{ content.photos|length }})</a></small></p>
+                            </div>
+                        {% endif %}
+                    </div>
 
                     <dl class="dl-horizontal">
                     {% if content.memorialpart_set.all %}
                         <dt>Sections</dt>
-                        {% with list=content.memorialpart_set.all %}
-                            {% include '_dd_item_list.html' %}
-                        {% endwith %}
+                        <dd>
+                            <ul>
+                            {% for part in content.memorialpart_set.all %}
+                                    <li>
+                                        <a href="{{ part.get_absolute_url }}">
+                                            {% if part.summary %}
+                                                {{ part.summary|safe }}
+                                            {% else %}
+                                                {{ part|safe }}
+                                            {% endif %}
+                                        </a>
+                                        {% if part.memorialname_set.all %}
+                                            ({{ part.memorialname_set.all|length }} names)
+                                        {% endif %}
+                                    </li>
+                            {% endfor %}
+                            </ul>
+                        </dd>
 
                     {% endif %}
                     {% if content.main_sources %}
@@ -32,16 +60,6 @@
                     {% endif %}
                     </dl>
 
-                </div>
-                <div class="span2">
-                    {% if content.photos %}
-                        {% thumbnail content.photos.0.sourceimage_set.all.0.image 160x0 as im %}
-                        <a class="thumbnail" href="{{ content.photos.0.get_absolute_url }}">
-                            <img src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}" alt="content.photos.0.title">
-                        </a>
-                        <p class="pull-right"><small><a href="{% url memorial-photos-view content.id %}">All photos ({{ content.photos|length }})</a></small><p>
-
-                    {% endif %}
                 </div>
             </div>
             <div class="row">

@@ -172,6 +172,8 @@ urlpatterns += patterns('app.memorials.views',
     url(r'^memorials/(?P<id>\d+)/photos/$', MemorialPhotosView.as_view(), name='memorial-photos-view'),
     url(r'^memorials/(?P<memorial_id>\d+)/names/results\.(?P<format>(html|rdf|json|ttl))/$', MemorialNamesView.as_view()),
     url(r'^memorials/(?P<memorial_id>\d+)/names/$', MemorialNamesView.as_view(), name='memorial-names-list'),
+    url(r'^memorials/parts/(?P<part_id>\d+)/results\.(?P<format>(html|rdf|json|ttl))/$', MemorialPartNamesView.as_view()),
+    url(r'^memorials/parts/(?P<part_id>\d+)/$', MemorialPartNamesView.as_view(), name='memorial-part-names-list'),
 )
 urlpatterns += patterns('',
     url(r'^$', HomeView.as_view(), name='home'),
