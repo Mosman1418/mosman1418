@@ -428,7 +428,7 @@ class AddSourceView(CreateView):
                 added_by=system_user
             )
             moa_page, created = Source.objects.get_or_create(
-                title='{} {}'.format(
+                title='Mapping Our Anzacs - {} {}'.format(
                     details['other_names'],
                     details['family_name']
                 ),

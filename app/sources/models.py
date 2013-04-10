@@ -33,7 +33,7 @@ class Source(StandardMetadata):
     json_url = models.URLField(blank=True, null=True)
 
     def __unicode__(self):
-        return self.title
+        return '{} ({})'.format(self.title, self.source_type)
 
     def authors(self):
         creators = self.sourceperson_set.filter(role__label='author')
