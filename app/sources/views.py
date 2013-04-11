@@ -451,6 +451,7 @@ class AddSourceView(CreateView):
                 assign('people.delete_personassociatedsource', current_user, person_source)
             person_name, created = AlternativePersonName.objects.get_or_create(
                 person=person,
+                display_name='{} {}'.format(details['other_names'], details['family_name']),
                 family_name=details['family_name'],
                 other_names=details['other_names'],
                 defaults={'added_by': current_user}
