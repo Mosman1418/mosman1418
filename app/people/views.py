@@ -647,6 +647,7 @@ class UpdateAltName(PermissionRequiredMixin, UpdateView):
 
 class DeleteAltName(PermissionRequiredMixin, DeleteView):
     model = AlternativePersonName
+    template_name = 'people/confirm_delete.html'
     permission_required = 'people.delete_alternativepersonname'
 
     def delete(self, request, *args, **kwargs):
