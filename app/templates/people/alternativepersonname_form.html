@@ -38,7 +38,7 @@
                             </div>
                         {% endif %}
                         <div class="controls">
-                            {{ form.sources }} <a href="{% url source-add-event event_id=alternativepersonname.id event_type='names' %}" class="btn btn-mini">Create a new source</a>
+                            {{ form.sources }} <a href="{% url source-add-entity entity_id=alternativepersonname.id entity_type='name' %}" class="btn btn-mini">Create a new source</a>
                         </div>
                     </div>
                 {% endif %}
