@@ -46,6 +46,7 @@
                     {% if alternativepersonname.id %}
                         <input class="btn btn-primary" name="continue" type="submit" value="Save &amp; continue editing">
                         <input class="btn btn-primary" name="finished" type="submit" value="Finished">
+                        <a class="btn btn-primary btn-danger" href="{% url altname-delete rank.id %}">Delete</a>
                     {% else %}
                         <input class="btn btn-primary" name="next" type="submit" value="Next">
                     {% endif %}
