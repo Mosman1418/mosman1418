@@ -133,7 +133,11 @@ class ApprovePersonForm(ModelForm):
 
 
 class AddAltNameForm(ModelForm):
-    person = PersonChoice()
+    person = forms.ModelChoiceField(
+        queryset=Person.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'readonly': 'readonly'})
+    )
     sources = SourcesMultiChoice(required=False)
 
     class Meta:
