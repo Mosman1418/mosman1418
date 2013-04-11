@@ -8,3 +8,5 @@ from app.sources.models import *
 admin.site.register(Source)
 admin.site.register(SourceType)
 admin.site.register(SourceImage)
+admin.site.register(Story)
+admin.site.register(SourcePerson)
