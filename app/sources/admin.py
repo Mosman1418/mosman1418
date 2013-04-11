@@ -7,3 +7,4 @@ from app.sources.models import *
 
 admin.site.register(Source)
 admin.site.register(SourceType)
+admin.site.register(SourceImage)
