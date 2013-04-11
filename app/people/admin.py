@@ -12,4 +12,6 @@ admin.site.register(ServiceNumber)
 admin.site.register(Birth)
 admin.site.register(Death)
 admin.site.register(LifeEvent)
-
+admin.site.register(AlternativePersonName)
+admin.site.register(EventLocation)
+admin.site.register(Repository)
