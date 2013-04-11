@@ -118,7 +118,7 @@
                         {% if content.sourceimage_set.all %}
                             {% thumbnail content.sourceimage_set.all.0.image 160x0 as im %}
                             <div class="span2">
-                                <a class="thumbnail" href="{{ content.photos.0.get_absolute_url }}">
+                                <a class="thumbnail" href="{{ content.sourceimage_set.all.0.image.url }}">
                                     <img src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}" alt="content.photos.0.title">
                                 </a>
                             </div>
