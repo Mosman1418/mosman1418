@@ -19,7 +19,7 @@
     {% for story in stories %}
     <a class="quote" href="{{ story.get_absolute_url }}">
         <blockquote class="pull-right">
-            <p><i class="icon-quote-left icon-muted"></i> {{ story.text|striptags|truncatewords_html:20 }}</p>
+            <p><i class="icon-quote-left icon-muted"></i> {{ story.text|striptags|truncatewords_html:20|safe }}</p>
             <small>contributed by {{ story.added_by }} on {{ story.date_created|date:"g F Y" }}</small>
         </blockquote>
     </a>
