@@ -197,13 +197,16 @@ class AddSourceForm(ModelForm, DateSelectMixin):
         ]
         url = cleaned_data['url']
         print url
+        id = None
         for pattern in patterns:
             try:
                 id = pattern.search(url).group(1)
                 break
             except AttributeError:
-                self._errors['url'] = self.error_class(['Not a valid Trove url'])
-                return cleaned_data
+                continue
+        if not id:
+            self._errors['url'] = self.error_class(['Not a valid Trove url'])
+            return cleaned_data
         trove_url = 'http://api.trove.nla.gov.au/newspaper/%s?key=%s&encoding=json' % (id, TROVE_API_KEY)
         response = urlopen(trove_url)
         data = json.load(response)
