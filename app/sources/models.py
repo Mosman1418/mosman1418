@@ -121,6 +121,9 @@ class Source(StandardMetadata):
     def get_absolute_url(self):
         return reverse('source-view', args=[str(self.id)])
 
+    class Meta:
+        ordering = ['title']
+
 
 class Story(StandardMetadata, ShortDateMixin):
     title = models.CharField(max_length=200)
@@ -138,6 +141,9 @@ class Story(StandardMetadata, ShortDateMixin):
 
     def get_absolute_url(self):
         return reverse('story-view', args=[self.id])
+
+    class Meta:
+        ordering = ['title']
 
 
 class SourceImage(models.Model):
