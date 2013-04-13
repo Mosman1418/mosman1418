@@ -193,10 +193,10 @@ class AddAddress(CreateView):
         person_address = form.cleaned_data.get('person_address', None)
         if person:
             pa = PersonAddress.objects.create(
-                    person=person,
-                    address=address,
-                    #added_by=self.request.user
-                )
+                person=person,
+                address=address,
+                added_by=self.request.user
+            )
             self.entity = pa
         elif person_address:
             person_address.address = address
