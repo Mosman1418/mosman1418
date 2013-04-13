@@ -31,6 +31,7 @@ class Source(StandardMetadata):
     url = models.URLField(blank=True, null=True)
     rdf_url = models.URLField(blank=True, null=True)
     json_url = models.URLField(blank=True, null=True)
+    caption = models.TextField(blank=True, null=True)
 
     def __unicode__(self):
         return '{} ({})'.format(self.title, self.source_type)
@@ -124,6 +125,7 @@ class Source(StandardMetadata):
 class Story(StandardMetadata, ShortDateMixin):
     title = models.CharField(max_length=200)
     text = models.TextField()
+    credit = models.TextField(blank=True, null=True)
     sources = models.ManyToManyField('sources.Source', blank=True, null=True)
 
     def subjects(self):
@@ -142,6 +144,7 @@ class SourceImage(models.Model):
     source = models.ForeignKey(Source)
     page = models.IntegerField(blank=True, null=True)
     image = models.ImageField(upload_to='images')
+    transcript = models.TextField(blank=True, null=True)
 
 
 class SourcePerson(models.Model):

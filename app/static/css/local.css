@@ -49,3 +49,11 @@ border-top: 1px solid #d7d7d7;
 padding-top: 10px;
 
 }
+
+@media (max-width: 767px) {
+  .sidenav.affix {
+    position: static;
+    width: auto;
+    top: 0;
+  }
+}

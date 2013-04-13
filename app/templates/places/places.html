@@ -9,7 +9,7 @@
                     <li><a href="/">Home</a> <span class="divider">/</span></li>
                     <li class="active">Places</li>
                 </ul>
-                <h2 class="page-header">Places</h2>
+                <h1>Places</h1>
                 {% alpha_browse 'place' letter %}
                 {% paginate 'place' 5 %}
                 <ul class="media-list">
@@ -34,4 +34,9 @@
                 {% paginate 'place' 5 %}
             </div>
         </div>
+{% endblock %}
+{% block footer %}
+{% with id_path=id_path identifier=identifier %}
+    {% include '_footer.html' %}
+{% endwith %}
 {% endblock %}

@@ -5,6 +5,10 @@
         <div class="row">
             {% with current='people' %}{% include '_sidenav.html' %}{% endwith %}
             <div class="span8">
+                <ul class="breadcrumb hidden-phone">
+                    <li><a href="/">Home</a> <span class="divider">/</span></li>
+                    <li class="active">People</li>
+                </ul>
                 <h1>People {% if status == 'pending' %}awaiting approval{% endif %}</h1>
                 {% alpha_browse 'people' letter %}
                 {% paginate 'people' 5 %}
@@ -29,4 +33,9 @@
                 {% paginate 'people' 5 %}
             </div>
         </div>
+{% endblock %}
+{% block footer %}
+{% with id_path=id_path identifier=identifier %}
+    {% include '_footer.html' %}
+{% endwith %}
 {% endblock %}

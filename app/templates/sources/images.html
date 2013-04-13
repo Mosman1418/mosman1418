@@ -2,12 +2,17 @@
 {% load thumbnail %}
 {% block extra_scripts %}
 <script src="{{ STATIC_URL }}js/jquery.isotope.min.js"></script>
+<script src="{{ STATIC_URL }}js/jquery.infinitescroll.min.js"></script>
 <script src="{{ STATIC_URL }}js/list-images.js"></script>
 {% endblock %}
 {% block content %}
         <div class="row">
             {% with current='images' %}{% include '_sidenav.html' %}{% endwith %}
             <div class="span10">
+                <ul class="breadcrumb hidden-phone">
+                    <li><a href="/">Home</a> <span class="divider">/</span></li>
+                    <li class="active">Images</li>
+                </ul>
                 <h1>Images</h1>
                 <ul id="wall" class="thumbnails">
                 {% for source in content %}
@@ -23,19 +28,16 @@
                     </ul>
                 <ul class="pager">
                     <li>
-                        {% if content.has_previous %}
-                            <a href="/sources/?page={{ content.previous_page_number }}">Previous</a>
-                        {% else %}
-                            Previous
-                        {% endif %}
-                    </li>                    <li>
                         {% if content.has_next %}
                             <a href="/sources/?page={{ content.next_page_number }}">Next</a>
-                        {% else %}
-                            Next
                         {% endif %}
                     </li>
                 </ul>
             </div>
         </div>
+{% endblock %}
+{% block footer %}
+{% with id_path=id_path identifier=identifier %}
+    {% include '_footer.html' %}
+{% endwith %}
 {% endblock %}
