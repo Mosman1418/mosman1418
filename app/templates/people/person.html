@@ -107,7 +107,7 @@
                     {% endif %}
                     {% if content.stories.all %}
                         <dt>Stories</dt>
-                        {% with list=content.stories %}
+                        {% with list=content.stories.all %}
                             {% include '_dd_item_list.html' %}
                         {% endwith %}
                     {% endif %}
