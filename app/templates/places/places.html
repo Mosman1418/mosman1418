@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load thumbnail %}
+{% load nav_extras %}
+{% block content %}
+        <div class="row">
+            {% with current='places' %}{% include '_sidenav.html' %}{% endwith %}
+            <div class="span8">
+                <ul class="breadcrumb hidden-phone">
+                    <li><a href="/">Home</a> <span class="divider">/</span></li>
+                    <li class="active">Places</li>
+                </ul>
+                <h1 class="page-header">Places</h1>
+                <ul class="media-list">
+                {% for place in content %}
+                    <li class="media">
+                        <a href="{{ place.get_absolute_url }}" class="thumb-container pull-left">
+                        {% if place.photos %}
+                            {% thumbnail place.photos.0.sourceimage_set.all.0.image 50x50 crop="True" as im %}
+                            <img src="{{ im.url }}">
+                        {% else %}
+                        <i class="icon-reorder icon-large icon-muted"></i>
+                        {% endif %}
+                        </a>
+                        <div class="media-body">
+                        <a href="{{ place.get_absolute_url }}" class="">{{ place|safe }}</a>
+                        </div>
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+{% endblock %}

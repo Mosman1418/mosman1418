@@ -1,12 +1,12 @@
 from django.db import models
 from django.core.urlresolvers import reverse
 
-from app.generic.models import Place, StandardMetadata
+from app.generic.models import Place as GenericPlace, StandardMetadata
 
 # Create your models here.
 
 
-class Place(Place):
+class Place(GenericPlace):
     place_name = models.CharField(max_length=100, blank=True)
     state = models.CharField(max_length=50, blank=True)
     country = models.CharField(max_length=50, blank=True)
@@ -24,7 +24,19 @@ class Place(Place):
         return summary
 
     def get_absolute_url(self):
-        reverse('place-view', args=[self.id])
+        return reverse('place-view', args=[self.id])
+
+    def burial_places(self):
+        people = list(set(self.burial_place.values_list('person__family_name', 'person__other_names', 'person')))
+        return people
+
+    def death_places(self):
+        people = list(set(self.death_set.values_list('person__family_name', 'person__other_names', 'person')))
+        return people
+
+    def birth_places(self):
+        people = list(set(self.birth_set.values_list('person__family_name', 'person__other_names', 'person')))
+        return people
 
 
 class Address(StandardMetadata):

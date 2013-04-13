@@ -1,3 +1,4 @@
+import re
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -201,7 +202,11 @@ class LifeEvent(Event):
     memorials = models.ManyToManyField('memorials.Memorial', blank=True, null=True)
 
     def __unicode__(self):
-        return '{}: {} ({})'.format(self.person, self.label, self.date_summary())
+        return '{} {} {}'.format(
+            self.person,
+            '{}{}'.format(self.label[0].lower(), self.label[1:]),
+            '({})'.format(self.date_summary()) if self.date_summary() else ''
+        )
 
     def summary(self):
         if self.date_summary():

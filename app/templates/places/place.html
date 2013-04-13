@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block content %}
+        <div class="row">
+            {% with current='places' %}{% include '_sidenav.html' %}{% endwith %}
+            <div class="span8">
+                <ul class="breadcrumb hidden-phone">
+                    <li><a href="/">Home</a> <span class="divider">/</span></li>
+                    <li><a href="{% url place-list %}">Places</a> <span class="divider">/</span></li>
+                    <li class="active">{{ content|safe }}</li>
+                </ul>
+                <h2>{{ content }}</h2>
+                <dl class="dl-horizontal">
+                    {% if content.place_name %}
+                        <dt>Place name</dt>
+                        <dd>{{ content.place_name }}</dd>
+                    {% endif %}
+                    {% if content.state %}
+                        <dt>State or district</dt>
+                        <dd>{{ content.state }}</dd>
+                    {% endif %}
+                    {% if content.country %}
+                        <dt>Country</dt>
+                        <dd>{{ content.country }}</dd>
+                    {% endif %}
+
+                    {% if content.birth_set.all %}
+                        <dt>Birth place of</dt>
+                        <dd>
+                            <ul>
+                            {% for item in content.birth_places %}
+                                    <li>
+                                        <a href="{% url person-view item.2 %}">
+                                            {{ item.1 }} {{ item.0 }}
+                                        </a>
+                                    </li>
+                            {% endfor %}
+                            </ul>
+                        </dd>
+                    {% endif %}
+                    {% if content.death_set.all %}
+                        <dt>Death place of</dt>
+                        <dd>
+                            <ul>
+                            {% for item in content.death_places %}
+                                    <li>
+                                        <a href="{% url person-view item.2 %}">
+                                            {{ item.1 }} {{ item.0 }}
+                                        </a>
+                                    </li>
+                            {% endfor %}
+                            </ul>
+                        </dd>
+                    {% endif %}
+                    {% if content.burial_place.all %}
+                        <dt>Burial place of</dt>
+                        <dd>
+                            <ul>
+                            {% for item in content.burial_places %}
+                                    <li>
+                                        <a href="{% url person-view item.2 %}">
+                                            {{ item.1 }} {{ item.0 }}
+                                        </a>
+                                    </li>
+                            {% endfor %}
+                            </ul>
+                        </dd>
+                    {% endif %}
+                    {% if content.lifeevent_set.all %}
+                        <dt>Life events</dt>
+                        <dd>
+                            <ul>
+                            {% for item in content.lifeevent_set.all %}
+                                    <li>
+                                        <a href="{{ item.get_absolute_url }}">
+                                             {{ item }}
+                                        </a>
+                                    </li>
+                            {% endfor %}
+                            </ul>
+                        </dd>
+                    {% endif %}
+                    {% if content.sources.all %}
+                        <dt>Sources</dt>
+                        {% with list=content.sources.all %}
+                            {% include '_dd_item_list.html' %}
+                        {% endwith %}
+                    {% endif %}
+                </dl>
+
+            </div>
+        </div>
+
+{% endblock %}
+{% block footer %}
+{% with id_path=id_path identifier=identifier %}
+    {% include '_footer.html' %}
+{% endwith %}
+{% endblock %}
