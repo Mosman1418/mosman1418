@@ -111,16 +111,16 @@ class Rank(StandardMetadata, ShortDateMixin):
 
     def __unicode__(self):
         return '{} held rank of {}{}'.format(
-                self.person,
-                self.rank,
-                ' ({})'.format(self.date_summary()) if self.date_summary() else ''
-            )
+            self.person,
+            self.rank,
+            ' ({})'.format(self.date_summary()) if self.date_summary() else ''
+        )
 
     def summary(self):
-        return 'held rank of {}{}'.format(
-                self.rank,
-                ' ({})'.format(self.date_summary()) if self.date_summary() else ''
-            )
+        return 'Held rank of {}{}'.format(
+            self.rank,
+            ' ({})'.format(self.date_summary()) if self.date_summary() else ''
+        )
 
     def date_summary(self):
         start = self.start_earliest()
@@ -146,7 +146,7 @@ class ServiceNumber(StandardMetadata):
     sources = models.ManyToManyField('sources.Source', blank=True, null=True)
 
     def __unicode__(self):
-        return '{}: service number {}'.format(self.person, self.service_number)
+        return '{} had service number {}'.format(self.person, self.service_number)
 
     def summary(self):
         return 'Service number {}'.format(self.service_number)
@@ -165,13 +165,24 @@ class AlternativePersonName(StandardMetadata):
     memorials = models.ManyToManyField('memorials.Memorial', blank=True, null=True)
 
     def __unicode__(self):
-        if self.display_name:
-            display = self.display_name
-        else:
+        display = 'Recorded name &ndash; '
+        if not self.display_name:
             if self.other_names:
-                display = '%s %s' % (self.other_names, self.family_name)
+                display += '{} {}'.format(self.other_names, self.family_name)
+            else:
+                display += self.family_name
+        else:
+            display += self.display_name
+        return display
+
+    def summary(self):
+        if not self.display_name:
+            if self.other_names:
+                display = '{} {}'.format(self.other_names, self.family_name)
             else:
                 display = self.family_name
+        else:
+            display = self.display_name
         return display
 
     def get_absolute_url(self):
@@ -268,21 +279,22 @@ class Birth(Event):
             if self.location:
                 summary += ' in {}'.format(self.location)
         elif self.location:
-            summary = 'In {}'.format(self.location.__unicode__())
+            summary += ' in {}'.format(self.location.__unicode__())
         return summary
 
     def summary(self):
         earliest = self.formatted_date('start_earliest')
         latest = self.formatted_date('start_latest')
+        summary = 'Born '
         if earliest:
             if earliest and latest:
-                summary = 'Between {} and {}'.format(earliest, latest)
+                summary += 'between {} and {}'.format(earliest, latest)
             elif earliest:
                 summary = earliest
             if self.location:
                 summary += ' in {}'.format(self.location)
         elif self.location:
-            summary = 'In {}'.format(self.location.__unicode__())
+            summary += 'in {}'.format(self.location.__unicode__())
         return summary
 
     def get_absolute_url(self):
