@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load thumbnail %}
+{% load nav_extras %}
+{% block content %}
+        <div class="row">
+            {% with current='places' %}{% include '_sidenav.html' %}{% endwith %}
+            <div class="span8">
+                <ul class="breadcrumb hidden-phone">
+                    <li><a href="/">Home</a> <span class="divider">/</span></li>
+                    <li><a href="{% url place-list %}">Places</a> <span class="divider">/</span></li>
+                    <li><a href="{% url address-list %}">Addresses</a> <span class="divider">/</span></li>
+                    <li class="active">{{ content }}</li>
+                </ul>
+                <h2>{{ content }}</h2>
+                <dl class="dl-horizontal">
+                    {% if content.building %}
+                        <dt>Building</dt>
+                        <dd>{{ content.building }}</dd>
+                    {% endif %}
+                    {% if content.street_number %}
+                        <dt>Number</dt>
+                        <dd>{{ content.street_number }}</dd>
+                    {% endif %}
+                    {% if content.street_name %}
+                        <dt>Street</dt>
+                        <dd>{{ content.street_name }}</dd>
+                    {% endif %}
+                    {% if content.mosman_street %}
+                        <dt>Street</dt>
+                        <dd><a href="{{ content.mosman_street.get_absolute_url }}">{{ content.mosman_street }}</a></dd>
+                    {% endif %}
+                    {% if content.place %}
+                        <dt>Place</dt>
+                        <dd><a href="{{ content.place.get_absolute_url }}">{{ content.place }}</a></dd>
+                    {% endif %}
+                    {% if content.personaddress_set.all %}
+                        <dt>Address of</dt>
+                        <dd>
+                            <ul>
+                            {% for person in content.personaddress_set.all %}
+                                    <li>
+                                        <a href="{% url person-view  person.person.id %}">
+                                            {{ person.person }}
+                                        </a>
+                                    </li>
+                            {% endfor %}
+                            </ul>
+                        </dd>
+                    {% endif %}
+                </dl>
+
+            </div>
+        </div>
+{% endblock %}
+{% block footer %}
+{% with id_path=id_path identifier=identifier %}
+    {% include '_footer.html' %}
+{% endwith %}
+{% endblock %}

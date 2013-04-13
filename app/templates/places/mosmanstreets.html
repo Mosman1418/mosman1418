@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load thumbnail %}
+{% load nav_extras %}
+{% block content %}
+        <div class="row">
+            {% with current='places' %}{% include '_sidenav.html' %}{% endwith %}
+            <div class="span8">
+                <ul class="breadcrumb hidden-phone">
+                    <li><a href="/">Home</a> <span class="divider">/</span></li>
+                    <li><a href="{% url place-list %}">Places</a> <span class="divider">/</span></li>
+                    <li>Mosman streets</li>
+                </ul>
+                <h2>Mosman streets</h2>
+                {% paginate 'mosmanstreet' 5 %}
+                <ul class="media-list">
+                {% for street in content %}
+                    <li class="media">
+                        <a href="{{ street.get_absolute_url }}" class="thumb-container pull-left">
+                        {% if street.photos %}
+                            {% thumbnail street.photos.0.sourceimage_set.all.0.image 50x50 crop="True" as im %}
+                            <img src="{{ im.url }}">
+                        {% else %}
+                        <i class="icon-reorder icon-large icon-muted"></i>
+                        {% endif %}
+                        </a>
+                        <div class="media-body">
+                        <a href="{{ street.get_absolute_url }}" class="">{{ street|safe }}</a>
+                        </div>
+                    </li>
+                {% empty %}
+                    <li>No matching results</li>
+                {% endfor %}
+                </ul>
+                {% paginate 'mosmanstreet' 5 %}
+
+
+            </div>
+        </div>
+{% endblock %}
+{% block footer %}
+{% with id_path=id_path identifier=identifier %}
+    {% include '_footer.html' %}
+{% endwith %}
+{% endblock %}

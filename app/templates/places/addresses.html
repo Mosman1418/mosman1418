@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load thumbnail %}
+{% load nav_extras %}
+{% block content %}
+        <div class="row">
+            {% with current='places' %}{% include '_sidenav.html' %}{% endwith %}
+            <div class="span8">
+                <ul class="breadcrumb hidden-phone">
+                    <li><a href="/">Home</a> <span class="divider">/</span></li>
+                    <li><a href="{% url place-list %}">Places</a> <span class="divider">/</span></li>
+                    <li class="active">Addresses</li>
+                </ul>
+                <h2 class="page-header">Addresses</h2>
+                {% paginate 'address' 5 %}
+                <ul class="media-list">
+                {% for address in content %}
+                    <li class="media">
+                        <a href="{{ address.get_absolute_url }}" class="thumb-container pull-left">
+                        {% if place.photos %}
+                            {% thumbnail address.photos.0.sourceimage_set.all.0.image 50x50 crop="True" as im %}
+                            <img src="{{ im.url }}">
+                        {% else %}
+                        <i class="icon-reorder icon-large icon-muted"></i>
+                        {% endif %}
+                        </a>
+                        <div class="media-body">
+                        <a href="{{ address.get_absolute_url }}" class="">{{ address|safe }}</a>
+                        </div>
+                    </li>
+                {% empty %}
+                    <li>No matching results</li>
+                {% endfor %}
+                </ul>
+                {% paginate 'address' 5 %}
+            </div>
+        </div>
+{% endblock %}

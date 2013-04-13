@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load thumbnail %}
+{% load nav_extras %}
+{% block content %}
+        <div class="row">
+            {% with current='places' %}{% include '_sidenav.html' %}{% endwith %}
+            <div class="span8">
+                <ul class="breadcrumb hidden-phone">
+                    <li><a href="/">Home</a> <span class="divider">/</span></li>
+                    <li><a href="{% url place-list %}">Places</a> <span class="divider">/</span></li>
+                    <li><a href="{% url mosmanstreet-list %}">Mosman streets</a> <span class="divider">/</span></li>
+                    <li class="active">{{ content }}</li>
+                </ul>
+                <h2>{{ content }}</h2>
+                <dl class="dl-horizontal">
+                    <dt>Addresses</dt>
+                    <dd>
+                        <ul>
+                        {% for address in content.address_set.all %}
+                            <li>
+                                <a href="{% url address-view  address.id %}">
+                                    {{ address }}
+                                </a>
+                            </li>
+                        {% empty %}
+                            <li>No addresses recorded yet</li>
+                        {% endfor %}
+                        </ul>
+                    </dd>
+                </dl>
+
+            </div>
+        </div>
+{% endblock %}
+{% block footer %}
+{% with id_path=id_path identifier=identifier %}
+    {% include '_footer.html' %}
+{% endwith %}
+{% endblock %}

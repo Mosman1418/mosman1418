@@ -49,7 +49,7 @@ class Address(StandardMetadata):
 
     def __unicode__(self):
         if self.mosman_street:
-            street = self.mosman_street
+            street = self.mosman_street.street_name.strip()
         elif self.street_name:
             street = self.street_name
         else:
@@ -57,12 +57,15 @@ class Address(StandardMetadata):
         return '{building}{number}{street}, {place}'.format(
             building='{}, '.format(self.building_name) if self.building_name else '',
             number='{} '.format(self.street_number) if self.street_number else '',
-            street='{} '.format(street) if street else '',
+            street='{}'.format(street if street else ''),
             place=self.place
         )
 
+    class Meta:
+        ordering = ['street_name', 'mosman_street__street_name', 'street_number']
+
     def get_absolute_url(self):
-        reverse('address-view', args=[self.id])
+        return reverse('address-view', args=[self.id])
 
 
 class MosmanStreet(StandardMetadata):
@@ -71,3 +74,6 @@ class MosmanStreet(StandardMetadata):
 
     def __unicode__(self):
         return self.street_name
+
+    def get_absolute_url(self):
+        return reverse('mosmanstreet-view', args=[self.id])
