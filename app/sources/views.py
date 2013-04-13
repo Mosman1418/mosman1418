@@ -864,6 +864,12 @@ class AddSourceView(CreateView):
         source = self.object
         person = source.main_people()[0]
         details = self.form.cleaned_data['details']
+        if details['additional_information']:
+            if person.notes:
+                person.notes = '{}\n\n{}'.format(person.notes, details['additional_information'])
+            else:
+                person.notes = details['additional_information']
+            person.save()
         # NAMES
         alt_name, created = AlternativePersonName.objects.get_or_create(
             person=person,
@@ -931,10 +937,13 @@ class AddSourceView(CreateView):
             assign('sources.change_source', current_user, cemetery_source)
             assign('sources.delete_source', current_user, cemetery_source)
         burial_place, created = Place.objects.get_or_create(
-            place_name=details['cemetery']['name'].title(),
-            state=details['cemetery']['locality'],
-            country=details['cemetery']['country'],
-            defaults={'added_by': current_user}
+            display_name='{}, {}'.format(details['cemetery']['name'].title(), details['cemetery']['country']),
+            defaults={
+                'place_name': details['cemetery']['name'].title(),
+                'state': details['cemetery']['locality'],
+                'country': details['cemetery']['country'],
+                'added_by': current_user
+            }
         )
         if created:
             assign('places.change_place', current_user, burial_place)

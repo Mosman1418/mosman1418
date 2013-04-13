@@ -11,6 +11,7 @@ class Person(GenericPerson):
     nickname = models.CharField(max_length=100, blank=True)
     gender = models.CharField(max_length=10, blank=True, choices=(('male', 'male'), ('female', 'female')))
     last_rank = models.CharField(max_length=50, blank=True, null=True)
+    notes = models.TextField(blank=True, null=True)
     #roles = models.ManyToManyField('PersonRole')
     addresses = models.ManyToManyField('places.Address', blank=True, null=True, through='PersonAddress')
     associated_places = models.ManyToManyField('places.Place', blank=True, null=True, through='PersonAssociatedPlace')
@@ -23,11 +24,11 @@ class Person(GenericPerson):
     stories = models.ManyToManyField('sources.Story', blank=True, null=True)
     public = models.BooleanField(default=False)  # Display on website
     status = models.CharField(max_length=15, choices=(
-                                                ('confirmed', 'confirmed'),
-                                                ('pending', 'pending'),
-                                                ('rejected', 'rejected'),
-                                                ('non-service', 'non-service')
-                                                ))
+        ('confirmed', 'confirmed'),
+        ('pending', 'pending'),
+        ('rejected', 'rejected'),
+        ('non-service', 'non-service')
+    ))
     mosman_connection = models.TextField(blank=True, null=True)
     admin_note = models.TextField(blank=True, null=True)
 
