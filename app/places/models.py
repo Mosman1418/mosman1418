@@ -14,13 +14,14 @@ class Place(GenericPlace):
     sources = models.ManyToManyField('sources.Source', blank=True, null=True)
 
     def __unicode__(self):
-        if self.display_name:
+        if not self.place_name:
             summary = self.display_name
         else:
-            summary = '{}{}'.format(self.place_name,
-                                    ', {}'.format(self.country)
-                                    if self.country else ''
-                                    )
+            summary = '{}{}{}'.format(
+                self.place_name,
+                ', {}'.format(self.state) if self.state else '',
+                ', {}'.format(self.country) if self.country else ''
+            )
         return summary
 
     def get_absolute_url(self):
