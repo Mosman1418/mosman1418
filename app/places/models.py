@@ -68,7 +68,7 @@ class Address(StandardMetadata):
         return reverse('address-view', args=[self.id])
 
 
-class MosmanStreet(StandardMetadata):
+class MosmanStreet(models.Model):
     street_name = models.CharField(max_length=250, blank=True)
     bounding_box = models.CharField(max_length=250, blank=True)
 
