@@ -13,7 +13,7 @@
                     <li><a href="{{ memorial.get_absolute_url }}">{{ memorial }}</a><span class="divider">/</span></li>
                     <li class="active">Names</li>
                 </ul>
-                <h1 class="page-header">{{ memorial }} <small>names</small></h1>
+                <h2 class="page-header">{{ memorial }} <small>names</small></h2>
 
                 {% paginate 'memorial-names' 5 %}
                 <ul class="media-list">
@@ -49,4 +49,9 @@
 
             </div>
         </div>
+{% endblock %}
+{% block footer %}
+{% with id_path=id_path identifier=identifier %}
+    {% include '_footer.html' %}
+{% endwith %}
 {% endblock %}

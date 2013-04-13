@@ -5,8 +5,13 @@
         <div class="row">
             {% with current='people' %}{% include '_sidenav.html' %}{% endwith %}
             <div class="span8">
-                <h1>Rank</h1>
-                <p>Details for <a href="{{ content.person.get_absolute_url }}">{{ content.person }}</a></p>
+                <ul class="breadcrumb hidden-phone">
+                    <li><a href="/">Home</a> <span class="divider">/</span></li>
+                    <li><a href="{% url people-list %}">People</a> <span class="divider">/</span></li>
+                    <li><a href="{{ content.person.get_absolute_url }}">{{ content.person }}</a> <span class="divider">/</span></li>
+                    <li class="active">{{ content.summary|safe }}</li>
+                </ul>
+                <h2>Rank</h2>
                 <dl class="dl-horizontal">
                     <dt>Rank</dt>
                     <dd>{{ content.rank }}</dd>
@@ -41,13 +46,7 @@
 
 {% endblock %}
 {% block footer %}
-<div class="row">
-    <div class="span8 offset2">
-        Identifer: <a href="{{ identifier }}">{{ identifier }}</a> |
-        <a href="{{ id_path }}.html/">HTML</a> |
-        <a href="{{ id_path }}.rdf/">RDF+XML</a> |
-        <a href="{{ id_path }}.ttl/">Turtle</a> |
-        <a href="{{ id_path }}.json/">JSON</a>
-    </div>
-</div>
+{% with id_path=id_path identifier=identifier %}
+    {% include '_footer.html' %}
+{% endwith %}
 {% endblock %}

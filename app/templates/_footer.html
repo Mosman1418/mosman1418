@@ -1,8 +1,9 @@
 <div class="row">
-    <div class="span2">
+    <div class="span3">
         <p><img src="{{ STATIC_URL }}img/doing_our_bit.png"></p>
     </div>
-    <div class="span8">
+    <div class="span8 offset1">
+        {% if identifier %}
         <p><small>
             Identifer: <a href="{{ identifier }}">{{ identifier }}</a> |
             <a href="{{ id_path }}.html/">HTML</a> |
@@ -10,5 +11,29 @@
             <a href="{{ id_path }}.ttl/">Turtle</a> |
             <a href="{{ id_path }}.json/">JSON</a>
         </small></p>
+        {% endif %}
+    </div>
+</div>
+<div class="row">
+    <div class="span4">
+        <h6>Licence</h6>
+        <p>
+        <a href="http://creativecommons.org/licenses/by/3.0/"><img src="{{ STATIC_URL }}img/cc88x31.png"></a><br>
+        <small>This work is licensed under a <a href="http://creativecommons.org/licenses/by/3.0/">Creative Commons Attribution 3.0 Unported License</a>.</small>
+        </p>
+    </div>
+    <div class="span4">
+        <h6>About the project</h6>
+        <p>
+        <img class="pull-right" src="{{ STATIC_URL }}img/mosman.gif">
+        <small>To commemorate the centenary of World War One, <a href="http://www.mosman.nsw.gov.au/library">Mosman Library</a> is creating an online resource to collect and display information about the wartime experiences of local service people.</small>
+        </p>
+    </div>
+    <div class="span4">
+        <h6>Doing their bit</h6>
+        <p>
+        <img class="pull-right" src="{{ STATIC_URL }}img/slnsw.gif">
+        <small>This project is supported by a State Government Library Development Grant. Thank you <a href="http://www.sl.nsw.gov.au/">SLNSW</a>.</small>
+        </p>
     </div>
 </div>

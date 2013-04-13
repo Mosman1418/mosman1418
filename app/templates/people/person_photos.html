@@ -14,7 +14,7 @@
                     <li><a href="{{ content.get_absolute_url }}">{{ content }}</a><span class="divider">/</span></li>
                     <li class="active">Images</li>
                 </ul>
-                <h1 class="page-header">{{ content }} <small>Images</small></h1>
+                <h2 class="page-header">{{ content }} <small>Images</small></h2>
 
                 <ul id="wall" class="thumbnails">
                 {% for source in content.photos %}
@@ -31,4 +31,9 @@
 
             </div>
         </div>
+{% endblock %}
+{% block footer %}
+{% with id_path=id_path identifier=identifier %}
+    {% include '_footer.html' %}
+{% endwith %}
 {% endblock %}

@@ -10,7 +10,7 @@
                         <li><a href="{% url memorial-list %}">Memorials</a> <span class="divider">/</span></li>
                         <li class="active">{{ content }}</li>
                     </ul>
-                    <h1>{{ content.name }}</h1>
+                    <h2>{{ content.name }}</h2>
                     <div class="row">
                         <div class="span6">
                             {% if content.address %}
@@ -72,15 +72,7 @@
 
 {% endblock %}
 {% block footer %}
-<div class="row">
-    <div class="span8 offset2">
-        <small>
-        Identifer: <a href="{{ identifier }}">{{ identifier }}</a> |
-        <a href="{{ id_path }}.html/">HTML</a> |
-        <a href="{{ id_path }}.rdf/">RDF+XML</a> |
-        <a href="{{ id_path }}.ttl/">Turtle</a> |
-        <a href="{{ id_path }}.json/">JSON</a>
-        </small>
-    </div>
-</div>
+{% with id_path=id_path identifier=identifier %}
+    {% include '_footer.html' %}
+{% endwith %}
 {% endblock %}
