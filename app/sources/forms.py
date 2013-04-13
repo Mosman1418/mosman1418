@@ -440,4 +440,5 @@ class AddStoryForm(ShortDateForm):
         exclude = ('added_by')
         widgets = {
             'text': CKEditorWidget(attrs={'class': 'input-xlarge'}),
+            'credit': CKEditorWidget(attrs={'class': 'input-xlarge'}),
         }

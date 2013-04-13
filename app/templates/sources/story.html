@@ -23,6 +23,12 @@
                             {{ content.end_earliest }}
                         </dd>
                     {% endif %}
+                    {% if content.credit %}
+                        <dt>Credit</dt>
+                        <dd>
+                            {{ content.credit }}
+                        </dd>
+                    {% endif %}
                     {% if content.subjects %}
                         <dt>Subject{{ content.subjects|pluralize }}</dt>
                         {% with list=content.subjects %}

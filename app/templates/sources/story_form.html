@@ -28,6 +28,9 @@
                 {% with label='Story' field=form.text %}
                     {% include '_form_field.html' %}
                 {% endwith %}
+                {% with label='Credit' field=form.credit %}
+                    {% include '_form_field.html' %}
+                {% endwith %}
                 <fieldset>
                     <legend>Dates</legend>
                     {% with label='Start date' field=form.start_earliest_date %}
