@@ -115,6 +115,9 @@ class AddPersonForm(ModelForm, DateSelectMixin):
                     'biography': forms.Textarea(attrs={
                                                 'class': 'input-xlarge',
                                                 'rows': '4'}),
+                    'notes': forms.Textarea(attrs={
+                                                'class': 'input-xlarge',
+                                                'rows': '4'}),
                     'mosman_connection': forms.Textarea(attrs={
                                                 'class': 'input-xlarge',
                                                 'rows': '4'})

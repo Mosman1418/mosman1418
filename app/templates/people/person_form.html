@@ -116,6 +116,9 @@
                         {% with label='Biographical note' field=form.biography %}
                             {% include '_form_field.html' %}
                         {% endwith %}
+                        {% with label='Working notes' field=form.notes help='Store your working notes &ndash; not publicly displayed' %}
+                            {% include '_form_field.html' %}
+                        {% endwith %}
 
                     {% if person.id %}
                         <div class="form-field control-group">
