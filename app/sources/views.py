@@ -463,7 +463,10 @@ class AddSourceView(CreateView):
             person_name.save()
             birth_place, created = Place.objects.get_or_create(
                 display_name=details['place_of_birth'],
-                defaults={'added_by': current_user}
+                defaults={
+                    'place_name': details['place_of_birth'],
+                    'added_by': current_user
+                }
             )
             if created:
                 assign('places.change_place', current_user, birth_place)
@@ -481,7 +484,10 @@ class AddSourceView(CreateView):
             enlistment_type = LifeEventType.objects.get(label='enlistment')
             enlistment_place, created = Place.objects.get_or_create(
                 display_name=details['place_of_enlistment'],
-                defaults={'added_by': current_user}
+                defaults={
+                    'place_name': details['place_of_enlistment'],
+                    'added_by': current_user
+                }
             )
             if created:
                 assign('places.change_place', current_user, enlistment_place)
@@ -596,7 +602,10 @@ class AddSourceView(CreateView):
         date = parse_date(details['date_of_death'])
         death_location, created = Place.objects.get_or_create(
             display_name=details['place_of_death'],
-            defaults={'added_by': current_user}
+            defaults={
+                'place_name': details['place_of_death'],
+                'added_by': current_user
+            }
         )
         if created:
             assign('places.change_place', current_user, death_location)
@@ -701,7 +710,10 @@ class AddSourceView(CreateView):
         embarkation_type = LifeEventType.objects.get(label='embarkation')
         embarkation_place, created = Place.objects.get_or_create(
             display_name=details['place_of_embarkation'],
-            defaults={'added_by': current_user}
+            defaults={
+                'place_name': details['place_of_embarkation'],
+                'added_by': current_user
+            }
         )
         if created:
                 assign('places.change_place', current_user, embarkation_place)

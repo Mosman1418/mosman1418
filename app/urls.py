@@ -150,6 +150,8 @@ urlpatterns += patterns('app.people.views',
 
     url(r'^places/$', PlaceListView.as_view(), name="place-list"),
     url(r'^places/results\.(?P<format>(html|rdf|json|ttl))/$', PlaceListView.as_view()),
+    url(r'^places/(?P<letter>[a-zA-Z]{1})/$', PlaceListView.as_view(), name="place-alpha-list"),
+    url(r'^places/(?P<letter>[a-zA-Z]{1})/results\.(?P<format>(html|rdf|json|ttl))/$', PlaceListView.as_view()),
     url(r'^places/(?P<id>\d+)/$', PlaceView.as_view(), name='place-view'),
     url(r'^places/(?P<id>\d+)\.(?P<format>(html|rdf|json|ttl))/$', PlaceView.as_view()),
     url(r'^places/(?P<pk>\d+)/update/$', UpdatePlace.as_view(), name='place-update'),

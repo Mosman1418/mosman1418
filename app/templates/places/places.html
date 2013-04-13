@@ -9,7 +9,9 @@
                     <li><a href="/">Home</a> <span class="divider">/</span></li>
                     <li class="active">Places</li>
                 </ul>
-                <h1 class="page-header">Places</h1>
+                <h2 class="page-header">Places</h2>
+                {% alpha_browse 'place' letter %}
+                {% paginate 'place' 5 %}
                 <ul class="media-list">
                 {% for place in content %}
                     <li class="media">
@@ -25,8 +27,11 @@
                         <a href="{{ place.get_absolute_url }}" class="">{{ place|safe }}</a>
                         </div>
                     </li>
+                {% empty %}
+                    <li>No matching results</li>
                 {% endfor %}
                 </ul>
+                {% paginate 'place' 5 %}
             </div>
         </div>
 {% endblock %}

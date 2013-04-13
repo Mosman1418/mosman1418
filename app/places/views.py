@@ -33,8 +33,9 @@ class PlaceView(LinkedDataView):
 
 class PlaceListView(LinkedDataListView):
     model = Place
-    path = '/places/results'
+    path = '/places/{}results'
     template_name = 'places/places'
+    browse_field = 'place_name'
 
     def make_graph(self, entities):
         namespaces = {}
