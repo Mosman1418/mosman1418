@@ -7,3 +7,4 @@ from app.places.models import *
 
 admin.site.register(Place)
 admin.site.register(Address)
+admin.site.register(MosmanStreet)
