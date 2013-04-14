@@ -1,10 +1,7 @@
 <div class="row">
-    <div class="span3">
-        <p><img src="{{ STATIC_URL }}img/63.png"></p>
-    </div>
-    <div class="span8 offset1">
+    <div class="span8 offset2">
         {% if identifier %}
-        <p><small>
+        <p class="identifier"><small>
             Identifer: <a href="{{ identifier }}">{{ identifier }}</a> |
             <a href="{{ id_path }}.html/">HTML</a> |
             <a href="{{ id_path }}.rdf/">RDF+XML</a> |
@@ -14,22 +11,30 @@
         {% endif %}
     </div>
 </div>
-<div class="row">
-    <div class="span4">
+<div class="row credits">
+    <div class="span3">
+        <p><img src="{{ STATIC_URL }}img/63.png"></p>
+        <p>
+        <small>
+            Find out more on the <a href="http://mosman1914-1918.net/project/">project blog</a> or our <a href="http://www.facebook.com/mosman1418">Facebook page</a>.
+        </small>
+        </p>
+    </div>
+    <div class="span3">
         <h6>Licence</h6>
         <p>
         <a href="http://creativecommons.org/licenses/by/3.0/"><img src="{{ STATIC_URL }}img/cc88x31.png"></a><br>
         <small>This work is licensed under a <a href="http://creativecommons.org/licenses/by/3.0/">Creative Commons Attribution 3.0 Unported License</a>.</small>
         </p>
     </div>
-    <div class="span4">
+    <div class="span3">
         <h6>About the project</h6>
         <p>
         <img class="pull-right" src="{{ STATIC_URL }}img/mosman.gif">
         <small>To commemorate the centenary of World War One, <a href="http://www.mosman.nsw.gov.au/library">Mosman Library</a> is creating an online resource to collect and display information about the wartime experiences of local service people.</small>
         </p>
     </div>
-    <div class="span4">
+    <div class="span3">
         <h6>Doing their bit</h6>
         <p>
         <img class="pull-right" src="{{ STATIC_URL }}img/slnsw.gif">
