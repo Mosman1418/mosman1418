@@ -2,6 +2,7 @@
 import httplib
 import itertools
 from django.shortcuts import render_to_response
+from django.shortcuts import redirect
 from django.http import HttpResponse
 from django.template import RequestContext
 from django.utils.cache import patch_vary_headers
@@ -32,6 +33,16 @@ class LinkedDataView(ContentNegotiatedView):
     template_name = ''
 
     def get(self, request, id=None, format=None):
+        # Check for merged records and redirect if necessary
+        instance = self.model.objects.get(id=id)
+        try:
+            redirect_to = instance.merged_into
+        except AttributeError:
+            pass
+        else:
+            if redirect_to:
+                return redirect(self.model.objects.get(id=redirect_to.id), permanent=True)
+        # End redirect check
         context = {}
         if format:
             context['content'] = self.model.objects.select_related().get(id=id)

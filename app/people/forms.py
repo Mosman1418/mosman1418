@@ -57,28 +57,28 @@ class EventLocationsMultiChoice(AutoModelSelect2MultipleField):
 class AddPersonForm(ModelForm, DateSelectMixin):
     # These are CharFields so they don't get vaildated as dates
     related_person = forms.ModelChoiceField(
-                queryset=PersonAssociatedPerson.objects.all(),
-                required=False,
-                widget=forms.Select(attrs={'readonly': 'readonly'})
-                )
+        queryset=PersonAssociatedPerson.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'readonly': 'readonly'})
+    )
     source = forms.ModelChoiceField(
-                queryset=Source.objects.all(),
-                required=False,
-                widget=forms.Select(attrs={'readonly': 'readonly'})
-                )
+        queryset=Source.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'readonly': 'readonly'})
+    )
     creator_type = forms.CharField(required=False, widget=forms.HiddenInput())
     birth_earliest_date = forms.CharField(widget=NewSelectDateWidget(
-                                attrs={'class': 'input-small'},
-                                years=YEARS), required=False)
+        attrs={'class': 'input-small'},
+        years=YEARS), required=False)
     birth_latest_date = forms.CharField(widget=NewSelectDateWidget(
-                                attrs={'class': 'input-small'},
-                                years=YEARS), required=False)
+        attrs={'class': 'input-small'},
+        years=YEARS), required=False)
     death_earliest_date = forms.CharField(widget=NewSelectDateWidget(
-                                attrs={'class': 'input-small'},
-                                years=YEARS), required=False)
+        attrs={'class': 'input-small'},
+        years=YEARS), required=False)
     death_latest_date = forms.CharField(widget=NewSelectDateWidget(
-                                attrs={'class': 'input-small'},
-                                years=YEARS), required=False)
+        attrs={'class': 'input-small'},
+        years=YEARS), required=False)
 
     def clean(self):
         cleaned_data = super(AddPersonForm, self).clean()
@@ -104,24 +104,24 @@ class AddPersonForm(ModelForm, DateSelectMixin):
         model = Person
         exclude = ('added_by', 'status')
         widgets = {
-                    'birth_earliest_month_known': forms.HiddenInput,
-                    'birth_earliest_day_known': forms.HiddenInput,
-                    'birth_latest_month_known': forms.HiddenInput,
-                    'birth_latest_day_known': forms.HiddenInput,
-                    'death_earliest_month_known': forms.HiddenInput,
-                    'death_earliest_day_known': forms.HiddenInput,
-                    'death_latest_month_known': forms.HiddenInput,
-                    'death_latest_day_known': forms.HiddenInput,
-                    'biography': forms.Textarea(attrs={
-                                                'class': 'input-xlarge',
-                                                'rows': '4'}),
-                    'notes': forms.Textarea(attrs={
-                                                'class': 'input-xlarge',
-                                                'rows': '4'}),
-                    'mosman_connection': forms.Textarea(attrs={
-                                                'class': 'input-xlarge',
-                                                'rows': '4'})
-                }
+            'birth_earliest_month_known': forms.HiddenInput,
+            'birth_earliest_day_known': forms.HiddenInput,
+            'birth_latest_month_known': forms.HiddenInput,
+            'birth_latest_day_known': forms.HiddenInput,
+            'death_earliest_month_known': forms.HiddenInput,
+            'death_earliest_day_known': forms.HiddenInput,
+            'death_latest_month_known': forms.HiddenInput,
+            'death_latest_day_known': forms.HiddenInput,
+            'biography': forms.Textarea(attrs={
+                'class': 'input-xlarge',
+                'rows': '4'}),
+            'notes': forms.Textarea(attrs={
+                'class': 'input-xlarge',
+                'rows': '4'}),
+            'mosman_connection': forms.Textarea(attrs={
+                'class': 'input-xlarge',
+                'rows': '4'})
+        }
 
 
 class UpdatePersonForm(AddPersonForm):
@@ -157,18 +157,18 @@ class AddLifeEventForm(AddEventForm):
         model = LifeEvent
         exclude = ('added_by',)
         widgets = {
-                    'start_earliest_month': forms.HiddenInput,
-                    'start_earliest_day': forms.HiddenInput,
-                    'start_latest_month': forms.HiddenInput,
-                    'start_latest_day': forms.HiddenInput,
-                    'end_earliest_month': forms.HiddenInput,
-                    'end_earliest_day': forms.HiddenInput,
-                    'end_latest_month': forms.HiddenInput,
-                    'end_latest_day': forms.HiddenInput,
-                    'description': forms.Textarea(attrs={
-                                                'class': 'input-large',
-                                                'rows': '4'})
-                }
+            'start_earliest_month': forms.HiddenInput,
+            'start_earliest_day': forms.HiddenInput,
+            'start_latest_month': forms.HiddenInput,
+            'start_latest_day': forms.HiddenInput,
+            'end_earliest_month': forms.HiddenInput,
+            'end_earliest_day': forms.HiddenInput,
+            'end_latest_month': forms.HiddenInput,
+            'end_latest_day': forms.HiddenInput,
+            'description': forms.Textarea(attrs={
+                'class': 'input-large',
+                'rows': '4'})
+        }
 
 
 class AddEventLocationForm(forms.ModelForm):
@@ -201,10 +201,10 @@ class AddDeathForm(AddEventForm):
 
 class AddRankForm(ShortDateForm):
     person = forms.ModelChoiceField(
-                queryset=Person.objects.all(),
-                required=False,
-                widget=forms.Select(attrs={'readonly': 'readonly'})
-                )
+        queryset=Person.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'readonly': 'readonly'})
+    )
     sources = SourcesMultiChoice(required=False)
 
     class Meta:
@@ -214,10 +214,10 @@ class AddRankForm(ShortDateForm):
 
 class AddServiceNumberForm(ModelForm):
     person = forms.ModelChoiceField(
-                queryset=Person.objects.all(),
-                required=False,
-                widget=forms.Select(attrs={'readonly': 'readonly'})
-                )
+        queryset=Person.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'readonly': 'readonly'})
+    )
     sources = SourcesMultiChoice(required=False)
 
     class Meta:
@@ -227,15 +227,15 @@ class AddServiceNumberForm(ModelForm):
 
 class AddOrganisationForm(ModelForm):
     person = forms.ModelChoiceField(
-                queryset=Person.objects.all(),
-                required=False,
-                widget=forms.Select(attrs={'readonly': 'readonly'})
-        )
+        queryset=Person.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'readonly': 'readonly'})
+    )
     associated_person = forms.ModelChoiceField(
-                queryset=Person.objects.all(),
-                required=False,
-                widget=forms.Select(attrs={'readonly': 'readonly'})
-        )
+        queryset=Person.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'readonly': 'readonly'})
+    )
 
     class Meta:
         model = Organisation
@@ -254,16 +254,16 @@ class AddAssociatedPersonForm(ShortDateForm):
 
 class AddAssociatedOrganisationForm(ModelForm, DateSelectMixin):
     person = forms.ModelChoiceField(
-                queryset=Person.objects.all(),
-                required=False,
-                widget=forms.Select(attrs={'readonly': 'readonly'})
-        )
+        queryset=Person.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'readonly': 'readonly'})
+    )
     start_earliest_date = forms.CharField(widget=NewSelectDateWidget(
-                                attrs={'class': 'input-small'},
-                                years=YEARS), required=False)
+        attrs={'class': 'input-small'},
+        years=YEARS), required=False)
     end_earliest_date = forms.CharField(widget=NewSelectDateWidget(
-                                attrs={'class': 'input-small'},
-                                years=YEARS), required=False)
+        attrs={'class': 'input-small'},
+        years=YEARS), required=False)
     organisation = OrganisationChoice()
     sources = SourcesMultiChoice(required=False)
 
@@ -283,25 +283,25 @@ class AddAssociatedOrganisationForm(ModelForm, DateSelectMixin):
         model = PersonAssociatedOrganisation
         exclude = ('added_by',)
         widgets = {
-                    'start_earliest_month': forms.HiddenInput,
-                    'start_earliest_day': forms.HiddenInput,
-                    'end_earliest_month': forms.HiddenInput,
-                    'end_earliest_day': forms.HiddenInput,
-                }
+            'start_earliest_month': forms.HiddenInput,
+            'start_earliest_day': forms.HiddenInput,
+            'end_earliest_month': forms.HiddenInput,
+            'end_earliest_day': forms.HiddenInput,
+        }
 
 
 class AddPersonAddressForm(ModelForm, DateSelectMixin):
     person = forms.ModelChoiceField(
-                queryset=Person.objects.all(),
-                required=False,
-                widget=forms.Select(attrs={'readonly': 'readonly'})
-        )
+        queryset=Person.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'readonly': 'readonly'})
+    )
     start_earliest_date = forms.CharField(widget=NewSelectDateWidget(
-                                attrs={'class': 'input-small'},
-                                years=YEARS), required=False)
+        attrs={'class': 'input-small'},
+        years=YEARS), required=False)
     end_earliest_date = forms.CharField(widget=NewSelectDateWidget(
-                                attrs={'class': 'input-small'},
-                                years=YEARS), required=False)
+        attrs={'class': 'input-small'},
+        years=YEARS), required=False)
     sources = SourcesMultiChoice(required=False)
 
     def clean(self):
@@ -320,74 +320,20 @@ class AddPersonAddressForm(ModelForm, DateSelectMixin):
         model = PersonAddress
         exclude = ('added_by',)
         widgets = {
-                    'start_earliest_month_known': forms.HiddenInput,
-                    'start_earliest_day_known': forms.HiddenInput,
-                    'start_latest_month_known': forms.HiddenInput,
-                    'start_latest_day_known': forms.HiddenInput,
-                    'end_earliest_month_known': forms.HiddenInput,
-                    'end_earliest_day_known': forms.HiddenInput,
-                    'end_latest_month_known': forms.HiddenInput,
-                    'end_latest_day_known': forms.HiddenInput,
-                }
+            'start_earliest_month_known': forms.HiddenInput,
+            'start_earliest_day_known': forms.HiddenInput,
+            'start_latest_month_known': forms.HiddenInput,
+            'start_latest_day_known': forms.HiddenInput,
+            'end_earliest_month_known': forms.HiddenInput,
+            'end_earliest_day_known': forms.HiddenInput,
+            'end_latest_month_known': forms.HiddenInput,
+            'end_latest_day_known': forms.HiddenInput,
+        }
 
 
-
-class AddResourceForm(ModelForm, DateSelectMixin):
-    years = [year for year in range(1850, 2013)]
-
-    earliest_date = forms.CharField(widget=NewSelectDateWidget(attrs={'class': 'input-small'}, years=years), required=False)
-    latest_date = forms.CharField(widget=NewSelectDateWidget(attrs={'class': 'input-small'}, years=years), required=False)
-    earliest_month_known = forms.BooleanField(widget=forms.HiddenInput, required=False)
-    earliest_day_known = forms.BooleanField(widget=forms.HiddenInput, required=False)
-    latest_month_known = forms.BooleanField(widget=forms.HiddenInput, required=False)
-    latest_day_known = forms.BooleanField(widget=forms.HiddenInput, required=False)
-    people_choices = [(id, id) for id in Person.objects.values_list('id', flat=True)]
-    people = forms.MultipleChoiceField(widget=forms.MultipleHiddenInput, choices=people_choices, required=False)
-    organisations_choices = [(id, id) for id in Organisation.objects.values_list('id', flat=True)]
-    organisations = forms.MultipleChoiceField(widget=forms.MultipleHiddenInput, choices=organisations_choices, required=False)
-
-    def clean_earliest_date(self):
-        return self.clean_date(self.cleaned_data['earliest_date'], 'start')
-
-    def clean_latest_date(self):
-        return self.clean_date(self.cleaned_data['latest_date'], 'end')
-
-    def clean_earliest_month_known(self):
-        return self.clean_month(self.cleaned_data['earliest_date'], 'start')
-
-    def clean_earliest_day_known(self):
-        return self.clean_day(self.cleaned_data['earliest_date'], 'start')
-
-    def clean_latest_month_known(self):
-        return self.clean_month(self.cleaned_data['latest_date'], 'end')
-
-    def clean_latest_day_known(self):
-        return self.clean_day(self.cleaned_data['latest_date'], 'end')
-
-
-class AddStoryForm(AddResourceForm):
-    title = forms.CharField(widget=forms.TextInput(attrs={'class': 'input-xxlarge'}))
-    text = forms.CharField(widget=forms.Textarea(attrs={'class': 'input-xxlarge'}))
-
-    class Meta:
-        model = PeopleStory
-        fields = ('title', 'text', 'people', 'organisations')
-
-
-class DeleteStoryForm(forms.Form):
-    id = forms.CharField(widget=forms.HiddenInput)
-
-
-class AddImageForm(AddResourceForm):
-    title = forms.CharField(widget=forms.TextInput(attrs={'class': 'input-xxlarge'}))
-    caption = forms.CharField(widget=forms.Textarea(attrs={'class': 'input-xxlarge'}))
-
-    class Meta:
-        model = PeopleImage
-        fields = ('title', 'image', 'earliest_date', 'latest_date', 'caption', 'people', 'organisations')
-
-
-class DeleteImageForm(forms.Form):
-    id = forms.CharField(widget=forms.HiddenInput)
-
-
+class PersonMergeForm(forms.Form):
+    merge_record = forms.ModelChoiceField(
+        queryset=Person.objects.all(),
+        widget=forms.Select(attrs={'readonly': 'readonly'})
+    )
+    master_record = PersonChoice()

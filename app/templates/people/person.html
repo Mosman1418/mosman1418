@@ -138,6 +138,11 @@
                 <p>
                     <a class="btn btn-primary btn-medium" href="{% url source-add-entity 'mainperson' content.id%}">Add a source</a>
                 </p>
+                {% if 'add_person' in perms %}
+                <p>
+                    <a class="btn btn-primary btn-medium" href="{% url person-merge content.id%}">Merge</a>
+                </p>
+                {% endif %}
             </div>
         </div>
 {% endblock %}

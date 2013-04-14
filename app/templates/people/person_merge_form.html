@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load django_select2_tags %}
+{% block title %}Log in{% endblock %}
+{% block extra_scripts %}
+{% import_django_select2_js %}
+{% endblock %}
+{% block extra_styles %}
+{% import_django_select2_css %}
+{% endblock %}
+{% block content %}
+    <div class="row">
+        {% with current='none' %}{% include '_sidenav.html' %}{% endwith %}
+        <div class="span10">
+            <h2>Merge records</h2>
+            <form action="" method="post" class="form-horizontal">{% csrf_token %}
+
+                {% with label='Record being merged' field=form.merge_record %}
+                    {% include '_form_field.html' %}
+                {% endwith %}
+                <p>
+                    Merge the record above into the record below. All of the attributes of the merged record will be added to the master record and the merged record will no longer be visible.
+                </p>
+                {% with label='Master record' field=form.master_record %}
+                    {% include '_form_field.html' %}
+                {% endwith %}
+
+                <div class="form-actions">
+                        <input class="btn btn-primary" name="next" type="submit" value="Merge">
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

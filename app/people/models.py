@@ -32,6 +32,7 @@ class Person(GenericPerson):
     ))
     mosman_connection = models.TextField(blank=True, null=True)
     admin_note = models.TextField(blank=True, null=True)
+    merged_into = models.ForeignKey('people.Person', blank=True, null=True)
 
     def __unicode__(self):
         if self.family_name:
