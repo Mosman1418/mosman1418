@@ -251,6 +251,9 @@ class AddSourceView(CreateView):
         initial = {}
         entity_type = self.kwargs.get('entity_type', None)
         entity_id = self.kwargs.get('entity_id', None)
+        if entity_type == 'mainperson':
+            person = Person.objects.get(id=entity_id)
+            initial['person_name'] = person.family_name
         initial[entity_type] = entity_id
         '''
         event_type = self.kwargs.get('event_type', None)

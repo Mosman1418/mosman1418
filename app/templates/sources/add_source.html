@@ -14,6 +14,7 @@
         {% with current='images' %}{% include '_sidenav.html' %}{% endwith %}
         <div class="span8">
             <h2>{% if link_id %}Edit{% else %}Add{% endif %} a source</h2>
+
             <form action="." method="post" enctype="multipart/form-data" class="form-horizontal">{% csrf_token %}
                 {% if form.errors %}
     <!-- Error messaging -->
@@ -208,6 +209,13 @@
                     {% endif %}
                 </div>
             </form>
+        </div>
+        <div class="span2">
+            {% if 'person_name' in form.initial.keys %}
+                <p>
+                    <a class="btn btn-primary" target="_blank" href="http://wraggelabs.com/ww1-records/?family_name={{ form.initial.person_name }}">Search for records <i class="icon-double-angle-right"></i></a>
+                </p>
+            {% endif %}
         </div>
     </div>
 {% endblock %}
