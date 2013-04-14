@@ -1210,3 +1210,4 @@ class DeleteStory(PermissionRequiredMixin, DeleteView):
 
     def get_success_url(self):
         return reverse_lazy('story-list')
+

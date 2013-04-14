@@ -337,3 +337,11 @@ class PersonMergeForm(forms.Form):
         widget=forms.Select(attrs={'readonly': 'readonly'})
     )
     master_record = PersonChoice()
+
+
+class OrganisationMergeForm(forms.Form):
+    merge_record = forms.ModelChoiceField(
+        queryset=Organisation.objects.all(),
+        widget=forms.Select(attrs={'readonly': 'readonly'})
+    )
+    master_record = OrganisationChoice()

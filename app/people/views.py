@@ -28,7 +28,7 @@ from app.linkeddata.views import LinkedDataView, LinkedDataListView, RDFSchema
 from app.people.models import *
 from app.people.forms import *
 from app.sources.models import Source
-from app.memorials.models import MemorialName
+from app.memorials.models import *
 
 
 TROVE_API_KEY = 'ierj9cpsh7f5u7kg'
@@ -379,6 +379,7 @@ class OrganisationListView(LinkedDataListView):
     model = Organisation
     path = '/organisations/results'
     template_name = 'people/organisations'
+    browse_field = 'name'
 
     def make_graph(self, entities):
         namespaces = {}
@@ -440,6 +441,26 @@ class PersonRelationshipView(LinkedDataView):
     model = PersonAssociatedPerson
     path = '/people/relationships/%s'
     template_name = 'people/relationship'
+
+    def make_graph(self, entity):
+        namespaces = {}
+        graph = Graph()
+        schemas = RDFSchema.objects.all()
+        for schema in schemas:
+            namespace = Namespace(schema.uri)
+            graph.bind(schema.prefix, namespace)
+            namespaces[schema.prefix] = namespace
+        host_ns = Namespace('http://%s' % (Site.objects.get_current().domain))
+        this_person = URIRef(host_ns[entity.get_absolute_url()])
+        graph.add((this_person, namespaces['rdf']['type'], namespaces['foaf']['Person']))
+        graph.add((this_person, namespaces['rdfs']['label'], Literal(str(entity))))
+        return graph
+
+
+class PersonMembershipView(LinkedDataView):
+    model = PersonAssociatedOrganisation
+    path = '/people/memberships/%s'
+    template_name = 'people/membership'
 
     def make_graph(self, entity):
         namespaces = {}
@@ -1414,6 +1435,9 @@ class PersonMergeView(FormView):
         for creator in SourcePerson.objects.filter(person=merge_record):
             creator.person = master_record
             creator.save()
+        for memorial in MemorialAssociatedPerson.objects.filter(person=merge_record):
+            memorial.organisation = master_record
+            memorial.save()
         merge_record.merged_into = master_record
         merge_record.save()
         self.redirect = master_record
@@ -1421,3 +1445,38 @@ class PersonMergeView(FormView):
 
     def get_success_url(self):
         return reverse_lazy('person-view', args=[self.redirect.id])
+
+
+class OrganisationMergeView(FormView):
+    template_name = 'people/organisation_merge_form.html'
+    form_class = OrganisationMergeForm
+
+    def get_initial(self):
+        id = self.kwargs.get('id', None)
+        initial = {'merge_record': id}
+        return initial
+
+    def form_valid(self, form):
+        merge_record = form.cleaned_data['merge_record']
+        master_record = form.cleaned_data['master_record']
+        # Find all properties of merged record and update
+        for source in OrganisationAssociatedSource.objects.filter(organisation=merge_record):
+            source.organisation = master_record
+            source.save()
+        for person in PersonAssociatedOrganisation.objects.filter(organisation=merge_record):
+            person.organisation = master_record
+            person.save()
+        for memorial in MemorialAssociatedOrganisation.objects.filter(organisation=merge_record):
+            memorial.organisation = master_record
+            memorial.save()
+        for story in merge_record.stories.all():
+            master_record.stories.add(story)
+            master_record.save()
+        merge_record.stories.clear()
+        merge_record.merged_into = master_record
+        merge_record.save()
+        self.redirect = master_record
+        return super(OrganisationMergeView, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('organisation-view', args=[self.redirect.id])

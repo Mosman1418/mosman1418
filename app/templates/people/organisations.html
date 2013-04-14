@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load thumbnail %}
+{% load nav_extras %}
+{% block content %}
+        <div class="row">
+            {% with current='people' %}{% include '_sidenav.html' %}{% endwith %}
+            <div class="span8">
+                <ul class="breadcrumb hidden-phone">
+                    <li><a href="/">Home</a> <span class="divider">/</span></li>
+                    <li class="active">Organisations</li>
+                </ul>
+                <h1>Organisations</h1>
+                {% alpha_browse 'organisation' letter %}
+                {% paginate 'organisation' 5 %}
+                <ul class="media-list">
+                {% for org in content %}
+                    <li class="media">
+                        <a href="{{ org.get_absolute_url }}" class="thumb-container pull-left">
+                        {% if org.photos %}
+                            {% thumbnail org.photos.0.sourceimage_set.all.0.image 50x50 crop="True" as im %}
+                            <img src="{{ im.url }}">
+                        {% else %}
+                        <i class="icon-user icon-large icon-muted"></i>
+                        {% endif %}
+                        </a>
+                        <div class="media-body">
+                        <a href="{{ org.get_absolute_url }}" class="">{{ org|safe }}</a><br>
+                        <small></small>
+                        </div>
+                    </li>
+                {% endfor %}
+                </ul>
+                {% paginate 'organisation' 5 %}
+            </div>
+        </div>
+{% endblock %}
+{% block footer %}
+{% with id_path=id_path identifier=identifier %}
+    {% include '_footer.html' %}
+{% endwith %}
+{% endblock %}

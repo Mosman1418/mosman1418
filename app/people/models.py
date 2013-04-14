@@ -377,11 +377,28 @@ class Organisation(Group):
     public = models.BooleanField(default=False)  # Display on website
     mosman_related = models.BooleanField(default=True)  # Appear in main people lists (not just authors)
     associated_sources = models.ManyToManyField('sources.Source', blank=True, null=True, through='OrganisationAssociatedSource')
-    images = models.ManyToManyField('PeopleImage', blank=True, null=True)
     stories = models.ManyToManyField('sources.Story', blank=True, null=True)
+    merged_into = models.ForeignKey('people.Organisation', blank=True, null=True)
 
     def __unicode__(self):
         return self.name if self.name else self.display_name
+
+    def get_absolute_url(self):
+        return reverse('organisation-view', args=[self.id])
+
+    def main_sources(self):
+        relations = (self.organisationassociatedsource_set
+                     .filter(association__label='primary topic of'))
+        return [relation.source for relation in relations]
+
+    def other_sources(self):
+        relations = (self.organisationassociatedsource_set
+                     .filter(association__label='topic of'))
+        return [relation.source for relation in relations]
+
+    class Meta:
+        ordering = ['name']
+        permissions = [('merge_organisation', 'Merge organisation')]
 
 
 class Repository(Group):
@@ -502,7 +519,7 @@ class PersonAssociatedOrganisation(StandardMetadata, ShortDateMixin):
         return '{} &ndash; {}'.format(self.association, self.organisation)
 
     def get_absolute_url(self):
-        return reverse('personorganisation-view', args=[str(self.id)])
+        return reverse('person-membership-view', args=[str(self.id)])
 
 
 class PersonAssociatedObject(models.Model):

@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block content %}
+        <div class="row">
+            {% with current='people' %}{% include '_sidenav.html' %}{% endwith %}
+            <div class="span8">
+                <ul class="breadcrumb hidden-phone">
+                    <li><a href="/">Home</a> <span class="divider">/</span></li>
+                    <li><a href="{% url people-list %}">People</a> <span class="divider">/</span></li>
+                    <li><a href="{{ content.person.get_absolute_url }}">{{ content.person }}</a> <span class="divider">/</span></li>
+                    <li class="active">{{ content.summary|safe }}</li>
+                </ul>
+                <h2>Related organisation</h2>
+                <dl class="dl-horizontal">
+                    <dt>Organisation</dt>
+                    <dd>
+                        <a href="{{ content.organisation.get_absolute_url }}">
+                            {{ content.organisation }}
+                        </a>
+                    </dd>
+                    <dt>Relationship</dt>
+                    <dd>{{ content.association }}</dd>
+                    {% if content.start_earliest %}
+                        <dt>Start date</dt>
+                        <dd>
+                            {{ content.start_earliest }}
+                        </dd>
+                    {% endif %}
+                    {% if content.start_earliest %}
+                        <dt>End date</dt>
+                        <dd>
+                            {{ content.end_earliest }}
+                        </dd>
+                    {% endif %}
+                    {% if content.sources.all %}
+                        <dt>Sources</dt>
+                        {% with list=content.sources.all %}
+                            {% include '_dd_item_list.html' %}
+                        {% endwith %}
+                    {% endif %}
+                    {% if content.memorials.all %}
+                        <dt>Memorials</dt>
+                        {% with list=content.memorials.all %}
+                            {% include '_dd_item_list.html' %}
+                        {% endwith %}
+                    {% endif %}
+                </dl>
+            </div>
+        </div>
+
+{% endblock %}
+{% block footer %}
+{% with id_path=id_path identifier=identifier %}
+    {% include '_footer.html' %}
+{% endwith %}
+{% endblock %}
