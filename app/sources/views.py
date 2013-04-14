@@ -652,11 +652,17 @@ class AddSourceView(CreateView):
         unit = '{}, {}'.format(details['unit'], details['service'])
         org, created = Organisation.objects.get_or_create(
             display_name=unit,
-            defaults={'added_by': current_user}
+            defaults={
+                'name': unit,
+                'added_by': current_user
+            }
         )
         if created:
             assign('people.change_organisation', current_user, org)
             assign('people.delete_organisation', current_user, org)
+        else:
+            if org.merged_into:
+                org = Organisation.objects.get(id=org.merged_into.id)
         org_association = PersonOrgAssociation.objects.get(label='member of')
         person_org = PersonAssociatedOrganisation.objects.create(
             person=person,
@@ -827,11 +833,17 @@ class AddSourceView(CreateView):
         unit = '{}, {}'.format(details['unit'], details['service'])
         org, created = Organisation.objects.get_or_create(
             display_name=unit,
-            defaults={'added_by': current_user}
+            defaults={
+                'name': unit,
+                'added_by': current_user
+            }
         )
         if created:
             assign('people.change_organisation', current_user, org)
             assign('people.delete_organisation', current_user, org)
+        else:
+            if org.merged_into:
+                org = Organisation.objects.get(id=org.merged_into.id)
         org_association = PersonOrgAssociation.objects.get(label='member of')
         person_org = PersonAssociatedOrganisation.objects.create(
             person=person,
@@ -923,11 +935,17 @@ class AddSourceView(CreateView):
             )
             org, created = Organisation.objects.get_or_create(
                 display_name=unit,
-                defaults={'added_by': current_user}
+                defaults={
+                    'name': unit,
+                    'added_by': current_user
+                }
             )
             if created:
                 assign('people.change_organisation', current_user, org)
                 assign('people.delete_organisation', current_user, org)
+            else:
+                if org.merged_into:
+                    org = Organisation.objects.get(id=org.merged_into.id)
             org_association = PersonOrgAssociation.objects.get(label='member of')
             person_org = PersonAssociatedOrganisation.objects.create(
                 person=person,
