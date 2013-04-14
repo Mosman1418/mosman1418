@@ -378,6 +378,7 @@ class AddSourceForm(ModelForm, DateSelectMixin):
         widgets = {
             'title': forms.TextInput(attrs={'class': 'input-xxlarge'}),
             'url': forms.TextInput(attrs={'class': 'input-xxlarge'}),
+            'caption': CKEditorWidget(attrs={'class': 'input-xlarge'}),
         }
 
 
@@ -413,6 +414,7 @@ class UpdateSourceForm(ModelForm, DateSelectMixin):
         widgets = {
             'title': forms.TextInput(attrs={'class': 'input-xlarge'}),
             'url': forms.TextInput(attrs={'class': 'input-xlarge'}),
+            'caption': CKEditorWidget(attrs={'class': 'input-xlarge'}),
         }
 
 
