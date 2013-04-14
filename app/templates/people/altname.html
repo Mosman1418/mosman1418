@@ -28,8 +28,14 @@
                         <dd>{{ content.nickname}}</dd>
                     {% endif %}
                     {% if content.sources %}
-                        <dt>Documented by</dt>
+                        <dt>Sources</dt>
                         {% with list=content.sources.all %}
+                            {% include '_dd_item_list.html' %}
+                        {% endwith %}
+                    {% endif %}
+                    {% if content.memorials.all %}
+                        <dt>Memorials</dt>
+                        {% with list=content.memorials.all %}
                             {% include '_dd_item_list.html' %}
                         {% endwith %}
                     {% endif %}
