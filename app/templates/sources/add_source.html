@@ -149,10 +149,12 @@
                     </fieldset>
                     <fieldset id="creators">
                         <legend>Creators</legend>
-                        {% with label='Authors' field=form.authors %}
+                        {% url source-creator-add source_id=source.id creator_type='author' as author_link %}
+                        {% with label='Authors' field=form.authors create_url=author_link create_type='author' %}
                             {% include '_form_field.html' %}
                         {% endwith %}
-                        {% with label='Editors' field=form.editors %}
+                        {% url source-creator-add source_id=source.id creator_type='editor' as editor_link %}
+                        {% with label='Editors' field=form.editors create_url=editor_link create_type='editor' %}
                             {% include '_form_field.html' %}
                         {% endwith %}
                     </fieldset>
