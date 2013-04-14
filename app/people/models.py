@@ -1,4 +1,5 @@
 import re
+from itertools import chain
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -62,6 +63,12 @@ class Person(GenericPerson):
                   .filter(association__label='primary topic of')
                   .filter(source__source_type__label='photograph'))
         return [photo.source for photo in photos]
+
+    def relationships(self):
+        forward_relations = self.personassociatedperson_set.all()
+        reverse_relations = self.related_person.all()
+        relations = list(chain(forward_relations, reverse_relations))
+        return relations
 
     def date_summary(self):
         start = self.birth_earliest()
@@ -489,13 +496,13 @@ class PersonAssociatedPerson(StandardMetadata, ShortDateMixin):
 
     def __unicode__(self):
         if self.associated_person:
-            summary = '{} {} {}'.format(self.person, self.association, self.associated_person)
+            summary = '{} - {} {}'.format(self.person, self.association, self.associated_person)
         else:
             summary = '{} {}'.format(self.person, self.association)
         return summary
 
     def summary(self):
-        return '{} &ndash; {}'.format(self.association, self.associated_person)
+        return '{} - {}'.format(self.association, self.associated_person)
 
     def class_name(self):
         return self.__class__.__name__
@@ -519,7 +526,7 @@ class PersonAssociatedOrganisation(StandardMetadata, ShortDateMixin):
         return summary
 
     def summary(self):
-        return '{} &ndash; {}'.format(self.association, self.organisation)
+        return '{} &ndash; {}'.format(self.association.label.title(), self.organisation)
 
     def get_absolute_url(self):
         return reverse('person-membership-view', args=[str(self.id)])
