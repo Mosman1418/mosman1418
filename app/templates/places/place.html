@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
+{% load guardian_tags %}
 {% block content %}
+    {% get_obj_perms request.user for content as 'perms' %}
         <div class="row">
             {% with current='places' %}{% include '_sidenav.html' %}{% endwith %}
             <div class="span8">
@@ -87,6 +89,18 @@
                     {% endif %}
                 </dl>
 
+            </div>
+            <div class="span2">
+                {% if 'change_place' in perms %}
+                    <p>
+                        <a class="btn btn-primary btn-medium" href="{% url place-update content.id%}">Update</a>
+                    </p>
+                    {% endif %}
+                    {% if 'merge_place' in perms %}
+                    <p>
+                        <a class="btn btn-primary btn-medium" href="{% url place-merge content.id%}">Merge</a>
+                    </p>
+                {% endif %}
             </div>
         </div>
 

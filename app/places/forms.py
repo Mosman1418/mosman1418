@@ -41,20 +41,28 @@ class AddPlaceForm(ModelForm):
 
 class AddAddressForm(ModelForm):
     person = forms.ModelChoiceField(
-            queryset=Person.objects.all(),
-            required=False,
-            widget=forms.Select(attrs={'readonly': 'readonly'})
-        )
+        queryset=Person.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'readonly': 'readonly'})
+    )
     person_address = forms.ModelChoiceField(
-            queryset=PersonAddress.objects.all(),
-            required=False,
-            widget=forms.Select(attrs={'readonly': 'readonly'})
-        )
+        queryset=PersonAddress.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'readonly': 'readonly'})
+    )
     place = PlaceChoice(required=False)
 
     class Meta:
         model = Address
         exclude = ('added_by', )
         widgets = {
-                'mosman_street': Select2Widget()
-            }
+            'mosman_street': Select2Widget()
+        }
+
+
+class PlaceMergeForm(forms.Form):
+    merge_record = forms.ModelChoiceField(
+        queryset=Place.objects.all(),
+        widget=forms.Select(attrs={'readonly': 'readonly'})
+    )
+    master_record = PlaceChoice()

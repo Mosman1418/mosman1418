@@ -145,6 +145,7 @@ urlpatterns += patterns('app.people.views',
     url(r'^places/(?P<pk>\d+)/update/$', UpdatePlace.as_view(), name='place-update'),
     url(r'^places/add/(?P<entity_type>(births|deaths|address))/(?P<entity_id>\d+)/$', AddPlace.as_view(), name='place-add-entity'),
     url(r'^places/add/$', AddPlace.as_view(), name='place-add'),
+    url(r'^places/(?P<id>\d+)/merge/$', PlaceMergeView.as_view(), name="place-merge"),
 
     url(r'^addresses/$', AddressListView.as_view(), name="address-list"),
     url(r'^addresses/results\.(?P<format>(html|rdf|json|ttl))/$', AddressListView.as_view()),

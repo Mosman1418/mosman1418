@@ -380,6 +380,7 @@ class OrganisationListView(LinkedDataListView):
     path = '/organisations/results'
     template_name = 'people/organisations'
     browse_field = 'name'
+    queryset = Organisation.objects.filter(merged_into__isnull=True)
 
     def make_graph(self, entities):
         namespaces = {}

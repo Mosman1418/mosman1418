@@ -471,6 +471,9 @@ class AddSourceView(CreateView):
             if created:
                 assign('places.change_place', current_user, birth_place)
                 assign('places.delete_place', current_user, birth_place)
+            else:
+                if birth_place.merged_into:
+                    birth_place = Place.objects.get(id=birth_place.merged_into.id)
             birth = Birth.objects.create(
                 label='Born at {}'.format(birth_place),
                 person=person,
@@ -492,6 +495,9 @@ class AddSourceView(CreateView):
             if created:
                 assign('places.change_place', current_user, enlistment_place)
                 assign('places.delete_place', current_user, enlistment_place)
+            else:
+                if enlistment_place.merged_into:
+                    enlistment_place = Place.objects.get(id=enlistment_place.merged_into.id)
             enlistment = LifeEvent.objects.create(
                 label='Enlisted at {}'.format(enlistment_place),
                 type_of_event=enlistment_type,
@@ -610,13 +616,22 @@ class AddSourceView(CreateView):
         if created:
             assign('places.change_place', current_user, death_location)
             assign('places.delete_place', current_user, death_location)
+        else:
+            if death_location.merged_into:
+                death_location = Place.objects.get(id=death_location.merged_into.id)
         burial_location, created = Place.objects.get_or_create(
             display_name=details['cemetery_or_memorial_details'],
-            defaults={'added_by': current_user}
+            defaults={
+                'place_name': details['cemetery_or_memorial_details'],
+                'added_by': current_user
+            }
         )
         if created:
             assign('places.change_place', current_user, burial_location)
             assign('places.delete_place', current_user, burial_location)
+        else:
+            if burial_location.merged_into:
+                burial_location = Place.objects.get(id=burial_location.merged_into.id)
         death = Death.objects.create(
             person=person,
             cause_of_death=details['cause_of_death'],
@@ -722,8 +737,11 @@ class AddSourceView(CreateView):
             }
         )
         if created:
-                assign('places.change_place', current_user, embarkation_place)
-                assign('places.delete_place', current_user, embarkation_place)
+            assign('places.change_place', current_user, embarkation_place)
+            assign('places.delete_place', current_user, embarkation_place)
+        else:
+            if embarkation_place.merged_into:
+                embarkation_place = Place.objects.get(id=embarkation_place.merged_into.id)
         date = parse_date(details['date_of_embarkation'])
         embarkation = LifeEvent.objects.create(
             label='Embarked from {} on the {}'.format(
@@ -978,6 +996,9 @@ class AddSourceView(CreateView):
         if created:
             assign('places.change_place', current_user, burial_place)
             assign('places.delete_place', current_user, burial_place)
+        else:
+            if burial_place.merged_into:
+                burial_place = Place.objects.get(id=burial_place.merged_into.id)
         burial_place.sources.add(cemetery_source)
         burial_place.save()
         if details['date_of_death']:

@@ -12,6 +12,7 @@ class Place(GenericPlace):
     country = models.CharField(max_length=50, blank=True)
     geonames_id = models.IntegerField(blank=True, null=True)
     sources = models.ManyToManyField('sources.Source', blank=True, null=True)
+    merged_into = models.ForeignKey('places.Place', blank=True, null=True)
 
     def __unicode__(self):
         if not self.place_name:
@@ -38,6 +39,10 @@ class Place(GenericPlace):
     def birth_places(self):
         people = list(set(self.birth_set.values_list('person__family_name', 'person__other_names', 'person')))
         return people
+
+    class Meta:
+        ordering = ['place_name']
+        permissions = [('merge_place', 'Merge place')]
 
 
 class Address(StandardMetadata):

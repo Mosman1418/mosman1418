@@ -1,6 +1,6 @@
 # Create your views here.
 
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.http import HttpResponse, HttpResponseRedirect
 from rdflib import Graph
@@ -9,6 +9,8 @@ from rdflib import Namespace, BNode, Literal, RDF, URIRef
 from app.linkeddata.views import LinkedDataView, LinkedDataListView, RDFSchema
 from app.places.models import *
 from app.places.forms import *
+from app.memorials.models import *
+from app.people.models import *
 
 
 class PlaceView(LinkedDataView):
@@ -36,6 +38,7 @@ class PlaceListView(LinkedDataListView):
     path = '/places/{}results'
     template_name = 'places/places'
     browse_field = 'place_name'
+    queryset = Place.objects.filter(merged_into__isnull=True)
 
     def make_graph(self, entities):
         namespaces = {}
@@ -271,3 +274,49 @@ class MosmanStreetListView(LinkedDataListView):
             graph.add((this_person, namespaces['rdfs']['label'], Literal(str(entity))))
         return graph
 
+
+class PlaceMergeView(FormView):
+    template_name = 'places/place_merge_form.html'
+    form_class = PlaceMergeForm
+
+    def get_initial(self):
+        id = self.kwargs.get('id', None)
+        initial = {'merge_record': id}
+        return initial
+
+    def form_valid(self, form):
+        merge_record = form.cleaned_data['merge_record']
+        master_record = form.cleaned_data['master_record']
+        # Find all properties of merged record and update
+        for address in Address.objects.filter(place=merge_record):
+            address.place = master_record
+            address.save()
+        for burial in Death.objects.filter(burial_place=merge_record):
+            burial.burial_place = master_record
+            burial.save()
+        for birth in Birth.objects.filter(location=merge_record):
+            birth.location = master_record
+            birth.save()
+        for death in Death.objects.filter(location=merge_record):
+            death.location = master_record
+            death.save()
+        for event in EventLocation.objects.filter(location=merge_record):
+            event.location = master_record
+            event.save()
+        for memorial in MemorialAssociatedPlace.objects.filter(place=merge_record):
+            memorial.place = master_record
+            memorial.save()
+        for memorial in Memorial.objects.filter(location=merge_record):
+            memorial.location = master_record
+            memorial.save()
+        for source in merge_record.sources.all():
+            master_record.sources.add(source)
+            master_record.save()
+        merge_record.sources.clear()
+        merge_record.merged_into = master_record
+        merge_record.save()
+        self.redirect = master_record
+        return super(PlaceMergeView, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('place-view', args=[self.redirect.id])
