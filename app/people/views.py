@@ -418,6 +418,26 @@ class RankView(LinkedDataView):
         return graph
 
 
+class PersonAddressView(LinkedDataView):
+    model = PersonAddress
+    path = '/people/addresses/%s'
+    template_name = 'people/personaddress'
+
+    def make_graph(self, entity):
+        namespaces = {}
+        graph = Graph()
+        schemas = RDFSchema.objects.all()
+        for schema in schemas:
+            namespace = Namespace(schema.uri)
+            graph.bind(schema.prefix, namespace)
+            namespaces[schema.prefix] = namespace
+        host_ns = Namespace('http://%s' % (Site.objects.get_current().domain))
+        this_person = URIRef(host_ns[entity.get_absolute_url()])
+        graph.add((this_person, namespaces['rdf']['type'], namespaces['foaf']['Person']))
+        graph.add((this_person, namespaces['rdfs']['label'], Literal(str(entity))))
+        return graph
+
+
 class ServiceNumberView(LinkedDataView):
     model = ServiceNumber
     path = '/people/servicenumbers/%s'

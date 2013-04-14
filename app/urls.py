@@ -132,6 +132,8 @@ urlpatterns += patterns('app.people.views',
     url(r'^people/(?P<person_id>\d+)/memberships/add/$', AddPersonAssociatedOrganisation.as_view(), name='personorganisation-add'),
     url(r'^people/memberships/(?P<pk>\d+)/delete/$', DeletePersonAssociatedOrganisation.as_view(), name='personorganisation-delete'),
 
+    url(r'^people/addresses/(?P<id>\d+)\.(?P<format>(html|rdf|json|ttl))/$', PersonAddressView.as_view()),
+    url(r'^people/addresses/(?P<id>\d+)/$', PersonAddressView.as_view(), name='personaddress-view'),
     url(r'^people/addresses/(?P<pk>\d+)/update/$', UpdatePersonAddress.as_view(), name='personaddress-update'),
     url(r'^people/(?P<person_id>\d+)/addresses/add/$', AddPersonAddress.as_view(), name='personaddress-add'),
     url(r'^people/addresses/(?P<pk>\d+)/delete/$', DeletePersonAddress.as_view(), name='personaddress-delete'),

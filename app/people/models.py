@@ -471,6 +471,9 @@ class PersonAddress(StandardMetadata, ShortDateMixin):
     def class_name(self):
         return self.__class__.__name__
 
+    def get_absolute_url(self):
+        return reverse('personaddress-view', args=[self.id])
+
 
 class PersonAssociatedPlace(models.Model):
     person = models.ForeignKey('Person')

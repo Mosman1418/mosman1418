@@ -125,7 +125,7 @@
                                 {% for name in person.alternativepersonname_set.all %}
                                     <li>
                                         <a href="{{ name.get_absolute_url }}">
-                                            {{ name }}
+                                            {{ name|safe }}
                                         </a>
                                         <a class="btn btn-mini" href="{% url altname-update name.id %}">Update</a>
                                     </li>
@@ -246,12 +246,12 @@
                             {% for address in person.personaddress_set.all %}
                                 <li>
                                     <a href="{{ address.get_absolute_url }}">
-                                        {{ address|safe }}
+                                        {{ address.address|safe }}
                                     </a>
                                     <a class="btn btn-mini" href="{% url personaddress-update address.id %}">Update</a>
                                 </li>
                             {% empty %}
-                                <li>No related people</li>
+                                <li>No addresses recorded</li>
                             {% endfor %}
                             </ul>
                             <a class="btn btn-small btn-primary" href="{% url personaddress-add person.id %}">Add address</a>
