@@ -4,6 +4,7 @@ from app.people.models import *
 from app.places.models import *
 from app.sources.models import *
 from django.forms.extras.widgets import SelectDateWidget
+from ckeditor.widgets import CKEditorWidget
 from calendar import monthrange
 from django.conf import settings
 from django.forms.models import inlineformset_factory
@@ -112,12 +113,8 @@ class AddPersonForm(ModelForm, DateSelectMixin):
             'death_earliest_day_known': forms.HiddenInput,
             'death_latest_month_known': forms.HiddenInput,
             'death_latest_day_known': forms.HiddenInput,
-            'biography': forms.Textarea(attrs={
-                'class': 'input-xlarge',
-                'rows': '4'}),
-            'notes': forms.Textarea(attrs={
-                'class': 'input-xlarge',
-                'rows': '4'}),
+            'biography': CKEditorWidget(attrs={'class': 'input-xlarge'}),
+            'notes': CKEditorWidget(attrs={'class': 'input-xlarge'}),
             'mosman_connection': forms.Textarea(attrs={
                 'class': 'input-xlarge',
                 'rows': '4'})

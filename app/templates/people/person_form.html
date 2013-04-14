@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 {% load guardian_tags %}
 {% block title %}Log in{% endblock %}
+{% block head_scripts %}
+<script src="{{ STATIC_URL }}ckeditor/ckeditor/ckeditor.js"></script>
+{% endblock %}
 {% block extra_scripts %}
 <script src="{{ STATIC_URL }}js/select2.min.js"></script>
 <script src="{{ STATIC_URL }}js/add-person.js"></script>
