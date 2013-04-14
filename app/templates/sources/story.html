@@ -32,7 +32,7 @@
                     {% if content.credit %}
                         <dt>Credit</dt>
                         <dd>
-                            {{ content.credit }}
+                            {{ content.credit|safe }}
                         </dd>
                     {% endif %}
                     {% if content.subjects %}
