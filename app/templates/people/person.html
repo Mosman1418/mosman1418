@@ -83,17 +83,19 @@
                     {% endif %}
                     {% if content.relationships %}
                         <dt>Relationship{{ content.relationships|pluralize }}</dt>
-                        {% for relationship in content.relationships %}
-                            <dd>
-                                <ul>
+                        <dd>
+                            <ul>
+                            {% for relationship in content.relationships %}
+
                                 {% if content.id == relationship.person.id %}
                                     <li><a href="{{ relationship.get_absolute_url }}">{{ relationship.summary.title|safe }}</a></li>
                                 {% else %}
                                     <li><a href="{{ relationship.get_absolute_url }}">{% if relationship.association.inverse_label %}{{ relationship.association.inverse_label.title }}{% else %}{{ relationship.association.label.title }}{% endif %} - {{ relationship.person }}
                                 {% endif %}</a></li>
-                                </ul>
-                            </dd>
-                        {% endfor %}
+                            {% endfor %}
+                            </ul>
+                        </dd>
+
                     {% endif %}
                     {% if content.personassociatedorganisation_set.all %}
                         <dt>Organisation{{ content.personassociatedorganisation_set.all|pluralize }}</dt>
