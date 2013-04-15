@@ -29,7 +29,7 @@
                         <p><b>Died:</b> {{ content.death_date_summary }}</p>
                         {% endif %}
                         {% if content.biography %}
-                            {{ content.biography }}
+                            {{ content.biography|safe }}
                         {% endif %}
                     </div>
                     <div class="span2">
