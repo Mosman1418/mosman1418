@@ -18,9 +18,24 @@
                     Add an organisation
                 {% endif %}
             </h2>
+            {% if form.errors %}
+    <!-- Error messaging -->
+    <div id="errors">
+        <div class="inner">
+            <p>There were some errors in the information you entered. Please correct the following:</p>
+            {{ form.non_field_errors }}
+            <ul>
+                {% for field in form %}
+                    {% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <!-- /Error messaging -->
+{% endif %}
             <form action="" method="post" class="form-horizontal">{% csrf_token %}
-                {% if 'associated_person' in form.initial %}
-                    {% with label='Associated with' field=form.associated_person %}
+                {% if 'person_organisation' in form.initial %}
+                    {% with label='Associated with' field=form.person_organisation %}
                         {% include '_form_field.html' %}
                     {% endwith %}
                 {% endif %}
@@ -35,11 +50,35 @@
                         {% include '_form_field.html' %}
                     {% endwith %}
                 </fieldset>
+                <fieldset>
+                    <legend>Dates</legend>
+                    {% with label='Start date' field=form.start_earliest_date %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                    {% with label='End date' field=form.end_earliest_date %}
+                        {% include '_form_field.html' %}
+                    {% endwith %}
+                </fieldset>
+                {% if organisation.id %}
+                    <fieldset>
+                        <legend>Sources</legend>
+                        {% url source-add-entity 'rank' rank.id as addsource %}
+                        {% with label='Sources' field=form.sources create_url=addsource create_type='source' %}
+                            {% include '_form_field.html' %}
+                        {% endwith %}
+                    </fieldset>
+                {% endif %}
                 <div class="form-actions">
-                    {% if person %}
-                        <input class="btn btn-primary" type="submit" value="Save">
+                    {% if 'person' in form.initial or 'person_organisation' in form_initial %}
+                        <input class="btn btn-primary" name="person_submit" type="submit" value="Next">
                     {% else %}
-                        <input class="btn btn-primary" type="submit" value="Next">
+                        {% if organisation.id %}
+                            <input class="btn btn-primary" name="continue" type="submit" value="Save &amp; continue editing">
+                            <input class="btn btn-primary" name="finished" type="submit" value="Finished">
+                            <a class="btn btn-primary btn-danger" href="{% url organisation-delete organisation.id %}">Delete</a>
+                        {% else %}
+                            <input class="btn btn-primary" name="next" type="submit" value="Next">
+                        {% endif %}
                     {% endif %}
                 </div>
                 </form>

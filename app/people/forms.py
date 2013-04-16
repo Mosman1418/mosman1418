@@ -228,13 +228,13 @@ class AddServiceNumberForm(ModelForm):
         exclude = ('added_by',)
 
 
-class AddOrganisationForm(ModelForm):
+class AddOrganisationForm(ShortDateForm):
     person = forms.ModelChoiceField(
         queryset=Person.objects.all(),
         required=False,
         widget=forms.Select(attrs={'readonly': 'readonly'})
     )
-    associated_person = forms.ModelChoiceField(
+    person_organisation = forms.ModelChoiceField(
         queryset=Person.objects.all(),
         required=False,
         widget=forms.Select(attrs={'readonly': 'readonly'})

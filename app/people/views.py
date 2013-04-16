@@ -976,7 +976,7 @@ class AddOrganisation(CreateView):
 
     # Use this instead the Guardian Permission mixin -
     # it doesn't seem to like CreateView
-    @method_decorator(permission_required('people.add_person'))
+    @method_decorator(permission_required('people.add_organisation'))
     def dispatch(self, *args, **kwargs):
         return super(AddOrganisation, self).dispatch(*args, **kwargs)
 
@@ -985,10 +985,11 @@ class AddOrganisation(CreateView):
         org = form.save(commit=False)
         org.added_by = self.request.user
         org.save()
+        self.object = org
         assign('people.change_organisation', self.request.user, org)
         assign('people.delete_organisation', self.request.user, org)
         person = form.cleaned_data.get('person', None)
-        associated_person = form.cleaned_data.get('associated_person', None)
+        person_organisation = form.cleaned_data.get('person_organisation', None)
         if person:
             person_org = PersonAssociatedOrganisation.objects.create(
                     person=person,
@@ -996,10 +997,10 @@ class AddOrganisation(CreateView):
                     added_by=self.request.user
                 )
             self.entity = person_org
-        elif associated_person:
-            associated_person.organisation = org
-            associated_person.save()
-            self.entity = associated_person
+        elif person_organisation:
+            person_organisation.organisation = org
+            person_organisation.save()
+            self.entity = person_organisation
         else:
             self.entity = None
         return HttpResponseRedirect(self.get_success_url())
@@ -1009,17 +1010,17 @@ class AddOrganisation(CreateView):
         entity_id = self.kwargs.get('entity_id', None)
         if entity_type == 'person':
             initial = {'person': entity_id}
-        elif entity_type == 'personaddress':
-            initial = {'associated_person': entity_id}
+        elif entity_type == 'personorganisation':
+            initial = {'person_organisation': entity_id}
         else:
             initial = {}
         return initial
 
     def get_success_url(self):
-        if self.entity:
+        if 'person_submit' in self.request.POST:
             url = reverse_lazy('personorganisation-update', args=[self.entity.id])
         else:
-            url = reverse_lazy('organisation-update', args=[self.object.id, ])
+            url = reverse_lazy('organisation-update', args=[self.object.id])
         return url
 
 
@@ -1051,7 +1052,14 @@ class UpdateOrganisation(PermissionRequiredMixin, UpdateView):
     def form_valid(self, form):
         org = form.save(commit=False)
         org.save()
-        return HttpResponseRedirect(reverse('organisation-view', args=[person.id]))
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        if 'continue' in self.request.POST:
+            url = reverse_lazy('organisation-update', args=[self.object.id])
+        else:
+            url = reverse_lazy('organisation-view', args=[self.object.id])
+        return url
 
 
 class DeleteOrganisation(PermissionRequiredMixin, DeleteView):
