@@ -1,6 +1,7 @@
-<div class="row">
+﻿{% if identifier %}
+<div class="container">
+	<div class="row">
     <div class="span8 offset2">
-        {% if identifier %}
         <p class="identifier"><small>
             Identifer: <a href="{{ identifier }}">{{ identifier }}</a> |
             <a href="{{ id_path }}.html/">HTML</a> |
@@ -8,37 +9,43 @@
             <a href="{{ id_path }}.ttl/">Turtle</a> |
             <a href="{{ id_path }}.json/">JSON</a>
         </small></p>
-        {% endif %}
+    </div>
     </div>
 </div>
-<div class="row credits">
-    <div class="span3">
-        <p><img src="{{ STATIC_URL }}img/63.png"></p>
-        <p>
-        <small>
-            Find out more on the <a href="http://mosman1914-1918.net/project/">project blog</a> or our <a href="http://www.facebook.com/mosman1418">Facebook page</a>.
-        </small>
-        </p>
+{% endif %}
+
+<footer><div class="container">
+
+	<div class="row credits1">
+    <div class="span8">
+
+        <div class="nav-off">
+	        <a href="http://mosman1914-1918.net/project/blog">Blog</a>
+			<a href="http://mosman1914-1918.net/project/events">Events</a>
+			<a href="http://mosman1914-1918.net/project/resources">Resources</a>
+			<a href="http://mosman1914-1918.net/project/subscribe">Subscribe</a>
+			<a href="http://mosman1914-1918.net/project/contact">Contact</a>
+        </div>
+
+        <p><em>To commemorate the centenary of World War One, <a href="http://www.mosman.nsw.gov.au/library">Mosman Library</a> is creating an online resource to collect and display information about the wartime experiences of local service people. <!-- But we don’t want to do it alone. Join the team and <a href="/contribute">do your bit</a>. --> </em></p>
+
+        <div class="sm">
+        <a title="Doing our bit on Facebook" href="http://facebook.com/mosman1418"><span class="facebook"></span></a><a title="#mosman1418" href="http://twitter.com/search/realtime?q=mosman1418"><span class="twitter"></span></a><a title="Doing our bit on Flickr" href="http://www.flickr.com/photos/mosmanlibrary/sets/72157630508797016/"><span class="flickr"></span></a><a title="Doing our bit on YouTube" href="http://www.youtube.com/playlist?list=PL06D5D9F17520B5EC"><span class="youtube"></span></a><a title="Email newsletter" href="http://mosman1914-1918.net/project/subscribe"><span class="subscribe"></span></a>
+        </div>
+
     </div>
-    <div class="span3">
-        <h6>Licence</h6>
-        <p>
-        <a href="http://creativecommons.org/licenses/by/3.0/"><img src="{{ STATIC_URL }}img/cc88x31.png"></a><br>
-        <small>This work is licensed under a <a href="http://creativecommons.org/licenses/by/3.0/">Creative Commons Attribution 3.0 Unported License</a>.</small>
-        </p>
+    <div class="span4">
+        <img class="DOB_logo" src="{{ STATIC_URL }}img/63.png">
     </div>
-    <div class="span3">
-        <h6>About the project</h6>
-        <p>
-        <img class="pull-right" src="{{ STATIC_URL }}img/mosman.gif">
-        <small>To commemorate the centenary of World War One, <a href="http://www.mosman.nsw.gov.au/library">Mosman Library</a> is creating an online resource to collect and display information about the wartime experiences of local service people.</small>
-        </p>
-    </div>
-    <div class="span3">
-        <h6>Doing their bit</h6>
-        <p>
-        <img class="pull-right" src="{{ STATIC_URL }}img/slnsw.gif">
-        <small>This project is supported by a State Government Library Development Grant. Thank you <a href="http://www.sl.nsw.gov.au/">SLNSW</a>.</small>
-        </p>
-    </div>
-</div>
+
+	</div>
+	<div class="row credits2">
+    	<div class="span5">
+    		<nobr><a title="Mosman Council" href="http://www.mosman.nsw.gov.au"><img src="{{ STATIC_URL }}img/logo-mc.png" /></a><a title="Mosman Library" href="http://www.mosman.nsw.gov.au/library"><img src="{{ STATIC_URL }}img/logo-ml.png" /></a><a title="State Library of NSW" href="http://sl.nsw.gov.au"><img src="{{ STATIC_URL }}img/logo-slnsw.png" /></a></nobr>
+    	</div>
+    	<div class="span7">
+    		<p><small>A project developed and managed by Mosman Library with the assistance of a State Government Library Development Grant. Licensed under a <a href="http://creativecommons.org/licenses/by/3.0/">Creative Commons Attribution 3.0 Unported License</a>.</small></p>
+    	</div>
+	</div>
+
+</div></footer>
