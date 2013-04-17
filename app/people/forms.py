@@ -113,14 +113,8 @@ class AddPersonForm(ModelForm, DateSelectMixin):
             'death_earliest_day_known': forms.HiddenInput,
             'death_latest_month_known': forms.HiddenInput,
             'death_latest_day_known': forms.HiddenInput,
-            #'biography': CKEditorWidget(attrs={'class': 'input-xlarge'}),
-            #'notes': CKEditorWidget(attrs={'class': 'input-xlarge'}),
-            'biography': forms.Textarea(attrs={
-                'class': 'input-xlarge',
-                'rows': '4'}),
-            'notes': forms.Textarea(attrs={
-                'class': 'input-xlarge',
-                'rows': '4'}),
+            'biography': CKEditorWidget(attrs={'class': 'input-xlarge'}),
+            'notes': CKEditorWidget(attrs={'class': 'input-xlarge'}),
             'mosman_connection': forms.Textarea(attrs={
                 'class': 'input-xlarge',
                 'rows': '4'})
@@ -235,7 +229,7 @@ class AddOrganisationForm(ShortDateForm):
         widget=forms.Select(attrs={'readonly': 'readonly'})
     )
     person_organisation = forms.ModelChoiceField(
-        queryset=Person.objects.all(),
+        queryset=PersonAssociatedOrganisation.objects.all(),
         required=False,
         widget=forms.Select(attrs={'readonly': 'readonly'})
     )
