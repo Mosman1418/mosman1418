@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load thumbnail %}
+{% block content %}
+<div class="row">
+    {% with current='' %}{% include '_sidenav.html' %}{% endwith %}
+    <div class="span8">
+        <h2>Server error</h2>
+    </div>
+    <div class="span2">
+
+    </div>
+</div>
+
+{% endblock %}
+{% block footer %}
+    {% include '_footer.html' %}
+{% endblock %}

@@ -10,8 +10,10 @@
                     <li class="active">People</li>
                 </ul>
                 <h1>People {% if status == 'pending' %}awaiting approval{% endif %}</h1>
-                {% alpha_browse 'people' letter %}
-                {% paginate 'people' 5 %}
+                {% if status != 'pending' %}
+                    {% alpha_browse 'people' letter %}
+                    {% paginate 'people' 5 %}
+                {% endif %}
                 <ul class="media-list">
                 {% for person in content %}
                     <li class="media">
@@ -30,7 +32,9 @@
                     </li>
                 {% endfor %}
                 </ul>
-                {% paginate 'people' 5 %}
+                {% if status != 'pending' %}
+                    {% paginate 'people' 5 %}
+                {% endif %}
             </div>
         </div>
 {% endblock %}
