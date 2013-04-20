@@ -176,6 +176,7 @@ urlpatterns += patterns('app.memorials.views',
 )
 urlpatterns += patterns('',
     url(r'^$', HomeView.as_view(), name='home'),
+    url(r'^contribute/$', ContributeView.as_view(), name='contribute'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^accounts/', include('registration.backends.default.urls')),
     (r'^ckeditor/', include('ckeditor.urls')),

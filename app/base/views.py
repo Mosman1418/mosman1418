@@ -12,3 +12,7 @@ class HomeView(TemplateView):
         context['stories'] = Story.objects.all().order_by('-date_created')[:5]
         context['image'] = Source.objects.filter(source_type__label='photograph').filter(personassociatedsource__association__label='primary topic of').order_by('?')[0]
         return context
+
+
+class ContributeView(TemplateView):
+    template_name = 'contribute.html'
