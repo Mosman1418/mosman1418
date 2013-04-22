@@ -1,37 +1,26 @@
-{% extends 'base.html' %}
+﻿{% extends 'base.html' %}
 {% load thumbnail %}
 {% block content %}
-<div class="row">
+<div class="row home-stories">
     {% with current='home' %}{% include '_sidenav.html' %}{% endwith %}
-    <div class="span7 text-center">
-            <h1 class="">&lsquo;Doing our bit&rsquo; <small></small></h1>
-            <p class="lead">Mosman 1914&ndash;1918</p>
+    <div class="span7">
+    {% for story in stories %}
+			    <a class="quote" href="{{ story.get_absolute_url }}">
+			        <blockquote class="pull-right">
+			            <p><i class="icon-quote-left icon-muted"></i> {{ story.text|striptags|truncatewords_html:20|safe }}</p>
+			            <small>contributed by {{ story.added_by }} on {{ story.date_created|date:"j F Y" }}</small>
+			        </blockquote>
+			    </a>
+    {% endfor %}
     </div>
     <div class="span3">
             {% thumbnail image.sourceimage_set.all.0.image 270x0 as im %}
             <a href="{{ image.get_absolute_url }}" title="{{ image.title }}">
                 <img class="photo" alt="{{ image.title }}" src="{{ im.url }}">
             </a>
+            <p><a class="btn btn-primary btn-block" href="{% url contribute %}">Do your bit <i class="icon-double-angle-right"></i></a></p>
     </div>
 </div>
-<div class="row home-stories">
-    <div class="span8 offset2 clearfix">
-    {% for story in stories %}
-    <a class="quote" href="{{ story.get_absolute_url }}">
-        <blockquote class="pull-right">
-            <p><i class="icon-quote-left icon-muted"></i> {{ story.text|striptags|truncatewords_html:20|safe }}</p>
-            <small>contributed by {{ story.added_by }} on {{ story.date_created|date:"j F Y" }}</small>
-        </blockquote>
-    </a>
-
-    {% endfor %}
-    </div>
-    <div class="span2">
-        <p><a class="btn btn-primary btn-block" href="{% url contribute %}">Do your bit <i class="icon-double-angle-right"></i></a></p>
-
-    </div>
-</div>
-
 {% endblock %}
 {% block footer %}
     {% include '_footer.html' %}
