@@ -4,6 +4,7 @@
 <div class="row home-stories">
     {% with current='home' %}{% include '_sidenav.html' %}{% endwith %}
     <div class="span7">
+    <h1 class="hh1">&lsquo;Doing our bit&rsquo;</h1>
     {% for story in stories %}
 			    <a class="quote" href="{{ story.get_absolute_url }}">
 			        <blockquote class="pull-right">
