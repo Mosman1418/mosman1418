@@ -1,5 +1,8 @@
-﻿<!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>    <html class="lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>    <html class="lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html> <!--<![endif]-->
   <head>
     <title>{% block page_title %}{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +11,7 @@
     <link href="{{ STATIC_URL }}css/bootstrap.min.css" rel="stylesheet">
     <link href="{{ STATIC_URL }}css/local.css" rel="stylesheet">
     <link href="{{ STATIC_URL }}css/bootstrap-responsive.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="http://mosman1914-1918.net/project/css/txp_orange.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/font-awesome.min.css">
     {% block extra_styles %}{% endblock %}
 <script type="text/javascript">
@@ -51,8 +55,9 @@
 				                <li><a href="{% url auth_logout %}">Logout</a></li>
 				            {% else %}
 				                <li><a href="{% url auth_login %}">Login</a></li>
+				                <li><a href="{% url registration_register %}">Register</a></li>
 				            {% endif %}
-				            <li><a href="{% url registration_register %}">Register</a></li>
+				                <li><a href="/contribute">Help</a></li>
 				        </ul>
 				    </li>
                 </ul>
