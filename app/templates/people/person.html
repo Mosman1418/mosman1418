@@ -2,7 +2,7 @@
 {% load guardian_tags %}
 {% load thumbnail %}
 {% block content %}
-        {% get_obj_perms request.user for content as 'perms' %}
+        {% get_obj_perms request.user for content as 'obj_perms' %}
         <div class="row">
             {% with current='people' %}{% include '_sidenav.html' %}{% endwith %}
             <div class="span8">
@@ -137,18 +137,16 @@
 
             </div>
             <div class="span2">
-                {% if 'change_person' in perms %}
                 <p>
-                    <a class="btn btn-primary btn-medium" href="{% url person-update content.id%}">Update</a>
+                    <a class="btn btn-primary btn-medium" href="{% url person-update content.id %}">Update</a>
                 </p>
-                {% endif %}
                 <p>
                     <a class="btn btn-primary btn-medium" href="{% url story-add-entity 'person' content.id%}">Add a story</a>
                 </p>
                 <p>
                     <a class="btn btn-primary btn-medium" href="{% url source-add-entity 'mainperson' content.id%}">Add a source</a>
                 </p>
-                {% if 'add_person' in perms %}
+                {% if perms.people.merge_person %}
                 <p>
                     <a class="btn btn-primary btn-medium" href="{% url person-merge content.id%}">Merge</a>
                 </p>

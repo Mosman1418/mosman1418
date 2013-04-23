@@ -606,10 +606,13 @@ class AddPerson(CreateView):
         return url
 
 
-class UpdatePerson(PermissionRequiredMixin, UpdateView):
+class UpdatePerson(UpdateView):
     form_class = UpdatePersonForm
     model = Person
-    permission_required = 'people.change_person'
+
+    @method_decorator(permission_required('people.change_person'))
+    def dispatch(self, *args, **kwargs):
+        return super(UpdatePerson, self).dispatch(*args, **kwargs)
 
     def prepare_date(self, name):
         date = getattr(self.object, name)

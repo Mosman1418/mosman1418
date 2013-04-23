@@ -104,7 +104,7 @@ class Person(GenericPerson):
 
     class Meta:
         ordering = ['family_name', 'other_names']
-        permissions = (('approve_person', 'Approve person'),)
+        permissions = (('approve_person', 'Approve person'), ('merge_person', 'Merge person'))
 
     def get_absolute_url(self):
         return reverse('person-view', args=[str(self.id)])
