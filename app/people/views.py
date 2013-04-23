@@ -895,6 +895,7 @@ class UpdateBirth(PermissionRequiredMixin, UpdateView):
 class DeleteBirth(PermissionRequiredMixin, DeleteView):
     model = Birth
     permission_required = 'people.delete_birth'
+    template_name = 'people/confirm_delete.html'
 
     def delete(self, request, *args, **kwargs):
         self.person_pk = self.get_object().person.pk
@@ -964,6 +965,7 @@ class UpdateDeath(PermissionRequiredMixin, UpdateView):
 class DeleteDeath(PermissionRequiredMixin, DeleteView):
     model = Death
     permission_required = 'people.delete_death'
+    template_name = 'people/confirm_delete.html'
 
     def delete(self, request, *args, **kwargs):
         self.person_pk = self.get_object().person.pk
