@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <!--[if lt IE 7]> <html class="lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>    <html class="lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>    <html class="lt-ie9"> <![endif]-->
@@ -55,8 +55,9 @@
 				                <li><a href="{% url auth_logout %}">Logout</a></li>
 				            {% else %}
 				                <li><a href="{% url auth_login %}">Login</a></li>
+				                <li><a href="{% url registration_register %}">Register</a></li>
 				            {% endif %}
-				            <li><a href="{% url registration_register %}">Register</a></li>
+				                <li><a href="/contribute">Help</a></li>
 				        </ul>
 				    </li>
                 </ul>
