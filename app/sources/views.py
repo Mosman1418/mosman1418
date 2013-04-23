@@ -1183,7 +1183,7 @@ class AddStory(CreateView):
 
     # Use this instead the Guardian Permission mixin -
     # it doesn't seem to like CreateView
-    @method_decorator(permission_required('source.add_story'))
+    @method_decorator(permission_required('sources.add_story'))
     def dispatch(self, *args, **kwargs):
         return super(AddStory, self).dispatch(*args, **kwargs)
 
