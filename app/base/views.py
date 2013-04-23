@@ -1,5 +1,8 @@
 # Create your views here.
 
+from registration.signals import user_activated
+from django.contrib.auth.models import Group
+
 from django.views.generic import TemplateView
 from app.sources.models import *
 
@@ -16,3 +19,11 @@ class HomeView(TemplateView):
 
 class ContributeView(TemplateView):
     template_name = 'contribute.html'
+
+
+def user_created(sender, user, request, **kwargs):
+    g = Group.objects.get(name='contributor')
+    g.user_set.add(user)
+    g.save()
+
+user_activated.connect(user_created)
