@@ -387,15 +387,16 @@ class AddSourceView(CreateView):
             defaults={
                 'title': item_details['title'],
                 'publication_date': dates['start_date']['date'],
-                'publication_date_month': dates['start_date']['month'],
-                'publication_date_day': dates['start_date']['day'],
+                'publication_date_month_known': dates['start_date']['month'],
+                'publication_date_day_known': dates['start_date']['day'],
                 'publication_date_end': dates['end_date']['date'],
-                'publication_date_end_month': dates['end_date']['month'],
-                'publication_date_end_day': dates['end_date']['day'],
+                'publication_date_end_month_known': dates['end_date']['month'],
+                'publication_date_end_day_known': dates['end_date']['day'],
                 'pages': item_details['digitised_pages'],
                 'citation': citation,
                 'url': item_url,
-                'rdf_url': 'http://dhistory.org/archives/naa/items/{}/#file'.format(barcode)
+                'rdf_url': 'http://dhistory.org/archives/naa/items/{}/#file'.format(barcode),
+                'added_by': current_user
             }
 
         )
@@ -421,6 +422,7 @@ class AddSourceView(CreateView):
             # Should perhaps log this in some way so it can be followed up.
             pass
         else:
+            print details
             website_type = SourceType.objects.get(label='website')
             webpage_type = SourceType.objects.get(label='webpage')
             moa_site, created = Source.objects.get_or_create(

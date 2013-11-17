@@ -241,6 +241,7 @@ class AddSourceForm(ModelForm, DateSelectMixin):
         rs = RSItemClient()
         rsseries = RSSeriesClient()
         item_details = rs.get_summary(barcode)
+        print item_details
         dates = item_details['contents_dates']
         citation = '{}, {}'.format(
             item_details['series'],
