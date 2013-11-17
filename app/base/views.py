@@ -4,7 +4,19 @@ from registration.signals import user_activated
 from django.contrib.auth.models import Group
 
 from django.views.generic import TemplateView
+from django.http import HttpResponse
 from app.sources.models import *
+
+import locale
+import sys
+
+
+def view_locale(request):
+    loc_info = "getlocale: " + str(locale.getlocale()) + \
+        "<br/>getdefaultlocale(): " + str(locale.getdefaultlocale()) + \
+        "<br/>fs_encoding: " + str(sys.getfilesystemencoding()) + \
+        "<br/>sys default encoding: " + str(sys.getdefaultencoding())
+    return HttpResponse(loc_info)
 
 
 class HomeView(TemplateView):
