@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import re
 import datetime
 from urllib2 import urlopen, URLError, HTTPError

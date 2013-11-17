@@ -1,6 +1,5 @@
-# Create your views here.
+# -*- coding: utf-8 -*-
 
-# Create your views here.
 from django.shortcuts import render_to_response, render
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.sites.models import Site
