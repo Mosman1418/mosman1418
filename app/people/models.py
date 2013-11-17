@@ -526,7 +526,11 @@ class PersonAssociatedOrganisation(StandardMetadata, ShortDateMixin):
         return summary
 
     def summary(self):
-        return '{} &ndash; {}'.format(self.association.label.title(), self.organisation)
+        if self.association:
+            summary = '{} &ndash; {}'.format(self.association.label.title(), self.organisation)
+        else:
+            summary = self.organisation
+        return summary
 
     def get_absolute_url(self):
         return reverse('person-membership-view', args=[str(self.id)])
