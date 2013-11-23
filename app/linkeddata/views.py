@@ -10,6 +10,9 @@ from django.contrib.sites.models import Site
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from rdflib import Graph
 from rdflib import Namespace, BNode, Literal, RDF, URIRef
+from rdflib.serializer import Serializer
+import rdfextras
+rdfextras.registerplugins()
 from django_conneg.views import ContentNegotiatedView
 from django_conneg.decorators import renderer
 
