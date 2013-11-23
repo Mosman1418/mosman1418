@@ -888,6 +888,8 @@ class AddSourceView(CreateView):
             award = 'Recommended: {}'.format(details['recommendation'])
         elif details['award']:
             award = 'Awarded: {}'.format(details['award'])
+        else:
+            award = 'Unspecified award'
         award_type = LifeEventType.objects.get(label='award')
         awarded = LifeEvent.objects.create(
             label=award,
