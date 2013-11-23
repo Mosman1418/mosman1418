@@ -1007,19 +1007,29 @@ class AddSourceView(CreateView):
                 burial_place = Place.objects.get(id=burial_place.merged_into.id)
         burial_place.sources.add(cemetery_source)
         burial_place.save()
-        if details['date_of_death']:
-            date = datetime.datetime.strptime(details['date_of_death'], '%d/%m/%Y')
-        else:
-            date = None
         death = Death.objects.create(
             person=person,
             burial_place=burial_place,
             added_by=current_user
         )
-        if date:
-            death.start_earliest_date = date
-            death.start_earliest_month = True
-            death.start_earliest_day = True
+        if details['date_of_death']:
+            try:
+                date = datetime.datetime.strptime(details['date_of_death'], '%d/%m/%Y')
+            except ValueError:
+                if 'Between ' in details['date_of_death']:
+                    dates = details['date_of_death'].replace('Between ', '').split(' and ')
+                    earliest_date = datetime.datetime.strptime(dates[0], '%d/%m/%Y')
+                    latest_date = datetime.datetime.strptime(dates[1], '%d/%m/%Y')
+                    death.start_earliest_date = earliest_date
+                    death.start_earliest_month = True
+                    death.start_earliest_day = True
+                    death.start_latest_date = latest_date
+                    death.start_latest_month = True
+                    death.start_latest_day = True
+            else:
+                death.start_earliest_date = date
+                death.start_earliest_month = True
+                death.start_earliest_day = True
         death.sources.add(source)
         death.save()
         assign('people.change_death', current_user, death)
