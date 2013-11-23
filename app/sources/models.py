@@ -2,6 +2,7 @@ import calendar
 
 from django.db import models
 from django.core.urlresolvers import reverse
+from unidecode import unidecode
 
 from app.linkeddata.models import RDFClass, RDFRelationship, RDFType
 from app.generic.models import StandardMetadata, ShortDateMixin
@@ -34,7 +35,7 @@ class Source(StandardMetadata):
     caption = models.TextField(blank=True, null=True)
 
     def __unicode__(self):
-        return '{} ({})'.format(self.title.decode('utf-8'), self.source_type)
+        return '{} ({})'.format(unidecode(self.title), self.source_type)
 
     def authors(self):
         creators = self.sourceperson_set.filter(role__label='author')
