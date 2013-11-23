@@ -34,7 +34,7 @@ class Source(StandardMetadata):
     caption = models.TextField(blank=True, null=True)
 
     def __unicode__(self):
-        return '{} ({})'.format(self.title, self.source_type)
+        return '{} ({})'.format(self.title.encode('utf-8'), self.source_type)
 
     def authors(self):
         creators = self.sourceperson_set.filter(role__label='author')
