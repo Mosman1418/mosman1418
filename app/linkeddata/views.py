@@ -8,14 +8,13 @@ from django.template import RequestContext
 from django.utils.cache import patch_vary_headers
 from django.contrib.sites.models import Site
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from rdflib import Graph, plugin
+
+from rdflib.plugin import register, Parser, Serializer
+register('json-ld', Parser, 'rdflib_jsonld.parser', 'JsonLDParser')
+register('json-ld', Serializer, 'rdflib_jsonld.serializer', 'JsonLDSerializer')
+from rdflib import Graph
 from rdflib import Namespace, BNode, Literal, RDF, URIRef
-from rdflib.serializer import Serializer
-plugin.register(
-    'json-ld',
-    Serializer,
-    'rdflib_jsonld.jsonld_serializer',
-    'JsonLDSerializer')
+
 #import rdfextras
 #rdfextras.registerplugins()
 from django_conneg.views import ContentNegotiatedView
