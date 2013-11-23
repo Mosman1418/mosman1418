@@ -26,7 +26,11 @@ from cwgctools.client import CWGCClient
 
 TROVE_API_KEY = 'ierj9cpsh7f5u7kg'
 
-YEARS = [year for year in range(1850, 2013)]
+def get_range_upper_year():
+    now = datetime.datetime.now().year
+    return now + 1
+
+YEARS = [year for year in range(1850, get_range_upper_year())]
 
 
 class NewSelectDateWidget(SelectDateWidget):

@@ -14,7 +14,11 @@ from app.generic.forms import AddEventForm, DateSelectMixin, ShortDateForm
 from app.places.forms import AddAddressForm
 
 
-YEARS = [year for year in range(1850, 2013)]
+def get_range_upper_year():
+    now = datetime.datetime.now().year
+    return now + 1
+
+YEARS = [year for year in range(1850, get_range_upper_year())]
 
 
 class NewSelectDateWidget(SelectDateWidget):
