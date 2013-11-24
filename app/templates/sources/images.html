@@ -30,7 +30,7 @@
                     {% csrf_token %}
                     <li>
                         {% if content.has_next %}
-                            <a href="/images/?page={{ content.next_page_number }}">Next</a>
+                            <a href="/images/results.html/?page={{ content.next_page_number }}">Next</a>
                         {% endif %}
                     </li>
                 </ul>
