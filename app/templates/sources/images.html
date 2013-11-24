@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load thumbnail %}
+{% load nav_extras %}
 {% block extra_scripts %}
 <script src="{{ STATIC_URL }}js/jquery.isotope.min.js"></script>
 <script src="{{ STATIC_URL }}js/jquery.infinitescroll.min.js"></script>
@@ -26,14 +27,7 @@
                     {% endwith %}
                 {% endfor %}
                     </ul>
-                <ul class="pager">
-                    {% csrf_token %}
-                    <li>
-                        {% if content.has_next %}
-                            <a href="/images/results.html/?page={{ content.next_page_number }}">Next</a>
-                        {% endif %}
-                    </li>
-                </ul>
+                    {% paginate 'image' 5 %}
             </div>
         </div>
 {% endblock %}
