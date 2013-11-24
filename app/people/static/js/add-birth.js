@@ -1,3 +1,3 @@
 $(function(){
-    $('#id_person').select2('disable');
+    $('#id_person').select2('readonly', true);
 });
