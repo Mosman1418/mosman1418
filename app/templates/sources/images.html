@@ -27,6 +27,7 @@
                 {% endfor %}
                     </ul>
                 <ul class="pager">
+                    {% csrf_token %}
                     <li>
                         {% if content.has_next %}
                             <a href="/images/?page={{ content.next_page_number }}">Next</a>
