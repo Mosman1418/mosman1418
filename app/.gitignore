@@ -1,4 +1,5 @@
 settings_local.py
 settings_prod.py
+settings_prod_old.py
 media/*
 collected_static/*
