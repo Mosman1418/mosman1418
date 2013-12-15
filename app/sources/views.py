@@ -453,16 +453,20 @@ class AddSourceView(CreateView):
             if created:
                 assign('people.change_personassociatedsource', current_user, person_source)
                 assign('people.delete_personassociatedsource', current_user, person_source)
-            person_name, created = AlternativePersonName.objects.get_or_create(
-                person=person,
-                display_name='{} {}'.format(details['other_names'], details['family_name']),
-                family_name=details['family_name'],
-                other_names=details['other_names'],
-                defaults={'added_by': current_user}
-            )
-            if created:
-                assign('people.change_alternativepersonname', current_user, person_name)
-                assign('people.delete_alternativepersonname', current_user, person_name)
+            try:
+                person_name, created = AlternativePersonName.objects.get_or_create(
+                    person=person,
+                    display_name='{} {}'.format(details['other_names'], details['family_name']),
+                    defaults={
+                        'family_name': details['family_name'],
+                        'other_names': details['other_names'],
+                        'added_by': current_user}
+                )
+                if created:
+                    assign('people.change_alternativepersonname', current_user, person_name)
+                    assign('people.delete_alternativepersonname', current_user, person_name)
+            except AlternativePersonName.MultipleObjectsReturned:
+                alt_name = AlternativePersonName.objects.filter(person=person, display_name=details['name'])[0]
             person_name.sources.add(self.object)
             person_name.save()
             birth_place, created = Place.objects.get_or_create(
@@ -586,14 +590,17 @@ class AddSourceView(CreateView):
         person = source.main_people()[0]
         details = self.form.cleaned_data['details']
         # NAMES
-        alt_name, created = AlternativePersonName.objects.get_or_create(
-            person=person,
-            display_name=details['name'],
-            defaults={'added_by': current_user}
-        )
-        if created:
-            assign('people.change_alternativepersonname', current_user, alt_name)
-            assign('people.delete_alternativepersonname', current_user, alt_name)
+        try:
+            alt_name, created = AlternativePersonName.objects.get_or_create(
+                person=person,
+                display_name=details['name'],
+                defaults={'added_by': current_user}
+            )
+            if created:
+                assign('people.change_alternativepersonname', current_user, alt_name)
+                assign('people.delete_alternativepersonname', current_user, alt_name)
+        except AlternativePersonName.MultipleObjectsReturned:
+            alt_name = AlternativePersonName.objects.filter(person=person, display_name=details['name'])[0]
         alt_name.sources.add(self.object)
         alt_name.save()
         if details['also_known_as']:
@@ -701,14 +708,17 @@ class AddSourceView(CreateView):
         details = self.form.cleaned_data['details']
         # Specific stuff
         # NAMES
-        alt_name, created = AlternativePersonName.objects.get_or_create(
-            person=person,
-            display_name=details['name'],
-            defaults={'added_by': current_user}
-        )
-        if created:
-            assign('people.change_alternativepersonname', current_user, alt_name)
-            assign('people.delete_alternativepersonname', current_user, alt_name)
+        try:
+            alt_name, created = AlternativePersonName.objects.get_or_create(
+                person=person,
+                display_name=details['name'],
+                defaults={'added_by': current_user}
+            )
+            if created:
+                assign('people.change_alternativepersonname', current_user, alt_name)
+                assign('people.delete_alternativepersonname', current_user, alt_name)
+        except AlternativePersonName.MultipleObjectsReturned:
+            alt_name = AlternativePersonName.objects.filter(person=person, display_name=details['name'])[0]
         alt_name.sources.add(self.object)
         alt_name.save()
         # DETAILS
@@ -781,14 +791,17 @@ class AddSourceView(CreateView):
         details = self.form.cleaned_data['details']
         # Specific stuff
         # NAMES
-        alt_name, created = AlternativePersonName.objects.get_or_create(
-            person=person,
-            display_name=details['name'],
-            defaults={'added_by': current_user}
-        )
-        if created:
-            assign('people.change_alternativepersonname', current_user, alt_name)
-            assign('people.delete_alternativepersonname', current_user, alt_name)
+        try:
+            alt_name, created = AlternativePersonName.objects.get_or_create(
+                person=person,
+                display_name=details['name'],
+                defaults={'added_by': current_user}
+            )
+            if created:
+                assign('people.change_alternativepersonname', current_user, alt_name)
+                assign('people.delete_alternativepersonname', current_user, alt_name)
+        except AlternativePersonName.MultipleObjectsReturned:
+            alt_name = AlternativePersonName.objects.filter(person=person, display_name=details['name'])[0]
         alt_name.sources.add(self.object)
         alt_name.save()
         # DETAILS
@@ -821,14 +834,17 @@ class AddSourceView(CreateView):
         details = self.form.cleaned_data['details']
         # Specific stuff
         # NAMES
-        alt_name, created = AlternativePersonName.objects.get_or_create(
-            person=person,
-            display_name=details['name'],
-            defaults={'added_by': current_user}
-        )
-        if created:
-            assign('people.change_alternativepersonname', current_user, alt_name)
-            assign('people.delete_alternativepersonname', current_user, alt_name)
+        try:
+            alt_name, created = AlternativePersonName.objects.get_or_create(
+                person=person,
+                display_name=details['name'],
+                defaults={'added_by': current_user}
+            )
+            if created:
+                assign('people.change_alternativepersonname', current_user, alt_name)
+                assign('people.delete_alternativepersonname', current_user, alt_name)
+        except AlternativePersonName.MultipleObjectsReturned:
+            alt_name = AlternativePersonName.objects.filter(person=person, display_name=details['name'])[0]
         alt_name.sources.add(self.object)
         alt_name.save()
         # DETAILS
@@ -919,14 +935,17 @@ class AddSourceView(CreateView):
                 person.notes = details['additional_information']
             person.save()
         # NAMES
-        alt_name, created = AlternativePersonName.objects.get_or_create(
-            person=person,
-            display_name=details['name'].title(),
-            defaults={'added_by': current_user}
-        )
-        if created:
-            assign('people.change_alternativepersonname', current_user, alt_name)
-            assign('people.delete_alternativepersonname', current_user, alt_name)
+        try:
+            alt_name, created = AlternativePersonName.objects.get_or_create(
+                person=person,
+                display_name=details['name'].title(),
+                defaults={'added_by': current_user}
+            )
+            if created:
+                assign('people.change_alternativepersonname', current_user, alt_name)
+                assign('people.delete_alternativepersonname', current_user, alt_name)
+        except AlternativePersonName.MultipleObjectsReturned:
+            alt_name = AlternativePersonName.objects.filter(person=person, display_name=details['name'])[0]
         alt_name.sources.add(self.object)
         alt_name.save()
         # DETAILS
