@@ -4,7 +4,10 @@ from django.contrib import admin
 from app.people.models import *
 
 
-admin.site.register(Person)
+class PersonAdmin(admin.ModelAdmin):
+	search_fields = ['family_name', 'other_names']
+
+admin.site.register(Person, PersonAdmin)
 admin.site.register(Organisation)
 admin.site.register(Rank)
 admin.site.register(ServiceNumber)
