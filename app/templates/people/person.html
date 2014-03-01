@@ -82,8 +82,8 @@
                             {% include '_dd_item_list.html' %}
                         {% endwith %}
                     {% endif %}
-                    {% if content.addresses %}
-                        <dt>Address{{ content.addresses.all|pluralize }}</dt>
+                    {% if content.addresses.all %}
+                        <dt>Address{{ content.addresses.all|pluralize:"es" }}</dt>
                         {% with list=content.addresses.all %}
                             {% include '_dd_item_list.html' %}
                         {% endwith %}
