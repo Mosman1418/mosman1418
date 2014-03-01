@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load guardian_tags %}
+{% block page_title %} -- {{ content }} -- Story{% endblock %}
 {% block content %}
 {% get_obj_perms user for content as 'entity_perms' %}
         <div class="row">

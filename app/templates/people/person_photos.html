@@ -4,6 +4,7 @@
 <script src="{{ STATIC_URL }}js/jquery.isotope.min.js"></script>
 <script src="{{ STATIC_URL }}js/list-images.js"></script>
 {% endblock %}
+{% block page_title %} -- {{ content }} -- Images{% endblock %}
 {% block content %}
         <div class="row">
             {% with current='people' %}{% include '_sidenav.html' %}{% endwith %}

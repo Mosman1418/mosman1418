@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load thumbnail %}
+{% block page_title %} -- {{ content.name }}{% endblock %}
 {% block content %}
         <div class="row">
             {% with current='memorials' %}{% include '_sidenav.html' %}{% endwith %}

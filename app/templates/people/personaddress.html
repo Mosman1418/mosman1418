@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load guardian_tags %}
+{% block page_title %} -- {{ content.person }} -- Address{% endblock %}
 {% block content %}
     {% get_obj_perms request.user for content as 'perms' %}
         <div class="row">

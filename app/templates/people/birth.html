@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% block page_title %} -- {{ content.person }} -- Birth{% endblock %}
 {% block content %}
         <div class="row">
             {% with current='people' %}{% include '_sidenav.html' %}{% endwith %}
