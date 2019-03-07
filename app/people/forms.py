@@ -4,7 +4,7 @@ from django.forms import ModelForm
 from app.people.models import *
 from app.places.models import *
 from app.sources.models import *
-from django.forms.extras.widgets import SelectDateWidget
+from django.forms.widgets import SelectDateWidget
 from ckeditor.widgets import CKEditorWidget
 from calendar import monthrange
 from django.conf import settings

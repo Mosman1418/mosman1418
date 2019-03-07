@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, url
 from django.contrib import admin
 from django.conf import settings
 
@@ -20,7 +20,8 @@ admin.autodiscover()
 
     # Uncomment the next line to enable the admin:
 
-urlpatterns = patterns('app.sources.views',
+# app.sources.views
+urlpatterns = [
     url(r'^sources/$', SourceListView.as_view(), name="source-list"),
     url(r'^sources/results\.(?P<format>(html|rdf|json|ttl))/$', SourceListView.as_view()),
     url(r'^sources/(?P<letter>[a-zA-Z]{1})/$', SourceListView.as_view(), name="source-alpha-list"),
@@ -46,8 +47,10 @@ urlpatterns = patterns('app.sources.views',
     url(r'^stories/add/(?P<entity_type>person)/(?P<entity_id>\d+)/$', AddStory.as_view(), name='story-add-entity'),
     url(r'^stories/(?P<pk>\d+)/update/$', UpdateStory.as_view(), name='story-update'),
     url(r'^stories/(?P<pk>\d+)/delete/$', DeleteStory.as_view(), name='story-delete'),
-)
-urlpatterns += patterns('app.people.views',
+]
+
+# app.people.views
+urlpatterns += [
     url(r'^sources/(?P<source_id>\d+)/(?P<creator_type>(author|editor))/add/$', AddPerson.as_view(), name='source-creator-add'),
     url(r'^people/$', PersonListView.as_view(), name="people-list"),
     url(r'^people/(?P<letter>[a-zA-Z]{1})/$', PersonListView.as_view(), name="people-alpha-list"),
@@ -161,8 +164,10 @@ urlpatterns += patterns('app.people.views',
     url(r'^mosmanstreets/results\.(?P<format>(html|rdf|json|ttl))/$', MosmanStreetListView.as_view()),
     url(r'^mosmanstreets/(?P<id>\d+)/$', MosmanStreetView.as_view(), name='mosmanstreet-view'),
     url(r'^mosmanstreets/(?P<id>\d+)\.(?P<format>(html|rdf|json|ttl))/$', MosmanStreetView.as_view()),
-)
-urlpatterns += patterns('app.memorials.views',
+]
+
+# app.memorials.views
+urlpatterns += [
     url(r'^memorials/$', MemorialListView.as_view(), name="memorial-list"),
     url(r'^memorials/results\.(?P<format>(html|rdf|json|ttl))/$', MemorialListView.as_view()),
     url(r'^memorials/(?P<id>\d+)\.(?P<format>(html|rdf|json|ttl))/$', MemorialView.as_view()),
@@ -173,21 +178,23 @@ urlpatterns += patterns('app.memorials.views',
     url(r'^memorials/(?P<memorial_id>\d+)/names/$', MemorialNamesView.as_view(), name='memorial-names-list'),
     url(r'^memorials/parts/(?P<part_id>\d+)/results\.(?P<format>(html|rdf|json|ttl))/$', MemorialPartNamesView.as_view()),
     url(r'^memorials/parts/(?P<part_id>\d+)/$', MemorialPartNamesView.as_view(), name='memorial-part-names-list'),
-)
-urlpatterns += patterns('',
+]
+
+urlpatterns += [
     url(r'^$', HomeView.as_view(), name='home'),
     url(r'^locale/$', 'app.base.views.view_locale'),
     url(r'^contribute/$', ContributeView.as_view(), name='contribute'),
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^accounts/', include('registration.backends.default.urls')),
+    url(r'^accounts/', include('django_registration.backends.default.urls')),
     (r'^ckeditor/', include('ckeditor.urls')),
     #url(r'^', include('cms.urls')),
     #url(r'^', include('filer.server.urls')),
-)
+]
 
-urlpatterns += patterns("",
+
+urlpatterns += [
     url(r"^select2/", include("django_select2.urls")),
-)
+]
 
 if settings.DEBUG:
     urlpatterns = patterns('',

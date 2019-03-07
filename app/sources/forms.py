@@ -16,7 +16,7 @@ from app.sources.models import *
 from app.people.models import *
 from app.generic.forms import DateSelectMixin, ShortDateForm
 
-from django.forms.extras.widgets import SelectDateWidget
+from django.forms.widgets import SelectDateWidget
 from calendar import monthrange
 
 from rstools.client import RSItemClient, RSSeriesClient

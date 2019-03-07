@@ -1,4 +1,4 @@
-from registration.signals import user_activated
+from django_registration.signals import user_activated
 from django.dispatch import receiver
 from django.contrib.auth.models import Group
 

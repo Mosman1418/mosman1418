@@ -10,3 +10,10 @@ img
 js
 less
 moatools
+
+# VScode Editor
+.history
+.vscode/
+
+# Don't ever push settings_prod in git repo
+settings_prod.py

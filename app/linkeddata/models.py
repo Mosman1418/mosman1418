@@ -12,7 +12,7 @@ class RDFSchema(models.Model):
 
 
 class RDFProperty(models.Model):
-    schema = models.ForeignKey('RDFSchema')
+    schema = models.ForeignKey('RDFSchema', on_delete=models.CASCADE)
     rdf_property = models.CharField(max_length=50)
     inverse_rdf_property = models.CharField(max_length=50, blank=True, null=True)
 
@@ -21,7 +21,7 @@ class RDFProperty(models.Model):
 
 
 class RDFClass(models.Model):
-    schema = models.ForeignKey('RDFSchema')
+    schema = models.ForeignKey('RDFSchema', on_delete=models.CASCADE)
     rdf_class = models.CharField(max_length=50)
 
     def __unicode__(self):

@@ -1,5 +1,5 @@
 from django.db import models
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from app.generic.models import Place as GenericPlace, StandardMetadata
 
@@ -12,7 +12,7 @@ class Place(GenericPlace):
     country = models.CharField(max_length=50, blank=True)
     geonames_id = models.IntegerField(blank=True, null=True)
     sources = models.ManyToManyField('sources.Source', blank=True, null=True)
-    merged_into = models.ForeignKey('places.Place', blank=True, null=True)
+    merged_into = models.ForeignKey('places.Place', on_delete=models.CASCADE, blank=True, null=True)
 
     def __unicode__(self):
         if not self.place_name:
@@ -49,8 +49,8 @@ class Address(StandardMetadata):
     building_name = models.CharField(max_length=250, blank=True)
     street_name = models.CharField(max_length=250, blank=True)
     street_number = models.CharField(max_length=250, blank=True)
-    mosman_street = models.ForeignKey('places.MosmanStreet', null=True, blank=True)
-    place = models.ForeignKey('places.Place', null=True, blank=True)
+    mosman_street = models.ForeignKey('places.MosmanStreet', on_delete=models.CASCADE, null=True, blank=True)
+    place = models.ForeignKey('places.Place', on_delete=models.CASCADE, null=True, blank=True)
 
     def __unicode__(self):
         if self.mosman_street:

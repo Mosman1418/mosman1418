@@ -7,7 +7,7 @@ import json
 from django.http import HttpResponse, HttpResponseRedirect
 from guardian.decorators import permission_required
 from guardian.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.core.urlresolvers import reverse, reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.contrib.contenttypes.models import ContentType
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
@@ -15,7 +15,7 @@ from django.views.generic import ListView
 from django.utils.decorators import method_decorator
 from calendar import monthrange
 import re
-from urllib2 import Request, urlopen, URLError, HTTPError
+from urllib.request import Request, urlopen, URLError, HTTPError
 from bs4 import BeautifulSoup
 import mechanize
 
@@ -602,7 +602,7 @@ class AddPerson(CreateView):
             url = reverse_lazy('source-update', args=[source.id])
         else:
             url = reverse_lazy('person-update', args=[self.object.id])
-        print url
+        print (url)
         return url
 
 

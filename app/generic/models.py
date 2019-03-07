@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 class StandardMetadata(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
-    added_by = models.ForeignKey(User)
+    added_by = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def class_name(self):
         return self.__class__.__name__
