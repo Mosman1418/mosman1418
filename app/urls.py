@@ -1,6 +1,7 @@
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.conf import settings
+from django.conf.urls.static import static
 
 from app.people.views import *
 from app.sources.views import *
@@ -179,14 +180,13 @@ urlpatterns += [
     url(r'^memorials/parts/(?P<part_id>\d+)/results\.(?P<format>(html|rdf|json|ttl))/$', MemorialPartNamesView.as_view()),
     url(r'^memorials/parts/(?P<part_id>\d+)/$', MemorialPartNamesView.as_view(), name='memorial-part-names-list'),
 ]
-
 urlpatterns += [
     url(r'^$', HomeView.as_view(), name='home'),
-    url(r'^locale/$', 'app.base.views.view_locale'),
+    url(r'^locale/$', view_locale),
     url(r'^contribute/$', ContributeView.as_view(), name='contribute'),
-    url(r'^admin/', include(admin.site.urls)),
-    url(r'^accounts/', include('django_registration.backends.default.urls')),
-    (r'^ckeditor/', include('ckeditor.urls')),
+    url(r'^admin/', admin.site.urls), 
+    url(r'^accounts/', include('django_registration.backends.activation.urls')),
+    url(r'^ckeditor/', include('ckeditor_uploader.urls')),
     #url(r'^', include('cms.urls')),
     #url(r'^', include('filer.server.urls')),
 ]
@@ -197,8 +197,10 @@ urlpatterns += [
 ]
 
 if settings.DEBUG:
-    urlpatterns = patterns('',
-    url(r'^media/(?P<path>.*)$', 'django.views.static.serve',
-        {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
-    url(r'', include('django.contrib.staticfiles.urls')),
-) + urlpatterns
+    urlpatterns = static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + urlpatterns
+    # urlpatterns = [
+        
+    # url(r'^media/(?P<path>.*)$', 'django.views.static.serve',
+    #     {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
+    # url(r'', include('django.contrib.staticfiles.urls')),
+    #  ] + urlpatterns

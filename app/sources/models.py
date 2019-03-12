@@ -156,7 +156,7 @@ class SourceImage(models.Model):
 
 class SourcePerson(models.Model):
     source = models.ForeignKey(Source, on_delete=models.CASCADE)
-    person = models.ForeignKey('people.Person', on_delete=models.CASCADE)
+    person = models.ForeignKey('people.Person', null=True, on_delete=models.CASCADE)
     role = models.ForeignKey('SourceRole', on_delete=models.CASCADE)
 
     def __unicode__(self):

@@ -11,7 +11,7 @@ class Place(GenericPlace):
     state = models.CharField(max_length=50, blank=True)
     country = models.CharField(max_length=50, blank=True)
     geonames_id = models.IntegerField(blank=True, null=True)
-    sources = models.ManyToManyField('sources.Source', blank=True, null=True)
+    sources = models.ManyToManyField('sources.Source', blank=True)
     merged_into = models.ForeignKey('places.Place', on_delete=models.CASCADE, blank=True, null=True)
 
     def __unicode__(self):

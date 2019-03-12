@@ -5,12 +5,12 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.sites.models import Site
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.http import HttpResponse, HttpResponseRedirect
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.auth.models import User
 from guardian.decorators import permission_required
 from guardian.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.utils.decorators import method_decorator
-from django.core.urlresolvers import reverse, reverse_lazy
+from django.urls import reverse, reverse_lazy
 
 from guardian.shortcuts import assign
 
@@ -421,7 +421,7 @@ class AddSourceView(CreateView):
             # Should perhaps log this in some way so it can be followed up.
             pass
         else:
-            print details
+            print (details)
             website_type = SourceType.objects.get(label='website')
             webpage_type = SourceType.objects.get(label='webpage')
             moa_site, created = Source.objects.get_or_create(

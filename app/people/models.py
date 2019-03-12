@@ -172,7 +172,7 @@ class AlternativePersonName(StandardMetadata):
     display_name = models.CharField(max_length=250)
     nickname = models.CharField(max_length=100, blank=True)
     sources = models.ManyToManyField('sources.Source', blank=True, null=True)
-    memorials = models.ManyToManyField('memorials.Memorial', blank=True, null=True)
+    memorials = models.ManyToManyField('memorials.Memorial', blank=True)
 
     def __unicode__(self):
         display = 'Recorded name &ndash; '

@@ -32,7 +32,7 @@ class RDFRelationship(models.Model):
     '''Generic relationship.'''
     label = models.CharField(max_length=50)
     inverse_label = models.CharField(max_length=50, blank=True, null=True)
-    rdf_property = models.ManyToManyField('linkeddata.RDFProperty', blank=True, null=True)
+    rdf_property = models.ManyToManyField('linkeddata.RDFProperty', blank=True)
 
     def __unicode__(self):
         return self.label
@@ -44,7 +44,7 @@ class RDFRelationship(models.Model):
 class RDFType(models.Model):
     '''Generic type.'''
     label = models.CharField(max_length=50)
-    rdf_class = models.ManyToManyField('linkeddata.RDFClass', blank=True, null=True)
+    rdf_class = models.ManyToManyField('linkeddata.RDFClass', blank=True)
 
     def __unicode__(self):
         return self.label

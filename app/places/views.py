@@ -1,7 +1,7 @@
 # Create your views here.
 
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
-from django.core.urlresolvers import reverse, reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.http import HttpResponse, HttpResponseRedirect
 from rdflib import Graph
 from rdflib import Namespace, BNode, Literal, RDF, URIRef
