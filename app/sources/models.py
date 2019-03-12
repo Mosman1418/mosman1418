@@ -13,7 +13,7 @@ from app.generic.models import StandardMetadata, ShortDateMixin
 class Source(StandardMetadata):
     title = models.TextField(blank=True, null=True)
     source_type = models.ForeignKey('SourceType', on_delete=models.CASCADE, blank=True, null=True)  # include rdf?
-    creators = models.ManyToManyField('people.Person', through='SourcePerson', blank=True, null=True)
+    creators = models.ManyToManyField('people.Person', through='SourcePerson', blank=True)
     publisher = models.CharField(max_length=100, blank=True, null=True)
     publication_place = models.CharField(max_length=100, blank=True, null=True)
     publication_date = models.DateField(blank=True, null=True)
@@ -130,7 +130,7 @@ class Story(StandardMetadata, ShortDateMixin):
     title = models.CharField(max_length=200)
     text = models.TextField()
     credit = models.TextField(blank=True, null=True)
-    sources = models.ManyToManyField('sources.Source', blank=True, null=True)
+    sources = models.ManyToManyField('sources.Source', blank=True)
 
     def subjects(self):
         people = list(self.person_set.all())
