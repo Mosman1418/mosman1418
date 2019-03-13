@@ -1,6 +1,6 @@
 import string
 from django import template
-from django.core.urlresolvers import reverse, reverse_lazy
+from django.urls import reverse, reverse_lazy
 
 register = template.Library()
 

@@ -186,6 +186,7 @@ urlpatterns += [
     url(r'^contribute/$', ContributeView.as_view(), name='contribute'),
     url(r'^admin/', admin.site.urls), 
     url(r'^accounts/', include('django_registration.backends.activation.urls')),
+    url(r'^accounts/', include('django.contrib.auth.urls')),
     url(r'^ckeditor/', include('ckeditor_uploader.urls')),
     #url(r'^', include('cms.urls')),
     #url(r'^', include('filer.server.urls')),

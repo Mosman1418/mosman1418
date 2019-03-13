@@ -14,13 +14,13 @@
 			    </a>
     {% endfor %}
     </div>
-    <div class="span3">
+    {% comment %} <div class="span3">
             {% thumbnail image.sourceimage_set.all.0.image 270x0 as im %}
             <a href="{{ image.get_absolute_url }}" title="{{ image.title }}">
                 <img class="photo" alt="{{ image.title }}" src="{{ im.url }}">
             </a>
             <p><a class="btn btn-primary btn-block" href="{% url contribute %}">Do your bit <i class="icon-double-angle-right"></i></a></p>
-    </div>
+    </div> {% endcomment %}
 </div>
 {% endblock %}
 {% block footer %}
