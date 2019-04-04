@@ -8,8 +8,8 @@
             <div class="span8">
                 <ul class="breadcrumb hidden-phone">
                     <li><a href="/">Home</a> <span class="divider">/</span></li>
-                    <li><a href="{% url place-list %}">Places</a> <span class="divider">/</span></li>
-                    <li><a href="{% url address-list %}">Addresses</a> <span class="divider">/</span></li>
+                    <li><a href="{% url 'place-list' %}">Places</a> <span class="divider">/</span></li>
+                    <li><a href="{% url 'address-list' %}">Addresses</a> <span class="divider">/</span></li>
                     <li class="active">{{ content }}</li>
                 </ul>
                 <h2>{{ content }}</h2>
@@ -40,7 +40,7 @@
                             <ul>
                             {% for person in content.personaddress_set.all %}
                                     <li>
-                                        <a href="{% url person-view  person.person.id %}">
+                                        <a href="{% url 'person-view'  person.person.id %}">
                                             {{ person.person }}
                                         </a>
                                     </li>

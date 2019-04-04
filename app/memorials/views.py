@@ -52,6 +52,16 @@ class MemorialNamesView(LinkedDataListView):
         context['memorial'] = Memorial.objects.get(id=memorial_id)
         self.path = self.path.format(memorial_id,
                                      '{}/'.format(letter) if letter else '')
+        if format is None:
+            format = 'html'
+            full_url = request.get_full_path()
+            if '.ttl' in full_url:
+                format = 'ttl'
+            elif '.json' in full_url:
+                format = 'json'
+            elif '.rdf' in full_url:
+                format = 'rdf'
+                
         if format:
             order_by = request.GET.get('order_by', 'position')
             results = self.model.objects.select_related().filter(memorial=memorial_id)
@@ -96,6 +106,7 @@ class MemorialPartNamesView(LinkedDataListView):
     template_name = 'memorials/memorial_part'
 
     def get(self, request, part_id, letter=None, format=None):
+
         context = {}
         queries_without_page = request.GET.copy()
         if 'page' in queries_without_page:

@@ -14,7 +14,7 @@ class Place(GenericPlace):
     sources = models.ManyToManyField('sources.Source', blank=True)
     merged_into = models.ForeignKey('places.Place', on_delete=models.CASCADE, blank=True, null=True)
 
-    def __unicode__(self):
+    def __str__(self):
         if not self.place_name:
             summary = self.display_name
         else:
@@ -52,7 +52,7 @@ class Address(StandardMetadata):
     mosman_street = models.ForeignKey('places.MosmanStreet', on_delete=models.CASCADE, null=True, blank=True)
     place = models.ForeignKey('places.Place', on_delete=models.CASCADE, null=True, blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         if self.mosman_street:
             street = self.mosman_street.street_name.strip()
         elif self.street_name:
@@ -77,7 +77,7 @@ class MosmanStreet(models.Model):
     street_name = models.CharField(max_length=250, blank=True)
     bounding_box = models.CharField(max_length=250, blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.street_name
 
     def get_absolute_url(self):

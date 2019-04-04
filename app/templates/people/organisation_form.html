@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 {% block title %}Log in{% endblock %}
 {% block extra_scripts %}
-<script src="{{ STATIC_URL }}js/select2.min.js"></script>
-<script src="{{ STATIC_URL }}js/add-person.js"></script>
+<script src="{% static 'js/select2.min.js' %}"></script>
+<script src="{% static 'js/add-person.js' %}"></script>
 {% endblock %}
 {% block extra_styles %}
-<link href="{{ STATIC_URL }}css/select2.css" rel="stylesheet">
+<link href="{% static 'css/select2.css' %}" rel="stylesheet">
 {% endblock %}
 {% block content %}
     <div class="row">
@@ -62,7 +62,7 @@
                 {% if organisation.id %}
                     <fieldset>
                         <legend>Sources</legend>
-                        {% url source-add-entity 'rank' rank.id as addsource %}
+                        {% url 'source-add-entity' 'rank' rank.id as addsource %}
                         {% with label='Sources' field=form.sources create_url=addsource create_type='source' %}
                             {% include '_form_field.html' %}
                         {% endwith %}
@@ -75,7 +75,7 @@
                         {% if organisation.id %}
                             <input class="btn btn-primary" name="continue" type="submit" value="Save &amp; continue editing">
                             <input class="btn btn-primary" name="finished" type="submit" value="Finished">
-                            <a class="btn btn-primary btn-danger" href="{% url organisation-delete organisation.id %}">Delete</a>
+                            <a class="btn btn-primary btn-danger" href="{% url 'organisation-delete' organisation.id %}">Delete</a>
                         {% else %}
                             <input class="btn btn-primary" name="next" type="submit" value="Next">
                         {% endif %}

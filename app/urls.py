@@ -1,4 +1,5 @@
-from django.conf.urls import include, url
+from django.urls import include, re_path
+from django.conf.urls import url
 from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
@@ -23,7 +24,7 @@ admin.autodiscover()
 
 # app.sources.views
 urlpatterns = [
-    url(r'^sources/$', SourceListView.as_view(), name="source-list"),
+    re_path(r'^sources/$', SourceListView.as_view(), name="source-list"),
     url(r'^sources/results\.(?P<format>(html|rdf|json|ttl))/$', SourceListView.as_view()),
     url(r'^sources/(?P<letter>[a-zA-Z]{1})/$', SourceListView.as_view(), name="source-alpha-list"),
     url(r'^sources/(?P<letter>[a-zA-Z]{1})/results\.(?P<format>(html|rdf|json|ttl))/$', SourceListView.as_view()),
@@ -170,9 +171,10 @@ urlpatterns += [
 # app.memorials.views
 urlpatterns += [
     url(r'^memorials/$', MemorialListView.as_view(), name="memorial-list"),
+    url(r'^memorials/results/$', MemorialListView.as_view(), name="memorial-list"),
     url(r'^memorials/results\.(?P<format>(html|rdf|json|ttl))/$', MemorialListView.as_view()),
-    url(r'^memorials/(?P<id>\d+)\.(?P<format>(html|rdf|json|ttl))/$', MemorialView.as_view()),
     url(r'^memorials/(?P<id>\d+)/$', MemorialView.as_view(), name='memorial-view'),
+    url(r'^memorials/(?P<id>\d+)\.(?P<format>(html|rdf|json|ttl))/$', MemorialView.as_view(), name='memorial-view'),
     url(r'^memorials/(?P<id>\d+)/photos\.(?P<format>(html|rdf|json|ttl))/$', MemorialPhotosView.as_view()),
     url(r'^memorials/(?P<id>\d+)/photos/$', MemorialPhotosView.as_view(), name='memorial-photos-view'),
     url(r'^memorials/(?P<memorial_id>\d+)/names/results\.(?P<format>(html|rdf|json|ttl))/$', MemorialNamesView.as_view()),

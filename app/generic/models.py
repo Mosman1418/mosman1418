@@ -76,7 +76,7 @@ class Thing(StandardMetadata):
     class Meta:
         abstract = True
 
-    def __unicode__(self):
+    def __str__(self):
         return self.label
 
 
@@ -126,7 +126,7 @@ class Person(StandardMetadata):
     def death_latest(self):
         return self.formatted_date('death_latest')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.display_name
 
 
@@ -137,7 +137,7 @@ class Group(StandardMetadata, ShortDateMixin):
     class Meta:
         abstract = True
 
-    def __unicode__(self):
+    def __str__(self):
         return self.display_name
 
 
@@ -150,7 +150,7 @@ class Place(StandardMetadata):
     class Meta:
         abstract = True
 
-    def __unicode__(self):
+    def __str__(self):
         return self.display_name
 
 
@@ -158,7 +158,7 @@ class Event(StandardMetadata, LongDateMixin):
     label = models.CharField(max_length=250, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.label
 
     class Meta:
@@ -177,7 +177,7 @@ class URI(StandardMetadata):
     uri = models.URLField()
     uri_type = models.CharField(max_length=20, choices=URI_TYPES, default='html')
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s (%s)' % (self.uri, self.uri_type)
 
     class Meta:

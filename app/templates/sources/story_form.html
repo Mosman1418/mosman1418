@@ -43,7 +43,7 @@
                 {% if story.id %}
                     <fieldset>
                         <legend>Sources</legend>
-                        {% url source-add-entity 'story' story.id as addsource %}
+                        {% url 'source-add-entity' 'story' story.id as addsource %}
                         {% with label='Sources' field=form.sources create_url=addsource create_type='source' %}
                             {% include '_form_field.html' %}
                         {% endwith %}
@@ -53,7 +53,7 @@
                     {% if story.id %}
                         <input class="btn btn-primary" name="continue" type="submit" value="Save &amp; continue editing">
                         <input class="btn btn-primary" name="finished" type="submit" value="Finished">
-                        <a class="btn btn-primary btn-danger" href="{% url story-delete story.id %}">Delete</a>
+                        <a class="btn btn-primary btn-danger" href="{% url 'story-delete' story.id %}">Delete</a>
                     {% else %}
                         <input class="btn btn-primary" name="next" type="submit" value="Next">
                     {% endif %}

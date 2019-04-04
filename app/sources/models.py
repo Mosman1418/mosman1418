@@ -34,7 +34,7 @@ class Source(StandardMetadata):
     json_url = models.URLField(blank=True, null=True)
     caption = models.TextField(blank=True, null=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return '{} ({})'.format(unidecode(self.title), self.source_type)
 
     def authors(self):
@@ -137,7 +137,7 @@ class Story(StandardMetadata, ShortDateMixin):
         organisations = list(self.organisation_set.all())
         return people + organisations
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     def get_absolute_url(self):
@@ -159,7 +159,7 @@ class SourcePerson(models.Model):
     person = models.ForeignKey('people.Person', null=True, on_delete=models.CASCADE)
     role = models.ForeignKey('SourceRole', on_delete=models.CASCADE)
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s - %s - %s' % (self.source, self.role, self.person)
 
 

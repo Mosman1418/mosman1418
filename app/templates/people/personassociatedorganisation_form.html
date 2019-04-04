@@ -1,9 +1,10 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load django_select2_tags %}
 {% block title %}Log in{% endblock %}
 {% block extra_scripts %}
 {% import_django_select2_js %}
-<script src="{{ STATIC_URL }}js/add-birth.js"></script>
+<script src="{% static 'js/add-birth.js' %}"></script>
 {% endblock %}
 {% block extra_styles %}
 {% import_django_select2_css %}
@@ -19,9 +20,9 @@
                     {% include '_form_field.html' %}
                 {% endwith %}
                 {% if 'person' in form.initial.keys %}
-                    {% url organisation-add-entity 'person' form.initial.person as addorg %}
+                    {% url 'organisation-add-entity' 'person' form.initial.person as addorg %}
                 {% elif personassociatedorganisation.id %}
-                    {% url organisation-add-entity 'personorganisation' personassociatedorganisation.id as addorg %}
+                    {% url 'organisation-add-entity' 'personorganisation' personassociatedorganisation.id as addorg %}
                 {% endif %}
                 {% with label='Organisation' field=form.organisation create_url=addorg create_type='organisation' %}
                     {% include '_form_field.html' %}
@@ -45,7 +46,7 @@
                     </fieldset>
                     <fieldset>
                         <legend>Sources</legend>
-                        {% url source-add-entity 'membership' personassociatedorganisation.id as addsource %}
+                        {% url 'source-add-entity' 'membership' personassociatedorganisation.id as addsource %}
                         {% with label='Sources' field=form.sources create_url=addsource create_type='source' %}
                             {% include '_form_field.html' %}
                         {% endwith %}
@@ -55,7 +56,7 @@
                     {% if personassociatedorganisation.id %}
                         <input class="btn btn-primary" name="continue" type="submit" value="Save &amp; continue editing">
                         <input class="btn btn-primary" name="finished" type="submit" value="Finished">
-                        <a class="btn btn-primary btn-danger" href="{% url personorganisation-delete personassociatedorganisation.id %}">Delete</a>
+                        <a class="btn btn-primary btn-danger" href="{% url 'personorganisation-delete' personassociatedorganisation.id %}">Delete</a>
                     {% else %}
                         <input class="btn btn-primary" name="next" type="submit" value="Next">
                     {% endif %}

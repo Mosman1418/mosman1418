@@ -18,7 +18,7 @@ class Memorial(StandardMetadata):
     associated_objects = models.ManyToManyField('objects.Object', through='MemorialAssociatedObject')
     associated_sources = models.ManyToManyField('sources.Source', through='MemorialAssociatedSource')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def main_sources(self):
@@ -47,7 +47,7 @@ class MemorialPart(StandardMetadata):
     description = models.TextField(blank=True)
     inscription = models.TextField(blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.label
 
     def get_absolute_url(self):
@@ -71,7 +71,7 @@ class MemorialName(StandardMetadata):
     person = models.ForeignKey('people.Person', on_delete=models.CASCADE, blank=True, null=True)
     notes = models.TextField(blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def position(self):
@@ -88,8 +88,8 @@ class MemorialAssociatedPerson(models.Model):
     person = models.ForeignKey('people.Person', on_delete=models.CASCADE,)
     association = models.ForeignKey('MemorialAssociation', on_delete=models.CASCADE,)
 
-    def __unicode__(self):
-        return self.person.__unicode__()
+    def __str__(self):
+        return self.person.__str__()
 
 
 class MemorialAssociatedOrganisation(models.Model):
@@ -97,8 +97,8 @@ class MemorialAssociatedOrganisation(models.Model):
     organisation = models.ForeignKey('people.Organisation', on_delete=models.CASCADE)
     association = models.ForeignKey('MemorialAssociation', on_delete=models.CASCADE)
 
-    def __unicode__(self):
-        return self.organisation.__unicode__()
+    def __str__(self):
+        return self.organisation.__str__()
 
 
 class MemorialAssociatedEvent(models.Model):
@@ -106,8 +106,8 @@ class MemorialAssociatedEvent(models.Model):
     event = models.ForeignKey('events.Event', on_delete=models.CASCADE)
     association = models.ForeignKey('MemorialAssociation', on_delete=models.CASCADE)
 
-    def __unicode__(self):
-        return self.event.__unicode__()
+    def __str__(self):
+        return self.event.__str__()
 
 
 class MemorialAssociatedPlace(models.Model):
@@ -115,8 +115,8 @@ class MemorialAssociatedPlace(models.Model):
     place = models.ForeignKey('places.Place', on_delete=models.CASCADE)
     association = models.ForeignKey('MemorialPlaceAssociation', on_delete=models.CASCADE)
 
-    def __unicode__(self):
-        return self.place.__unicode__()
+    def __str__(self):
+        return self.place.__str__()
 
 
 class MemorialAssociatedObject(models.Model):
@@ -124,8 +124,8 @@ class MemorialAssociatedObject(models.Model):
     object = models.ForeignKey('objects.Object', on_delete=models.CASCADE)
     association = models.ForeignKey('MemorialAssociation', on_delete=models.CASCADE)
 
-    def __unicode__(self):
-        return self.object.__unicode__()
+    def __str__(self):
+        return self.object.__str__()
 
 
 class MemorialAssociatedSource(models.Model):
@@ -133,15 +133,15 @@ class MemorialAssociatedSource(models.Model):
     source = models.ForeignKey('sources.Source', on_delete=models.CASCADE)
     association = models.ForeignKey('MemorialSourceAssociation', on_delete=models.CASCADE)
 
-    def __unicode__(self):
-        return self.source.__unicode__()
+    def __str__(self):
+        return self.source.__str__()
 
 
 class MemorialSourceAssociation(models.Model):
     label = models.CharField(max_length=50, blank=True, null=True)
     rdf_property = models.ManyToManyField(RDFProperty, blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.label
 
 
@@ -149,7 +149,7 @@ class MemorialPlaceAssociation(models.Model):
     label = models.CharField(max_length=50, blank=True, null=True)
     rdf_property = models.ManyToManyField(RDFProperty, blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.label
 
 
@@ -157,5 +157,5 @@ class MemorialAssociation(models.Model):
     label = models.CharField(max_length=50, blank=True, null=True)
     rdf_property = models.ManyToManyField(RDFProperty, blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.label
