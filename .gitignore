@@ -1,15 +1,15 @@
 *.pyc
-rstools
+# rstools
 admin
-awmtools
+# awmtools
 ckeditor
 css
-cwgctools
+# cwgctools
 django_extensions
 img
 js
 less
-moatools
+# moatools
 
 # VScode Editor
 .history
