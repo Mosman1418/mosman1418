@@ -6,8 +6,7 @@
         
     </div>
     {% with current='home' %}{% include '_sidenav.html' %}{% endwith %}
-    {% comment %} <div class="span3"><img src="/media/images/Solider.Nurse.png"/></div> {% endcomment %}
-    <div class="span3"><img src="http://mosman1914-1918.net/media/images/Solider.Nurse.png"/></div>
+    <div class="span3"><img src="/media/images/Solider.Nurse.png"/></div> 
     <div class="span4">
     <h1 class="hh1">&lsquo;Doing our bit&rsquo;</h1>
     <!--{% for story in stories %}
@@ -21,20 +20,13 @@
     <p style="text-align: center;">Over 1500 men and women enlisted during the First World War. What are their stories? To commemorate the centenary of World War One, Mosman Library Service has created an online resource to collect and display information about the wartime experiences of local service people.</p>
     <p class="home-stories-btn" style="width: 270px; float: right"><a class="btn btn-primary btn-block" href="{% url 'contribute' %}">Do your bit <i class="icon-double-angle-right"></i></a></p>
     </div>
-    <div class="span3">
-            
-            <a href="/sources/1517/" title="Informal outdoor portrait of four 1st Battalion officers.">
-                <img class="photo" alt="Informal outdoor portrait of four 1st Battalion officers." src="http://mosman1914-1918.net/media/images/P07973.016.JPG.270x0_q85.jpg">
-            </a>
-            <!--<p style="width:270px;"><a class="btn btn-primary btn-block" href="/contribute/">Do your bit <i class="icon-double-angle-right"></i></a></p>-->
-    </div>
-    {% comment %} <div class="span3" class="home-stories-img-feed" >
+    <div class="span3" class="home-stories-img-feed" >
             {% thumbnail image.sourceimage_set.all.0.image 270x0 as im %}
             <a href="{{ image.get_absolute_url }}" title="{{ image.title }}">
                 <img class="photo" alt="{{ image.title }}" src="{{ im.url }}">
             </a>
             <!--<p style="width:270px;"><a class="btn btn-primary btn-block" href="{% url contribute %}">Do your bit <i class="icon-double-angle-right"></i></a></p>-->
-    </div> {% endcomment %}
+    </div>
 </div>
 {% endblock %}
 {% block footer %}
