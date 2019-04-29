@@ -1,5 +1,5 @@
 # Create your views here.
-
+from django.contrib.sites.models import Site
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
 from django.urls import reverse, reverse_lazy
 from django.http import HttpResponse, HttpResponseRedirect
