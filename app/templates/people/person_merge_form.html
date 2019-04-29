@@ -1,11 +1,10 @@
 {% extends 'base.html' %}
-{% load django_select2_tags %}
 {% block title %}Log in{% endblock %}
 {% block extra_scripts %}
-{% import_django_select2_js %}
+<script src="{% static 'js/select2.min.js' %}"></script>
 {% endblock %}
 {% block extra_styles %}
-{% import_django_select2_css %}
+<link href="{% static 'css/select2.css' %}" type="text/css" media="screen" rel="stylesheet" />
 {% endblock %}
 {% block content %}
     <div class="row">

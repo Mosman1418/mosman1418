@@ -1,15 +1,12 @@
 {% extends 'base.html' %}
 {% load static %}
-{% comment %} {% load django_select2_tags %} {% endcomment %}
 {% block title %}Log in{% endblock %}
 {% block extra_scripts %}
-{{form.media.js}}
-{% comment %} {% import_django_select2_js %} {% endcomment %}
+<script src="{% static 'js/select2.min.js' %}"></script>
 <script src="{% static 'js/add-event.js' %}"></script>
 {% endblock %}
 {% block extra_styles %}
-{{form.media.css}}
-{% comment %} {% import_django_select2_css %} {% endcomment %}
+<link href="{% static 'css/select2.css' %}" type="text/css" media="screen" rel="stylesheet" />
 {% endblock %}
 {% block content %}
     <div class="row">
