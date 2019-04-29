@@ -1,10 +1,11 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load thumbnail %}
 {% load nav_extras %}
 {% block extra_scripts %}
-<script src="{{ STATIC_URL }}js/jquery.isotope.min.js"></script>
-<script src="{{ STATIC_URL }}js/jquery.infinitescroll.min.js"></script>
-<script src="{{ STATIC_URL }}js/list-images.js"></script>
+<script src="{% static 'js/jquery.isotope.min.js' %}"></script>
+<script src="{% static 'js/jquery.infinitescroll.min.js' %}"></script>
+<script src="{% static 'js/list-images.js' %}"></script>
 {% endblock %}
 {% block page_title %} -- Images{% endblock %}
 {% block content %}
