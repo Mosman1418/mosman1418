@@ -2,9 +2,10 @@
 {% load thumbnail %}
 {% block content %}
 <div class="row">
-    {% with current='' %}{% include '_sidenav.html' %}{% endwith %}
+    {% comment %} {% with current='' %}{% include '_sidenav.html' %}{% endwith %} {% endcomment %}
     <div class="span8">
         <h2>Page not found</h2>
+        <h4>Click <a href="/">here</a> to go back to the home page.</h4>
     </div>
     <div class="span2">
 
@@ -12,6 +13,4 @@
 </div>
 
 {% endblock %}
-{% block footer %}
-    {% include '_footer.html' %}
-{% endblock %}
+
