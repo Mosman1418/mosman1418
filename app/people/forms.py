@@ -4,12 +4,14 @@ from django.forms import ModelForm
 from app.people.models import *
 from app.places.models import *
 from app.sources.models import *
-from django.forms.extras.widgets import SelectDateWidget
+from django.forms.widgets import SelectDateWidget
 from ckeditor.widgets import CKEditorWidget
 from calendar import monthrange
 from django.conf import settings
 from django.forms.models import inlineformset_factory
-from django_select2 import *
+from django_select2.forms import (
+    ModelSelect2Widget, Select2Widget, ModelSelect2MultipleWidget
+)
 
 from app.generic.forms import AddEventForm, DateSelectMixin, ShortDateForm
 from app.places.forms import AddAddressForm
@@ -26,36 +28,36 @@ class NewSelectDateWidget(SelectDateWidget):
     none_value = (0, 'unknown')
 
 
-class PeopleMultiChoice(AutoModelSelect2MultipleField):
+class PeopleMultiChoice(ModelSelect2MultipleWidget):
     queryset = Person.objects
     search_fields = ['family_name__istartswith', ]
 
 
-class PersonChoice(AutoModelSelect2Field):
+class PersonChoice(ModelSelect2Widget):
     queryset = Person.objects
     search_fields = ['family_name__istartswith', ]
 
 
-class PlaceChoice(AutoModelSelect2Field):
+class PlaceChoice(ModelSelect2Widget):
     queryset = Place.objects
     search_fields = ['display_name__istartswith', 'place_name__istartswith']
 
 
-class OrganisationChoice(AutoModelSelect2Field):
+class OrganisationChoice(ModelSelect2Widget):
     queryset = Organisation.objects
     search_fields = ['display_name__istartswith', 'name__istartswith']
 
 
-class LifeEventChoice(AutoModelSelect2Field):
+class LifeEventChoice(ModelSelect2Widget):
     queryset = LifeEvent.objects
 
 
-class SourcesMultiChoice(AutoModelSelect2MultipleField):
+class SourcesMultiChoice(ModelSelect2MultipleWidget):
     queryset = Source.objects
     search_fields = ['title__icontains', ]
 
 
-class EventLocationsMultiChoice(AutoModelSelect2MultipleField):
+class EventLocationsMultiChoice(ModelSelect2MultipleWidget):
     queryset = EventLocation.objects
     search_fields = ['label__icontains', ]
 
@@ -179,6 +181,7 @@ class AddEventLocationForm(forms.ModelForm):
 
     class Meta:
         model = EventLocation
+        fields = ('lifeevent', 'location')
 
 
 class AddBirthForm(AddEventForm):

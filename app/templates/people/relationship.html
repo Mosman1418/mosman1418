@@ -6,7 +6,7 @@
             <div class="span8">
                 <ul class="breadcrumb hidden-phone">
                     <li><a href="/">Home</a> <span class="divider">/</span></li>
-                    <li><a href="{% url people-list %}">People</a> <span class="divider">/</span></li>
+                    <li><a href="{% url 'people-list' %}">People</a> <span class="divider">/</span></li>
                     <li><a href="{{ content.person.get_absolute_url }}">{{ content.person }}</a> <span class="divider">/</span></li>
                     <li class="active">{{ content.summary|safe }}</li>
                 </ul>

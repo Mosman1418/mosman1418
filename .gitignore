@@ -1,12 +1,19 @@
 *.pyc
-rstools
+# rstools
 admin
-awmtools
+# awmtools
 ckeditor
 css
-cwgctools
+# cwgctools
 django_extensions
 img
 js
 less
-moatools
+# moatools
+
+# VScode Editor
+.history
+.vscode/
+
+# Don't ever push settings_prod in git repo
+settings_prod.py

@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from django.forms.extras.widgets import SelectDateWidget
+from django.forms.widgets import SelectDateWidget
 from calendar import monthrange
 
 YEARS = [year for year in range(1850, 2013)]

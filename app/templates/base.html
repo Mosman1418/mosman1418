@@ -1,18 +1,21 @@
+{% load static %}
 <!DOCTYPE html>
 <!--[if lt IE 7]> <html class="lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>    <html class="lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>    <html class="lt-ie9"> <![endif]-->
 <!--[if gt IE 8]><!--> <html> <!--<![endif]-->
-  <head>
+  
+	<head>
+
     <title>Doing our bit, Mosman 1914-1918{% block page_title %}{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="{{ STATIC_URL }}js/jquery-1.8.0.min.js"></script>
+    <script src="{% static 'js/jquery-1.8.0.min.js' %}"></script>
     {% block head_scripts %}{% endblock %}
-    <link href="{{ STATIC_URL }}css/bootstrap.min.css" rel="stylesheet">
-    <link href="{{ STATIC_URL }}css/local.css" rel="stylesheet">
-    <link href="{{ STATIC_URL }}css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/local.css' %}" rel="stylesheet">
+    <link href="{% static 'css/bootstrap-responsive.css' %}" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="http://mosman1914-1918.net/project/css/txp_orange.css" />
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/font-awesome.min.css">
+    <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
 
     <!-- HTML5/Media Queries support for IE < 9 -->
 	  <!--[if lt IE 9]>
@@ -47,7 +50,7 @@
 	         <span class="icon-bar"></span>
 	       </a>
 		   
-	       <a class="brand" href="/"><i>Doing our bit, Mosman 1914-1918</i></a>
+	       <a class="brand DOB_logo_header" href="/"><i>Doing our bit, Mosman 1914-1918</i></a>
 	       <div class="nav-collapse collapse" id="main-menu">
 		        <ul class="nav pull-right">
 				    <li class="dropdown">
@@ -60,10 +63,10 @@
 				                <li>
 				                <a href="#">Welcome {{ user.username }}!</a>
 				                </li>
-				                <li><a href="{% url auth_logout %}">Logout</a></li>
+				                <li><a href="{% url 'logout' %}">Logout</a></li>
 				            {% else %}
-				                <li><a href="{% url auth_login %}">Login</a></li>
-				                <li><a href="{% url registration_register %}">Register</a></li>
+				                <li><a href="{% url 'login' %}">Login</a></li>
+				                <li><a href="{% url 'django_registration_register' %}">Register</a></li>
 				            {% endif %}
 				                <li><a href="/contribute">Help</a></li>
 				        </ul>
@@ -84,7 +87,7 @@
             {% block footer %}{% endblock %}
 
 
-    <script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
     {% block extra_scripts %}{% endblock %}
   </body>
 </html>

@@ -2,21 +2,22 @@
 
 import re
 import datetime
-from urllib2 import urlopen, URLError, HTTPError
+from urllib.request import urlopen, URLError, HTTPError
 import json
 from bs4 import BeautifulSoup
 
 from django import forms
 from django.forms import ModelForm
 from django.forms.models import inlineformset_factory
-from django_select2 import *
-from ckeditor.widgets import CKEditorWidget
+from django_select2.forms import (
+    ModelSelect2Widget, Select2Widget, ModelSelect2MultipleWidget)
+from ckeditor.widgets import CKEditorWidget 
 
 from app.sources.models import *
 from app.people.models import *
 from app.generic.forms import DateSelectMixin, ShortDateForm
 
-from django.forms.extras.widgets import SelectDateWidget
+from django.forms.widgets import SelectDateWidget
 from calendar import monthrange
 
 from rstools.client import RSItemClient, RSSeriesClient
@@ -37,31 +38,31 @@ class NewSelectDateWidget(SelectDateWidget):
     none_value = (0, 'unknown')
 
 
-class PeopleMultiChoices(AutoModelSelect2MultipleField):
+class PeopleMultiChoices(ModelSelect2MultipleWidget):
     queryset = Person.objects
     search_fields = ['family_name__istartswith', ]
 
 
-class SourceChoice(AutoModelSelect2Field):
+class SourceChoice(ModelSelect2Widget):
     queryset = Source.objects
 
 
-class CollectionChoice(AutoModelSelect2Field):
+class CollectionChoice(ModelSelect2Widget):
     queryset = Source.objects
     search_fields = ['title__icontains']
 
 
-class RepositoryChoice(AutoModelSelect2Field):
+class RepositoryChoice(ModelSelect2Widget):
     queryset = Repository.objects
     search_fields = ['display_name__icontains']
 
 
-class AuthorMultiChoices(AutoModelSelect2MultipleField):
+class AuthorMultiChoices(ModelSelect2MultipleWidget):
     queryset = Person.objects
     search_fields = ['family_name__istartswith', ]
 
 
-class SourcesMultiChoice(AutoModelSelect2MultipleField):
+class SourcesMultiChoice(ModelSelect2MultipleWidget):
     queryset = Source.objects
     search_fields = ['title__icontains', ]
 
@@ -202,7 +203,7 @@ class AddSourceForm(ModelForm, DateSelectMixin):
             re.compile(r'http://nla.gov.au/nla.news-article(\d+)')
         ]
         url = cleaned_data['url']
-        print url
+        print (url)
         id = None
         for pattern in patterns:
             try:
@@ -247,7 +248,7 @@ class AddSourceForm(ModelForm, DateSelectMixin):
         rs = RSItemClient()
         rsseries = RSSeriesClient()
         item_details = rs.get_summary(barcode)
-        print item_details
+        print (item_details)
         dates = item_details['contents_dates']
         citation = '{}, {}'.format(
             item_details['series'],
@@ -381,7 +382,7 @@ class AddSourceForm(ModelForm, DateSelectMixin):
 
     class Meta:
         model = Source
-        exclude = ('added_by')
+        exclude = ('added_by',)
         widgets = {
             'title': forms.TextInput(attrs={'class': 'input-xxlarge'}),
             'url': forms.TextInput(attrs={'class': 'input-xxlarge'}),
@@ -417,7 +418,7 @@ class UpdateSourceForm(ModelForm, DateSelectMixin):
 
     class Meta:
         model = Source
-        exclude = ('added_by')
+        exclude = ('added_by',)
         widgets = {
             'title': forms.TextInput(attrs={'class': 'input-xlarge'}),
             'url': forms.TextInput(attrs={'class': 'input-xlarge'}),
@@ -431,7 +432,7 @@ class AddSourcePersonForm(ModelForm):
 
     class Meta:
         model = SourcePerson
-        exclude = ('person', 'added_by')
+        exclude = ('person', 'added_by',)
         widgets = {
             'source': forms.Select(attrs={'readonly': True})
         }
@@ -446,7 +447,7 @@ class AddStoryForm(ShortDateForm):
 
     class Meta:
         model = Story
-        exclude = ('added_by')
+        exclude = ('added_by',)
         widgets = {
             'text': CKEditorWidget(attrs={'class': 'input-xlarge'}),
             'credit': CKEditorWidget(attrs={'class': 'input-xlarge'}),

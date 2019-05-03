@@ -9,7 +9,7 @@
             <div class="span8">
                 <ul class="breadcrumb hidden-phone">
                     <li><a href="/">Home</a> <span class="divider">/</span></li>
-                    <li><a href="{% url people-list %}">People</a> <span class="divider">/</span></li>
+                    <li><a href="{% url 'people-list' %}">People</a> <span class="divider">/</span></li>
                     <li class="active">{{ content }}</li>
                 </ul>
                 <h2>{{ content }}</h2>
@@ -17,7 +17,7 @@
                 <div class="alert">
                     This entry is awaiting approval.
                     {% if 'approve_person' in perms %}
-                        <a class="btn btn-mini btn-primary" href="{% url person-approve content.id %}">Approve</a>
+                        <a class="btn btn-mini btn-primary" href="{% url 'person-approve' content.id %}">Approve</a>
                     {% endif %}
                 </div>
                 {% endif %}
@@ -40,7 +40,7 @@
                                 <a class="thumbnail" href="{{ content.photos.0.get_absolute_url }}">
                                     <img src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}" alt="content.photos.0.title">
                                 </a>
-                                <p class="pull-right"><small><a href="{% url person-photos-view content.id %}">All photos ({{ content.photos|length }})</a></small></p>
+                                <p class="pull-right"><small><a href="{% url 'person-photos-view' content.id %}">All photos ({{ content.photos|length }})</a></small></p>
                             </div>
                         {% endif %}
                     </div>
@@ -145,17 +145,17 @@
             </div>
             <div class="span2">
                 <p>
-                    <a class="btn btn-primary btn-medium" href="{% url person-update content.id %}">Update</a>
+                    <a class="btn btn-primary btn-medium" href="{% url 'person-update' content.id %}">Update</a>
                 </p>
                 <p>
-                    <a class="btn btn-primary btn-medium" href="{% url story-add-entity 'person' content.id%}">Add a story</a>
+                    <a class="btn btn-primary btn-medium" href="{% url 'story-add-entity' 'person' content.id%}">Add a story</a>
                 </p>
                 <p>
-                    <a class="btn btn-primary btn-medium" href="{% url source-add-entity 'mainperson' content.id%}">Add a source</a>
+                    <a class="btn btn-primary btn-medium" href="{% url 'source-add-entity' 'mainperson' content.id%}">Add a source</a>
                 </p>
                 {% if perms.people.merge_person %}
                 <p>
-                    <a class="btn btn-primary btn-medium" href="{% url person-merge content.id%}">Merge</a>
+                    <a class="btn btn-primary btn-medium" href="{% url 'person-merge' content.id%}">Merge</a>
                 </p>
                 {% endif %}
             </div>

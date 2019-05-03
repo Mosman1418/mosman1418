@@ -10,7 +10,7 @@
             <div class="span8">
                 <ul class="breadcrumb hidden-phone">
                     <li><a href="/">Home</a> <span class="divider">/</span></li>
-                    <li><a href="{% url memorial-list %}">Memorials</a> <span class="divider">/</span></li>
+                    <li><a href="{% url 'memorial-list' %}">Memorials</a> <span class="divider">/</span></li>
                     <li><a href="{{ memorial.get_absolute_url }}">{{ memorial }}</a><span class="divider">/</span></li>
                     <li class="active">Names</li>
                 </ul>

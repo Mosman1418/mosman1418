@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Account activation{% endblock %}
+{% block content %}
+    <div class="row">
+        {% with current='none' %}{% include '_sidenav.html' %}{% endwith %}
+        <div class="span10">
+            <h2>Account activation</h2>
+            {% if account %}
+                Thanks {{ account }}, activation complete! You may now <a href="{% url 'login' %}>login</a> using the username and password you set at registration.
+            {% else %}
+                Oops &ndash; it seems that your activation key is invalid. Please check the url again.
+            {% endif %}
+        </div>
+    </div>
+
+{% endblock %}

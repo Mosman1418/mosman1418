@@ -8,7 +8,7 @@
                 <div class="span8">
                     <ul class="breadcrumb hidden-phone">
                         <li><a href="/">Home</a> <span class="divider">/</span></li>
-                        <li><a href="{% url memorial-list %}">Memorials</a> <span class="divider">/</span></li>
+                        <li><a href="{% url 'memorial-list' %}">Memorials</a> <span class="divider">/</span></li>
                         <li class="active">{{ content }}</li>
                     </ul>
                     <h2>{{ content.name }}</h2>
@@ -17,7 +17,7 @@
                             {% if content.address %}
                                 <p>{{ content.address }}</p>
                             {% endif %}
-                            <p><a href="{% url memorial-names-list content.id %}">{{ content.memorialname_set.all|length }} names recorded</a></p>
+                            <p><a href="{% url 'memorial-names-list' content.id %}">{{ content.memorialname_set.all|length }} names recorded</a></p>
                         </div>
                         {% if content.photos %}
                             {% thumbnail content.photos.0.sourceimage_set.all.0.image 160x0 as im %}
@@ -25,7 +25,7 @@
                                 <a class="thumbnail" href="{{ content.photos.0.get_absolute_url }}">
                                     <img src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}" alt="content.photos.0.title">
                                 </a>
-                                <p class="pull-right"><small><a href="{% url memorial-photos-view content.id %}">All photos ({{ content.photos|length }})</a></small></p>
+                                <p class="pull-right"><small><a href="{% url 'memorial-photos-view' content.id %}">All photos ({{ content.photos|length }})</a></small></p>
                             </div>
                         {% endif %}
                     </div>

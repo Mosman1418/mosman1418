@@ -32,7 +32,7 @@
                     <div class="alert">
                         This entry is awaiting approval.
                         {% if 'approve_person' in perms %}
-                            <a class="btn btn-mini btn-primary" href="{% url person-approve person.id %}">Approve</a>
+                            <a class="btn btn-mini btn-primary" href="{% url 'person-approve' person.id %}">Approve</a>
                         {% endif %}
                     </div>
                 {% endif %}
@@ -130,13 +130,13 @@
                                         <a href="{{ name.get_absolute_url }}">
                                             {{ name|safe }}
                                         </a>
-                                        <a class="btn btn-mini" href="{% url altname-update name.id %}">Update</a>
+                                        <a class="btn btn-mini" href="{% url 'altname-update' name.id %}">Update</a>
                                     </li>
                                 {% empty %}
                                     <li>No name records</li>
                                 {% endfor %}
                                 </ul>
-                                <a class="btn btn-small btn-primary" href="{% url altname-add person.id %}">Add name record</a>
+                                <a class="btn btn-small btn-primary" href="{% url 'altname-add' person.id %}">Add name record</a>
                             </div>
                         </div>
                         <div class="form-field control-group">
@@ -148,13 +148,13 @@
                                         <a href="{{ rank.get_absolute_url }}">
                                             {{ rank.summary }}
                                         </a>
-                                        <a class="btn btn-mini" href="{% url rank-update rank.id %}">Update</a>
+                                        <a class="btn btn-mini" href="{% url 'rank-update' rank.id %}">Update</a>
                                     </li>
                                 {% empty %}
                                     <li>No ranks recorded</li>
                                 {% endfor %}
                                 </ul>
-                                <a class="btn btn-small btn-primary" href="{% url rank-add person.id %}">Add rank</a>
+                                <a class="btn btn-small btn-primary" href="{% url 'rank-add' person.id %}">Add rank</a>
                             </div>
                         </div>
                         <div class="form-field control-group">
@@ -166,13 +166,13 @@
                                         <a href="{{ number.get_absolute_url }}">
                                             {{ number.summary }}
                                         </a>
-                                        <a class="btn btn-mini" href="{% url servicenumber-update number.id %}">Update</a>
+                                        <a class="btn btn-mini" href="{% url 'servicenumber-update' number.id %}">Update</a>
                                     </li>
                                 {% empty %}
                                     <li>No service numbers recorded</li>
                                 {% endfor %}
                                 </ul>
-                                <a class="btn btn-small btn-primary" href="{% url servicenumber-add person.id %}">Add service number</a>
+                                <a class="btn btn-small btn-primary" href="{% url 'servicenumber-add' person.id %}">Add service number</a>
                             </div>
                         </div>
                     {% endif %}
@@ -194,13 +194,13 @@
                                     <a href="{{ birth.get_absolute_url }}">
                                         {{ birth.summary|safe }}
                                     </a>
-                                    <a class="btn btn-mini" href="{% url birth-update birth.id %}">Update</a>
+                                    <a class="btn btn-mini" href="{% url 'birth-update' birth.id %}">Update</a>
                                 </li>
                             {% empty %}
                                 <li>No birth records</li>
                             {% endfor %}
                             </ul>
-                            <a class="btn btn-small btn-primary" href="{% url birth-add person.id %}">Add birth record</a>
+                            <a class="btn btn-small btn-primary" href="{% url 'birth-add' person.id %}">Add birth record</a>
                         </div>
                     </div>
                     <div class="form-field control-group">
@@ -212,13 +212,13 @@
                                     <a href="{{ death.get_absolute_url }}">
                                         {{ death.summary|safe }}
                                     </a>
-                                    <a class="btn btn-mini" href="{% url death-update death.id %}">Update</a>
+                                    <a class="btn btn-mini" href="{% url 'death-update' death.id %}">Update</a>
                                 </li>
                             {% empty %}
                                 <li>No death records</li>
                             {% endfor %}
                             </ul>
-                            <a class="btn btn-small btn-primary" href="{% url death-add person.id %}">Add death record</a>
+                            <a class="btn btn-small btn-primary" href="{% url 'death-add' person.id %}">Add death record</a>
                         </div>
                     </div>
                     <div class="form-field control-group">
@@ -230,13 +230,13 @@
                                     <a href="{{ event.get_absolute_url }}">
                                         {{ event.summary|safe }}
                                     </a>
-                                    <a class="btn btn-mini" href="{% url lifeevent-update event.id %}">Update</a>
+                                    <a class="btn btn-mini" href="{% url 'lifeevent-update' event.id %}">Update</a>
                                 </li>
                             {% empty %}
                                 <li>No life events</li>
                             {% endfor %}
                             </ul>
-                            <a class="btn btn-small btn-primary" href="{% url lifeevent-add person.id %}">Add life event</a>
+                            <a class="btn btn-small btn-primary" href="{% url 'lifeevent-add' person.id %}">Add life event</a>
                         </div>
                     </div>
                 </fieldset>
@@ -251,13 +251,13 @@
                                     <a href="{{ address.get_absolute_url }}">
                                         {{ address.address|safe }}
                                     </a>
-                                    <a class="btn btn-mini" href="{% url personaddress-update address.id %}">Update</a>
+                                    <a class="btn btn-mini" href="{% url 'personaddress-update' address.id %}">Update</a>
                                 </li>
                             {% empty %}
                                 <li>No addresses recorded</li>
                             {% endfor %}
                             </ul>
-                            <a class="btn btn-small btn-primary" href="{% url personaddress-add person.id %}">Add address</a>
+                            <a class="btn btn-small btn-primary" href="{% url 'personaddress-add' person.id %}">Add address</a>
                         </div>
                     </div>
 
@@ -273,13 +273,13 @@
                                     <a href="{{ assoc.get_absolute_url }}">
                                         {{ assoc.summary|safe }}
                                     </a>
-                                    <a class="btn btn-mini" href="{% url persontoperson-update assoc.id %}">Update</a>
+                                    <a class="btn btn-mini" href="{% url 'persontoperson-update' assoc.id %}">Update</a>
                                 </li>
                             {% empty %}
                                 <li>No related people</li>
                             {% endfor %}
                             </ul>
-                            <a class="btn btn-small btn-primary" href="{% url persontoperson-add person.id %}">Add related person</a>
+                            <a class="btn btn-small btn-primary" href="{% url 'persontoperson-add' person.id %}">Add related person</a>
                         </div>
                     </div>
                     <div class="form-field control-group">
@@ -291,13 +291,13 @@
                                     <a href="{{ assoc.get_absolute_url }}">
                                         {{ assoc.summary|safe }}
                                     </a>
-                                    <a class="btn btn-mini" href="{% url personorganisation-update assoc.id %}">Update</a>
+                                    <a class="btn btn-mini" href="{% url 'personorganisation-update' assoc.id %}">Update</a>
                                 </li>
                             {% empty %}
                                 <li>No related organisations</li>
                             {% endfor %}
                             </ul>
-                            <a class="btn btn-small btn-primary" href="{% url personorganisation-add person.id %}">Add related organisation</a>
+                            <a class="btn btn-small btn-primary" href="{% url 'personorganisation-add' person.id %}">Add related organisation</a>
                         </div>
                     </div>
 
@@ -313,13 +313,13 @@
                                     <a href="{{ source.get_absolute_url }}">
                                         {{ source|safe|truncatewords:10 }}
                                     </a>
-                                    <a class="btn btn-mini" href="{% url source-update source.id %}">Update</a>
+                                    <a class="btn btn-mini" href="{% url 'source-update' source.id %}">Update</a>
                                 </li>
                             {% empty %}
                                 <li>No main sources</li>
                             {% endfor %}
                             </ul>
-                            <a class="btn btn-small btn-primary" href="{% url source-add-entity 'mainperson' person.id %}">Add main source</a>
+                            <a class="btn btn-small btn-primary" href="{% url 'source-add-entity' 'mainperson' person.id %}">Add main source</a>
                         </div>
                     </div>
                     <div class="form-field control-group">
@@ -331,13 +331,13 @@
                                     <a href="{{ source.get_absolute_url }}">
                                         {{ source|safe|truncatewords:10 }}
                                     </a>
-                                    <a class="btn btn-mini" href="{% url source-update source.id %}">Update</a>
+                                    <a class="btn btn-mini" href="{% url 'source-update' source.id %}">Update</a>
                                 </li>
                             {% empty %}
                                 <li>No other sources</li>
                             {% endfor %}
                             </ul>
-                            <a class="btn btn-small btn-primary" href="{% url source-add-entity 'person' person.id %}">Add other source</a>
+                            <a class="btn btn-small btn-primary" href="{% url 'source-add-entity' 'person' person.id %}">Add other source</a>
                         </div>
                     </div>
 

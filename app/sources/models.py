@@ -1,7 +1,7 @@
 import calendar
 
 from django.db import models
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from unidecode import unidecode
 
 from app.linkeddata.models import RDFClass, RDFRelationship, RDFType
@@ -12,8 +12,8 @@ from app.generic.models import StandardMetadata, ShortDateMixin
 
 class Source(StandardMetadata):
     title = models.TextField(blank=True, null=True)
-    source_type = models.ForeignKey('SourceType', blank=True, null=True)  # include rdf?
-    creators = models.ManyToManyField('people.Person', through='SourcePerson', blank=True, null=True)
+    source_type = models.ForeignKey('SourceType', on_delete=models.CASCADE, blank=True, null=True)  # include rdf?
+    creators = models.ManyToManyField('people.Person', through='SourcePerson', blank=True)
     publisher = models.CharField(max_length=100, blank=True, null=True)
     publication_place = models.CharField(max_length=100, blank=True, null=True)
     publication_date = models.DateField(blank=True, null=True)
@@ -22,11 +22,11 @@ class Source(StandardMetadata):
     publication_date_end = models.DateField(blank=True, null=True)
     publication_date_end_month_known = models.BooleanField(default=False)
     publication_date_end_day_known = models.BooleanField(default=False)
-    collection = models.ForeignKey('Source', blank=True, null=True, related_name='collection_source')
+    collection = models.ForeignKey('Source', on_delete=models.CASCADE, blank=True, null=True, related_name='collection_source')
     collection_title = models.CharField(max_length=250, blank=True, null=True)
     collection_item_id = models.CharField(max_length=100, blank=True, null=True)  # Identifier within context of a specific collection, eg file number
     repository_item_id = models.CharField(max_length=100, blank=True, null=True)  # Identifier within context of repository, eg barcode
-    repository = models.ForeignKey('people.Repository', blank=True, null=True)
+    repository = models.ForeignKey('people.Repository', on_delete=models.CASCADE, blank=True, null=True)
     citation = models.CharField(max_length=250, blank=True, null=True)
     pages = models.CharField(max_length=50, blank=True, null=True)
     url = models.URLField(blank=True, null=True)
@@ -34,7 +34,7 @@ class Source(StandardMetadata):
     json_url = models.URLField(blank=True, null=True)
     caption = models.TextField(blank=True, null=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return '{} ({})'.format(unidecode(self.title), self.source_type)
 
     def authors(self):
@@ -130,14 +130,14 @@ class Story(StandardMetadata, ShortDateMixin):
     title = models.CharField(max_length=200)
     text = models.TextField()
     credit = models.TextField(blank=True, null=True)
-    sources = models.ManyToManyField('sources.Source', blank=True, null=True)
+    sources = models.ManyToManyField('sources.Source', blank=True)
 
     def subjects(self):
         people = list(self.person_set.all())
         organisations = list(self.organisation_set.all())
         return people + organisations
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     def get_absolute_url(self):
@@ -148,18 +148,18 @@ class Story(StandardMetadata, ShortDateMixin):
 
 
 class SourceImage(models.Model):
-    source = models.ForeignKey(Source)
+    source = models.ForeignKey(Source, on_delete=models.CASCADE)
     page = models.IntegerField(blank=True, null=True)
     image = models.ImageField(upload_to='images')
     transcript = models.TextField(blank=True, null=True)
 
 
 class SourcePerson(models.Model):
-    source = models.ForeignKey(Source)
-    person = models.ForeignKey('people.Person')
-    role = models.ForeignKey('SourceRole')
+    source = models.ForeignKey(Source, on_delete=models.CASCADE)
+    person = models.ForeignKey('people.Person', null=True, on_delete=models.CASCADE)
+    role = models.ForeignKey('SourceRole', on_delete=models.CASCADE)
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s - %s - %s' % (self.source, self.role, self.person)
 
 

@@ -1,16 +1,16 @@
 {% extends 'base.html' %}
-{% load django_select2_tags %}
+{% load static %}
 {% load thumbnail %}
 {% block title %}Log in{% endblock %}
 {% block head_scripts %}
-<script src="{{ STATIC_URL }}ckeditor/ckeditor/ckeditor.js"></script>
+<script src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
 {% endblock %}
 {% block extra_scripts %}
-{% import_django_select2_js %}
-<script src="{{ STATIC_URL }}js/add-source.js"></script>
+<script src="{% static 'js/select2.min.js' %}"></script>
+<script src="{% static 'js/add-source.js' %}"></script>
 {% endblock %}
 {% block extra_styles %}
-{% import_django_select2_css %}
+<link href="{% static 'css/select2.css' %}" type="text/css" media="screen" rel="stylesheet" />
 {% endblock %}
 {% block content %}
     <div class="row">
@@ -156,11 +156,11 @@
                     </fieldset>
                     <fieldset id="creators">
                         <legend>Creators</legend>
-                        {% url source-creator-add source_id=source.id creator_type='author' as author_link %}
+                        {% url 'source-creator-add' source_id=source.id creator_type='author' as author_link %}
                         {% with label='Authors' field=form.authors create_url=author_link create_type='author' %}
                             {% include '_form_field.html' %}
                         {% endwith %}
-                        {% url source-creator-add source_id=source.id creator_type='editor' as editor_link %}
+                        {% url 'source-creator-add' source_id=source.id creator_type='editor' as editor_link %}
                         {% with label='Editors' field=form.editors create_url=editor_link create_type='editor' %}
                             {% include '_form_field.html' %}
                         {% endwith %}
@@ -209,7 +209,7 @@
                     {% if source.id %}
                         <input class="btn btn-primary" name="continue" type="submit" value="Save &amp; continue editing">
                         <input class="btn btn-primary" name="finished" type="submit" value="Finished">
-                        <a class="btn btn-primary btn-danger" href="{% url source-delete source.id %}">Delete</a>
+                        <a class="btn btn-primary btn-danger" href="{% url 'source-delete' source.id %}">Delete</a>
                     {% else %}
                         <input class="btn btn-primary" name="next" type="submit" value="Next">
                     {% endif %}

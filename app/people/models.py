@@ -2,7 +2,7 @@ import re
 from itertools import chain
 from django.db import models
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from app.linkeddata.models import RDFClass, RDFRelationship, RDFType
 from app.generic.models import StandardMetadata, Event, Period, Person as GenericPerson, Group, ShortDateMixin, LongDateMixin
 
@@ -15,15 +15,15 @@ class Person(GenericPerson):
     last_rank = models.CharField(max_length=50, blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
     #roles = models.ManyToManyField('PersonRole')
-    addresses = models.ManyToManyField('places.Address', blank=True, null=True, through='PersonAddress')
-    associated_places = models.ManyToManyField('places.Place', blank=True, null=True, through='PersonAssociatedPlace')
-    associated_people = models.ManyToManyField('Person', blank=True, null=True, through='PersonAssociatedPerson', related_name='related_people')
-    associated_organisations = models.ManyToManyField('Organisation', blank=True, null=True, through='PersonAssociatedOrganisation')
-    associated_events = models.ManyToManyField('events.Event', blank=True, null=True, through='PersonAssociatedEvent')
-    associated_objects = models.ManyToManyField('objects.Object', blank=True, null=True, through='PersonAssociatedObject')
-    associated_sources = models.ManyToManyField('sources.Source', blank=True, null=True, through='PersonAssociatedSource')
-    images = models.ManyToManyField('PeopleImage', blank=True, null=True)
-    stories = models.ManyToManyField('sources.Story', blank=True, null=True)
+    addresses = models.ManyToManyField('places.Address', blank=True,through='PersonAddress')
+    associated_places = models.ManyToManyField('places.Place', blank=True,through='PersonAssociatedPlace')
+    associated_people = models.ManyToManyField('Person', blank=True, through='PersonAssociatedPerson', related_name='related_people')
+    associated_organisations = models.ManyToManyField('Organisation', blank=True,  through='PersonAssociatedOrganisation')
+    associated_events = models.ManyToManyField('events.Event', blank=True, through='PersonAssociatedEvent')
+    associated_objects = models.ManyToManyField('objects.Object', blank=True, through='PersonAssociatedObject')
+    associated_sources = models.ManyToManyField('sources.Source', blank=True, through='PersonAssociatedSource')
+    images = models.ManyToManyField('PeopleImage', blank=True)
+    stories = models.ManyToManyField('sources.Story', blank=True)
     public = models.BooleanField(default=False)  # Display on website
     status = models.CharField(max_length=15, choices=(
         ('confirmed', 'confirmed'),
@@ -33,9 +33,9 @@ class Person(GenericPerson):
     ))
     mosman_connection = models.TextField(blank=True, null=True)
     admin_note = models.TextField(blank=True, null=True)
-    merged_into = models.ForeignKey('people.Person', blank=True, null=True)
+    merged_into = models.ForeignKey('people.Person', on_delete=models.CASCADE, blank=True, null=True)
 
-    def __unicode__(self):
+    def __str__(self):
         if self.family_name:
             if self.other_names:
                 display = '%s %s' % (self.other_names, self.family_name)
@@ -114,12 +114,12 @@ class Person(GenericPerson):
 
 
 class Rank(StandardMetadata, ShortDateMixin):
-    person = models.ForeignKey('Person')
+    person = models.ForeignKey('Person', on_delete=models.CASCADE)
     rank = models.CharField(max_length=100)
-    sources = models.ManyToManyField('sources.Source', blank=True, null=True)
-    memorials = models.ManyToManyField('memorials.Memorial', blank=True, null=True)
+    sources = models.ManyToManyField('sources.Source', blank=True)
+    memorials = models.ManyToManyField('memorials.Memorial', blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return '{} held rank of {}{}'.format(
             self.person,
             self.rank,
@@ -151,11 +151,11 @@ class Rank(StandardMetadata, ShortDateMixin):
 
 
 class ServiceNumber(StandardMetadata):
-    person = models.ForeignKey('Person')
+    person = models.ForeignKey('Person', on_delete=models.CASCADE)
     service_number = models.CharField(max_length=100)
-    sources = models.ManyToManyField('sources.Source', blank=True, null=True)
+    sources = models.ManyToManyField('sources.Source', blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return '{} had service number {}'.format(self.person, self.service_number)
 
     def summary(self):
@@ -166,15 +166,15 @@ class ServiceNumber(StandardMetadata):
 
 
 class AlternativePersonName(StandardMetadata):
-    person = models.ForeignKey('Person')
+    person = models.ForeignKey('Person', on_delete=models.CASCADE)
     family_name = models.CharField(max_length=100, blank=True)
     other_names = models.CharField(max_length=100, blank=True)
     display_name = models.CharField(max_length=250)
     nickname = models.CharField(max_length=100, blank=True)
-    sources = models.ManyToManyField('sources.Source', blank=True, null=True)
-    memorials = models.ManyToManyField('memorials.Memorial', blank=True, null=True)
+    sources = models.ManyToManyField('sources.Source', blank=True)
+    memorials = models.ManyToManyField('memorials.Memorial', blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         display = 'Recorded name &ndash; '
         if not self.display_name:
             if self.other_names:
@@ -203,13 +203,13 @@ class AlternativePersonName(StandardMetadata):
 
 
 class LifeEvent(Event):
-    person = models.ForeignKey('people.Person')
-    locations = models.ManyToManyField('places.Place', blank=True, null=True, through='EventLocation')
-    sources = models.ManyToManyField('sources.Source', blank=True, null=True)
-    type_of_event = models.ForeignKey('people.LifeEventType', blank=True, null=True)
-    memorials = models.ManyToManyField('memorials.Memorial', blank=True, null=True)
+    person = models.ForeignKey('people.Person', on_delete=models.CASCADE)
+    locations = models.ManyToManyField('places.Place', blank=True, through='EventLocation')
+    sources = models.ManyToManyField('sources.Source', blank=True)
+    type_of_event = models.ForeignKey('people.LifeEventType', on_delete=models.CASCADE, blank=True, null=True)
+    memorials = models.ManyToManyField('memorials.Memorial', blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return '{} {} {}'.format(
             self.person,
             '{}{}'.format(self.label[0].lower(), self.label[1:]),
@@ -251,12 +251,12 @@ class LifeEvent(Event):
 
 
 class EventLocation(StandardMetadata):
-    lifeevent = models.ForeignKey('people.LifeEvent')
-    location = models.ForeignKey('places.Place', blank=True, null=True)
-    association = models.ForeignKey('people.EventLocationAssociation', blank=True, null=True)
+    lifeevent = models.ForeignKey('people.LifeEvent', on_delete=models.CASCADE)
+    location = models.ForeignKey('places.Place', on_delete=models.CASCADE, blank=True, null=True)
+    association = models.ForeignKey('people.EventLocationAssociation', on_delete=models.CASCADE, blank=True, null=True)
 
-    def __unicode__(self):
-        summary = self.lifeevent.__unicode__()
+    def __str__(self):
+        summary = self.lifeevent.__str__()
         if self.location:
             summary += ' {} {}'.format(self.association, self.location)
         return summary
@@ -273,15 +273,15 @@ class EventLocationAssociation(RDFRelationship):
 
 
 class LifePeriod(Period):
-    person = models.ForeignKey('people.Person')
+    person = models.ForeignKey('people.Person', on_delete=models.CASCADE)
 
 
 class Birth(Event):
-    person = models.ForeignKey('people.Person')
-    location = models.ForeignKey('places.Place', blank=True, null=True)
-    sources = models.ManyToManyField('sources.Source', blank=True, null=True)
+    person = models.ForeignKey('people.Person', on_delete=models.CASCADE)
+    location = models.ForeignKey('places.Place', on_delete=models.CASCADE, blank=True, null=True)
+    sources = models.ManyToManyField('sources.Source', blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         earliest = self.formatted_date('start_earliest')
         latest = self.formatted_date('start_latest')
         summary = '{} born '.format(self.person)
@@ -293,7 +293,7 @@ class Birth(Event):
             if self.location:
                 summary += ' in {}'.format(self.location)
         elif self.location:
-            summary += ' in {}'.format(self.location.__unicode__())
+            summary += ' in {}'.format(self.location.__str__())
         return summary
 
     def summary(self):
@@ -308,7 +308,7 @@ class Birth(Event):
             if self.location:
                 summary += ' in {}'.format(self.location)
         elif self.location:
-            summary += 'in {}'.format(self.location.__unicode__())
+            summary += 'in {}'.format(self.location.__str__())
         return summary
 
     def get_absolute_url(self):
@@ -322,14 +322,14 @@ class Birth(Event):
 
 
 class Death(Event):
-    person = models.ForeignKey('people.Person')
-    location = models.ForeignKey('places.Place', blank=True, null=True)
+    person = models.ForeignKey('people.Person', on_delete=models.CASCADE)
+    location = models.ForeignKey('places.Place', on_delete=models.CASCADE, blank=True, null=True)
     cause_of_death = models.CharField(max_length=200, blank=True, null=True)
-    burial_place = models.ForeignKey('places.Place', blank=True, null=True, related_name='burial_place')
-    sources = models.ManyToManyField('sources.Source', blank=True, null=True)
-    memorials = models.ManyToManyField('memorials.Memorial', blank=True, null=True)
+    burial_place = models.ForeignKey('places.Place', on_delete=models.CASCADE, blank=True, null=True, related_name='burial_place')
+    sources = models.ManyToManyField('sources.Source', blank=True)
+    memorials = models.ManyToManyField('memorials.Memorial', blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         earliest = self.formatted_date('start_earliest')
         latest = self.formatted_date('start_latest')
         summary = '{} died '.format(self.person)
@@ -341,7 +341,7 @@ class Death(Event):
         if self.location:
             summary += ' in {}'.format(self.location)
         elif self.location:
-            summary = 'In {}'.format(self.location.__unicode__())
+            summary = 'In {}'.format(self.location.__str__())
         return summary
 
     def summary(self):
@@ -355,7 +355,7 @@ class Death(Event):
             if self.location:
                 summary += ' in {}'.format(self.location)
         elif self.location:
-            summary = 'In {}'.format(self.location.__unicode__())
+            summary = 'In {}'.format(self.location.__str__())
         elif self.burial_place:
             summary = 'Buried at {}'.format(self.burial_place)
         elif self.cause_of_death:
@@ -383,11 +383,11 @@ class Organisation(Group):
     short_name = models.CharField(max_length=100, null=True, blank=True)
     public = models.BooleanField(default=False)  # Display on website
     mosman_related = models.BooleanField(default=True)  # Appear in main people lists (not just authors)
-    associated_sources = models.ManyToManyField('sources.Source', blank=True, null=True, through='OrganisationAssociatedSource')
-    stories = models.ManyToManyField('sources.Story', blank=True, null=True)
-    merged_into = models.ForeignKey('people.Organisation', blank=True, null=True)
+    associated_sources = models.ManyToManyField('sources.Source', blank=True, through='OrganisationAssociatedSource')
+    stories = models.ManyToManyField('sources.Story', blank=True)
+    merged_into = models.ForeignKey('people.Organisation', on_delete=models.CASCADE, blank=True, null=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name if self.name else self.display_name
 
     def get_absolute_url(self):
@@ -413,7 +413,7 @@ class Repository(Group):
     name = models.CharField(max_length=250)
     short_name = models.CharField(max_length=100, null=True, blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name if self.name else self.display_name
 
 
@@ -427,16 +427,15 @@ class PeopleImage(models.Model):
     latest_date = models.DateField(null=True, blank=True)
     latest_month_known = models.BooleanField(default=False)
     latest_day_known = models.BooleanField(default=False)
-    added_by = models.ForeignKey(User)
+    added_by = models.ForeignKey(User, on_delete=models.CASCADE)
     date_added = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
-    @models.permalink
     def get_absolute_url(self):
-        return ('view_image', [str(self.id)])
+        return reverse('view_image', args=(str(self.id),))
 
 
 class PeopleStory(models.Model):
@@ -448,16 +447,15 @@ class PeopleStory(models.Model):
     latest_date = models.DateField(null=True, blank=True)
     latest_month_known = models.BooleanField(default=False)
     latest_day_known = models.BooleanField(default=False)
-    added_by = models.ForeignKey(User)
+    added_by = models.ForeignKey(User, on_delete=models.CASCADE)
     date_added = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
-    @models.permalink
     def get_absolute_url(self):
-        return ('view_story', [str(self.id)])
+        return reverse('view_story', args=(str(self.id),))
 
 
 class PersonRole(RDFRelationship):
@@ -465,11 +463,11 @@ class PersonRole(RDFRelationship):
 
 
 class PersonAddress(StandardMetadata, ShortDateMixin):
-    person = models.ForeignKey('Person')
-    address = models.ForeignKey('places.Address')
-    sources = models.ManyToManyField('sources.Source', blank=True, null=True)
+    person = models.ForeignKey('Person', on_delete=models.CASCADE)
+    address = models.ForeignKey('places.Address', on_delete=models.CASCADE)
+    sources = models.ManyToManyField('sources.Source', blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return '{} lived at {}'.format(self.person, self.address)
 
     def summary(self):
@@ -483,18 +481,18 @@ class PersonAddress(StandardMetadata, ShortDateMixin):
 
 
 class PersonAssociatedPlace(models.Model):
-    person = models.ForeignKey('Person')
-    place = models.ForeignKey('places.Place')
-    association = models.ForeignKey('PersonAssociation')
+    person = models.ForeignKey('Person', on_delete=models.CASCADE)
+    place = models.ForeignKey('places.Place', on_delete=models.CASCADE)
+    association = models.ForeignKey('PersonAssociation', on_delete=models.CASCADE)
 
 
 class PersonAssociatedPerson(StandardMetadata, ShortDateMixin):
-    person = models.ForeignKey('Person')
-    associated_person = models.ForeignKey('Person', related_name='related_person', blank=True, null=True)
-    association = models.ForeignKey('PersonAssociation')
-    sources = models.ManyToManyField('sources.Source', blank=True, null=True)
+    person = models.ForeignKey('Person', on_delete=models.CASCADE)
+    associated_person = models.ForeignKey('Person', on_delete=models.CASCADE, related_name='related_person', blank=True, null=True)
+    association = models.ForeignKey('PersonAssociation', on_delete=models.CASCADE)
+    sources = models.ManyToManyField('sources.Source', blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         if self.associated_person:
             summary = '{} - {} {}'.format(self.person, self.association, self.associated_person)
         else:
@@ -512,13 +510,13 @@ class PersonAssociatedPerson(StandardMetadata, ShortDateMixin):
 
 
 class PersonAssociatedOrganisation(StandardMetadata, ShortDateMixin):
-    person = models.ForeignKey('Person')
-    organisation = models.ForeignKey('Organisation')
-    association = models.ForeignKey('PersonOrgAssociation', null=True, blank=True)
-    sources = models.ManyToManyField('sources.Source', blank=True, null=True)
-    memorials = models.ManyToManyField('memorials.Memorial', blank=True, null=True)
+    person = models.ForeignKey('Person', on_delete=models.CASCADE)
+    organisation = models.ForeignKey('Organisation', on_delete=models.CASCADE)
+    association = models.ForeignKey('PersonOrgAssociation', on_delete=models.CASCADE, null=True, blank=True)
+    sources = models.ManyToManyField('sources.Source', blank=True)
+    memorials = models.ManyToManyField('memorials.Memorial', blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         if self.organisation:
             summary = '{} {} {}'.format(self.person, self.association, self.organisation)
         else:
@@ -537,21 +535,21 @@ class PersonAssociatedOrganisation(StandardMetadata, ShortDateMixin):
 
 
 class PersonAssociatedObject(models.Model):
-    person = models.ForeignKey('Person')
-    object = models.ForeignKey('objects.Object')
-    association = models.ForeignKey('PersonAssociation')
+    person = models.ForeignKey('Person', on_delete=models.CASCADE)
+    object = models.ForeignKey('objects.Object', on_delete=models.CASCADE)
+    association = models.ForeignKey('PersonAssociation', on_delete=models.CASCADE)
 
 
 class PersonAssociatedEvent(models.Model):
-    person = models.ForeignKey('Person')
-    event = models.ForeignKey('events.Event')
-    association = models.ForeignKey('EventAssociation')
+    person = models.ForeignKey('Person', on_delete=models.CASCADE)
+    event = models.ForeignKey('events.Event', on_delete=models.CASCADE)
+    association = models.ForeignKey('EventAssociation', on_delete=models.CASCADE)
 
 
 class PersonAssociatedSource(StandardMetadata):
-    person = models.ForeignKey('Person')
-    source = models.ForeignKey('sources.Source')
-    association = models.ForeignKey('SourceAssociation')
+    person = models.ForeignKey('Person', on_delete=models.CASCADE)
+    source = models.ForeignKey('sources.Source', on_delete=models.CASCADE)
+    association = models.ForeignKey('SourceAssociation', on_delete=models.CASCADE)
 
 
 class PersonAssociation(RDFRelationship):
@@ -579,9 +577,9 @@ class ObjectAssociation(RDFRelationship):
 
 
 class OrganisationAssociatedSource(StandardMetadata):
-    organisation = models.ForeignKey('Organisation')
-    source = models.ForeignKey('sources.Source')
-    association = models.ForeignKey('SourceAssociation')
+    organisation = models.ForeignKey('Organisation', on_delete=models.CASCADE)
+    source = models.ForeignKey('sources.Source', on_delete=models.CASCADE)
+    association = models.ForeignKey('SourceAssociation', on_delete=models.CASCADE)
 
 
 class LifeEventType(RDFType):

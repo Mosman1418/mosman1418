@@ -16,7 +16,7 @@
                     <h5>Related people</h5>
                     <ul>
                     {% for person in content.person_set.all %}
-                        <li><a href="{% url person_view person.id %}">{{ person }}</a></li>
+                        <li><a href="{% url 'person_view' person.id %}">{{ person }}</a></li>
                     {% endfor %}
                     </ul>
                 {% endif %}
@@ -32,7 +32,7 @@
             </div>
             <div class="span2">
                 {% if 'change_peopleimage' in content_perms %}
-                <a class="btn btn-primary btn-medium" href="{% url edit_image content.id%}">Edit</a>
+                <a class="btn btn-primary btn-medium" href="{% url 'edit_image' content.id%}">Edit</a>
                 {% endif %}
             </div>
         </div>

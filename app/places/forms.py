@@ -3,28 +3,30 @@ from django.forms import ModelForm
 from app.people.models import *
 from app.places.models import *
 from app.sources.models import *
-from django.forms.extras.widgets import SelectDateWidget
+from django.forms.widgets import SelectDateWidget
 from calendar import monthrange
 from django.conf import settings
-from django_select2 import *
 
+from django_select2.forms import (
+    ModelSelect2Widget, Select2Widget
+)
 from app.people.models import *
 from app.places.models import *
 
 
-class BirthChoice(AutoModelSelect2Field):
+class BirthChoice(ModelSelect2Widget):
     queryset = Birth.objects
 
 
-class DeathChoice(AutoModelSelect2Field):
+class DeathChoice(ModelSelect2Widget):
     queryset = Death.objects
 
 
-class EventChoice(AutoModelSelect2Field):
+class EventChoice(ModelSelect2Widget):
     queryset = EventLocation.objects
 
 
-class PlaceChoice(AutoModelSelect2Field):
+class PlaceChoice(ModelSelect2Widget):
     queryset = Place.objects
     search_fields = ['display_name__istartswith', 'place_name__istartswith']
 

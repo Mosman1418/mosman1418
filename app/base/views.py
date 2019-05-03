@@ -1,6 +1,6 @@
 # Create your views here.
 
-from registration.signals import user_activated
+from django_registration.signals import user_activated
 from django.contrib.auth.models import Group
 
 from django.views.generic import TemplateView

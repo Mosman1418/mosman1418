@@ -1,15 +1,16 @@
 {% extends 'base.html' %}
-{% load django_select2_tags %}
+{% load static %}
 {% block title %}Log in{% endblock %}
 {% block extra_scripts %}
-{% import_django_select2_js %}
-<script src="{{ STATIC_URL }}js/add-event.js"></script>
+<script src="{% static 'js/select2.min.js' %}"></script>
+<script src="{% static 'js/add-event.js' %}"></script>
 {% endblock %}
 {% block extra_styles %}
-{% import_django_select2_css %}
+<link href="{% static 'css/select2.css' %}" type="text/css" media="screen" rel="stylesheet" />
 {% endblock %}
 {% block content %}
     <div class="row">
+    fdsfds{{form}}
         {% with current='none' %}{% include '_sidenav.html' %}{% endwith %}
         <div class="span10">
             <h2>{% if lifeevent.id %}Update{% else %}Add{% endif %} a life event</h2>
@@ -81,13 +82,13 @@
                                         <a href="{{ location.get_absolute_url }}">
                                             {{ location.label }}
                                         </a>
-                                        <a class="btn btn-mini" href="{% url eventlocation-update location.id %}">Update</a>
+                                        <a class="btn btn-mini" href="{% url 'eventlocation-update' location.id %}">Update</a>
                                     </li>
                                 {% empty %}
                                     <li>No locations</li>
                                 {% endfor %}
                                 </ul>
-                                <a class="btn btn-small btn-primary" href="{% url eventlocation-add lifeevent.id %}">Add location</a>
+                                <a class="btn btn-small btn-primary" href="{% url 'eventlocation-add' lifeevent.id %}">Add location</a>
                             </div>
                         </div>
                     </fieldset>
@@ -101,7 +102,7 @@
                                 </div>
                             {% endif %}
                             <div class="controls">
-                                {{ form.sources }} <a href="{% url source-add-entity 'lifeevent' lifeevent.id %}" class="btn btn-mini">Create a new source</a>
+                                {{ form.sources }} <a href="{% url 'source-add-entity' 'lifeevent' lifeevent.id %}" class="btn btn-mini">Create a new source</a>
                             </div>
                         </div>
                     </fieldset>
@@ -110,7 +111,7 @@
                     {% if lifeevent.id %}
                         <input class="btn btn-primary" name="continue" type="submit" value="Save &amp; continue editing">
                         <input class="btn btn-primary" name="finished" type="submit" value="Finished">
-                        <a class="btn btn-primary btn-danger" href="{% url lifeevent-delete lifeevent.id %}">Delete</a>
+                        <a class="btn btn-primary btn-danger" href="{% url 'lifeevent-delete' lifeevent.id %}">Delete</a>
                     {% else %}
                         <input class="btn btn-primary" name="next" type="submit" value="Next">
                     {% endif %}

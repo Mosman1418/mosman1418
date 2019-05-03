@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
-{% load django_select2_tags %}
+{% load static %}
 {% block title %}Log in{% endblock %}
 {% block extra_scripts %}
-{% import_django_select2_js %}
-<script src="{{ STATIC_URL }}js/add-birth.js"></script>
+<script src="{% static 'js/select2.min.js' %}"></script>
+<script src="{% static 'js/add-birth.js' %}"></script>
 {% endblock %}
 {% block extra_styles %}
-{% import_django_select2_css %}
+<link href="{% static 'css/select2.css' %}" type="text/css" media="screen" rel="stylesheet" />
 {% endblock %}
 {% block content %}
     <div class="row">
@@ -22,7 +22,7 @@
                     {% include '_form_field.html' %}
                 {% endwith %}
                 {% if servicenumber.id %}
-                    {% url source-add-entity 'servicenumber' servicenumber.id as addsource %}
+                    {% url 'source-add-entity' 'servicenumber' servicenumber.id as addsource %}
                     {% with label='Sources' field=form.sources create_url=addsource create_type='source' %}
                         {% include '_form_field.html' %}
                     {% endwith %}
@@ -31,7 +31,7 @@
                     {% if servicenumber.id %}
                         <input class="btn btn-primary" name="continue" type="submit" value="Save &amp; continue editing">
                         <input class="btn btn-primary" name="finished" type="submit" value="Finished">
-                        <a class="btn btn-primary btn-danger" href="{% url servicenumber-delete servicenumber.id %}">Delete</a>
+                        <a class="btn btn-primary btn-danger" href="{% url 'servicenumber-delete' servicenumber.id %}">Delete</a>
                     {% else %}
                         <input class="btn btn-primary" name="next" type="submit" value="Next">
                     {% endif %}
