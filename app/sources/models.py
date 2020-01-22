@@ -91,6 +91,7 @@ class Source(StandardMetadata):
         return entities
 
     def formatted_date(self, date_name):
+        print(date_name)
         months = calendar.month_name
         date_obj = getattr(self, '{}'.format(date_name))
         month = getattr(self, '{}_month_known'.format(date_name))
