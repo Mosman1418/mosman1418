@@ -194,6 +194,9 @@ urlpatterns += [
     #url(r'^', include('filer.server.urls')),
 ]
 
+urlpatterns += [
+   url(r'^admin/', admin.site.urls),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 urlpatterns += [
     url(r"^select2/", include("django_select2.urls")),

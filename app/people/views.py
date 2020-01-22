@@ -570,6 +570,7 @@ class AddPerson(CreateView):
         if related_person:
             related_person.associated_person = person
             related_person.save()
+        print('111')
         source = form.cleaned_data.get('source', None)
         creator_type = form.cleaned_data.get('creator_type', None)
         if source and creator_type:
