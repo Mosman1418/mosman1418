@@ -14,6 +14,7 @@ less
 # VScode Editor
 .history
 .vscode/
-
+media/
+static/
 # Don't ever push settings_prod in git repo
 settings_prod.py

@@ -94,7 +94,6 @@ class AddSourceForm(ModelForm, DateSelectMixin):
     publication_date = forms.CharField(widget=NewSelectDateWidget(
         attrs={'class': 'input-small'},
         years=YEARS), required=False)
-    print(publication_date)
     publication_date_end = forms.CharField(widget=NewSelectDateWidget(
         attrs={'class': 'input-small'},
         years=YEARS), required=False)
