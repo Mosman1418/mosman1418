@@ -421,6 +421,7 @@ class AddSourceView(CreateView):
             # Should perhaps log this in some way so it can be followed up.
             pass
         else:
+            print (details)
             website_type = SourceType.objects.get(label='website')
             webpage_type = SourceType.objects.get(label='webpage')
             moa_site, created = Source.objects.get_or_create(
@@ -1136,8 +1137,22 @@ class UpdateSourceView(PermissionRequiredMixin, UpdateView):
             self.object = source
             images.instance = self.object
             images.save()
+            '''
             # creators
-           
+            author_role = SourceRole.objects.get(label='author')
+            editor_role = SourceRole.objects.get(label='editor')
+            authors = form.cleaned_data['authors']
+            editors = form.cleaned_data['editors']
+            self.associate_creators(authors, author_role)
+            self.associate_creators(editors, editor_role)
+            # subjects
+            main_people = form.cleaned_data['main_people']
+            other_people = form.cleaned_data['other_people']
+            primary_topic = SourceAssociation.objects.get(label='primary topic of')
+            topic = SourceAssociation.objects.get(label='topic of')
+            self.associate_people(main_people, primary_topic)
+            self.associate_people(other_people, topic)
+            '''
             #for organisation in organisations:
              #   link.person_set.add(Organisation.objects.get(id=int(organisation)))
             return HttpResponseRedirect(reverse('source-view', args=[source.id]))
