@@ -1069,9 +1069,9 @@ class UpdateSourceView(PermissionRequiredMixin, UpdateView):
             month = date.month
             day = date.day
             if getattr(self.object, '{}_month_known'.format(name)) is False:
-                month = 0
+                month = 1
             if getattr(self.object, '{}_day_known'.format(name)) is False:
-                day = 0
+                day = 1
             date = '{}-{}-{}'.format(day, month, year)
         return date
 

@@ -59,7 +59,7 @@ class RepositoryChoice(ModelSelect2Widget):
 
 class AuthorMultiChoices(ModelSelect2MultipleWidget):
     queryset = Person.objects
-    search_fields = ['family_name__istartswith', ]
+    search_fields = ['family_name__istartswith' ]
 
 
 class SourcesMultiChoice(ModelSelect2MultipleWidget):
@@ -102,7 +102,7 @@ class AddSourceForm(ModelForm, DateSelectMixin):
     category = forms.ChoiceField(choices=categories)
     collection = CollectionChoice(required=False)
     repository = RepositoryChoice(required=False)
-    authors = AuthorMultiChoices(required=False)
+    authors = AuthorMultiChoices(required=True)
     editors = AuthorMultiChoices(required=False)
     person = forms.ModelChoiceField(
         queryset=Person.objects.all(),
@@ -397,12 +397,12 @@ class UpdateSourceForm(ModelForm, DateSelectMixin):
     publication_date_end = forms.CharField(widget=NewSelectDateWidget(
         attrs={'class': 'input-small'},
         years=YEARS), required=False)
-    main_people = PeopleMultiChoices(required=False)
-    other_people = PeopleMultiChoices(required=False)
+    #main_people = PeopleMultiChoices(required=False)
+    #other_people = PeopleMultiChoices(required=False)
     collection = CollectionChoice(required=False)
     repository = RepositoryChoice(required=False)
-    authors = AuthorMultiChoices(required=False)
-    editors = AuthorMultiChoices(required=False)
+    #authors = AuthorMultiChoices(required=False)
+    #editors = AuthorMultiChoices(required=False)
 
     def clean(self):
         cleaned_data = super(UpdateSourceForm, self).clean()

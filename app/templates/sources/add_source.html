@@ -115,6 +115,7 @@
                 {% with label='Publication date' field=form.publication_date %}
                     {% include '_form_field.html' %}
                 {% endwith %}
+                <!--
                 {% with label='Publication date end' field=form.publication_date_end %}
                     {% include '_form_field.html' %}
                 {% endwith %}
@@ -128,7 +129,7 @@
                         </label>
                     </div>
                 </div>
-
+                -->
                 {% if source.id %}
                     <fieldset>
                     <legend>Images</legend>
@@ -158,6 +159,7 @@
                     <fieldset id="creators">
                         <legend>Creators</legend>
                         {% url 'source-creator-add' source_id=source.id creator_type='author' as author_link %}
+                        
                         {% with label='Authors' field=form.authors create_url=author_link create_type='author' %}
                             {% include '_form_field.html' %}
                         {% endwith %}
@@ -196,7 +198,7 @@
                             {% include '_form_field.html' %}
                         {% endwith %}
                     </fieldset>
-                    <fieldset id="subjects">
+                    <!--<fieldset id="subjects">
                         <legend>Subjects</legend>
                         {% with label='Main people' field=form.main_people %}
                             {% include '_form_field.html' %}
@@ -204,7 +206,7 @@
                         {% with label='Other people' field=form.other_people %}
                             {% include '_form_field.html' %}
                         {% endwith %}
-                    </fieldset>
+                    </fieldset>-->
                 {% endif %}
                 <div class="form-actions">
                     {% if source.id %}
