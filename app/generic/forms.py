@@ -105,7 +105,10 @@ class DateSelectMixin(object):
                         day = '1'
                     elif type == 'end':
                         day = monthrange(int(year), int(month))[1]
-            date = '%s-%s-%s' % (year, month, day)
+            if int(year) == 0:
+                date = None
+            else:
+                date = '%s-%s-%s' % (year, month, day)
         else:
             date = None
         return date
@@ -115,7 +118,7 @@ class DateSelectMixin(object):
             year, month, day = date.split('-')
             status = False if int(month) == 0 else True
         else:
-            status = False
+            status = True
         return status
 
     def clean_day(self, date, type):
@@ -123,7 +126,7 @@ class DateSelectMixin(object):
             year, month, day = date.split('-')
             status = False if int(day) == 0 else True
         else:
-            status = False
+            status = True
         return status
 
 

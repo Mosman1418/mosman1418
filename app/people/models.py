@@ -171,7 +171,7 @@ class AlternativePersonName(StandardMetadata):
     other_names = models.CharField(max_length=100, blank=True)
     display_name = models.CharField(max_length=250)
     nickname = models.CharField(max_length=100, blank=True)
-    sources = models.ManyToManyField('sources.Source', blank=True)
+    #sources = models.ManyToManyField('sources.Source', blank=True)
     memorials = models.ManyToManyField('memorials.Memorial', blank=True)
 
     def __str__(self):
@@ -205,7 +205,7 @@ class AlternativePersonName(StandardMetadata):
 class LifeEvent(Event):
     person = models.ForeignKey('people.Person', on_delete=models.CASCADE)
     locations = models.ManyToManyField('places.Place', blank=True, through='EventLocation')
-    sources = models.ManyToManyField('sources.Source', blank=True)
+    #sources = models.ManyToManyField('sources.Source', blank=True)
     type_of_event = models.ForeignKey('people.LifeEventType', on_delete=models.CASCADE, blank=True, null=True)
     memorials = models.ManyToManyField('memorials.Memorial', blank=True)
 
@@ -279,7 +279,7 @@ class LifePeriod(Period):
 class Birth(Event):
     person = models.ForeignKey('people.Person', on_delete=models.CASCADE)
     location = models.ForeignKey('places.Place', on_delete=models.CASCADE, blank=True, null=True)
-    sources = models.ManyToManyField('sources.Source', blank=True)
+    #sources = models.ManyToManyField('sources.Source', blank=True)
 
     def __str__(self):
         earliest = self.formatted_date('start_earliest')
@@ -465,7 +465,7 @@ class PersonRole(RDFRelationship):
 class PersonAddress(StandardMetadata, ShortDateMixin):
     person = models.ForeignKey('Person', on_delete=models.CASCADE)
     address = models.ForeignKey('places.Address', on_delete=models.CASCADE)
-    sources = models.ManyToManyField('sources.Source', blank=True)
+    #sources = models.ManyToManyField('sources.Source', blank=True)
 
     def __str__(self):
         return '{} lived at {}'.format(self.person, self.address)

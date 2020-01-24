@@ -1068,11 +1068,11 @@ class UpdateSourceView(PermissionRequiredMixin, UpdateView):
             year = date.year
             month = date.month
             day = date.day
-            if getattr(self.object, '{}_month_known'.format(name)) is False:
-                month = 1
-            if getattr(self.object, '{}_day_known'.format(name)) is False:
-                day = 1
-            date = '{}-{}-{}'.format(day, month, year)
+            #if getattr(self.object, '{}_month_known'.format(name)) is False:
+                #month = 0
+            #if getattr(self.object, '{}_day_known'.format(name)) is False:
+                #day = 0
+            #date = '{}-{}-{}'.format(day, month, year)
         return date
 
     def get_initial(self):

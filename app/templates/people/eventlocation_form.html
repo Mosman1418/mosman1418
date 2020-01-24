@@ -15,20 +15,20 @@
             <h2>{% if birth.id %}Update{% else %}Add{% endif %} an associated place</h2>
             <form action="" method="post" class="form-horizontal">{% csrf_token %}
                 {% if form.errors %}
-    <!-- Error messaging -->
-    <div id="errors">
-        <div class="inner">
-            <p>There were some errors in the information you entered. Please correct the following:</p>
-            {{ form.non_field_errors }}
-            <ul>
-                {% for field in form %}
-                    {% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
-    <!-- /Error messaging -->
-{% endif %}
+                <!-- Error messaging -->
+                <div id="errors">
+                    <div class="inner">
+                        <p>There were some errors in the information you entered. Please correct the following:</p>
+                        {{ form.non_field_errors }}
+                        <ul>
+                            {% for field in form %}
+                                {% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <!-- /Error messaging -->
+            {% endif %}
 
                 {% with label='Life event' field=form.lifeevent %}
                     {% include '_form_field.html' %}

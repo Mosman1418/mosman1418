@@ -10,7 +10,7 @@
 {% endblock %}
 {% block content %}
     <div class="row">
-    fdsfds{{form}}
+  
         {% with current='none' %}{% include '_sidenav.html' %}{% endwith %}
         <div class="span10">
             <h2>{% if lifeevent.id %}Update{% else %}Add{% endif %} a life event</h2>
@@ -92,7 +92,7 @@
                             </div>
                         </div>
                     </fieldset>
-                    <fieldset>
+                    <!--<fieldset>
                         <legend>Sources</legend>
                         <div class="form-field control-group">
                             <label class="control-label" for="id_sources">Sources</label>
@@ -105,7 +105,7 @@
                                 {{ form.sources }} <a href="{% url 'source-add-entity' 'lifeevent' lifeevent.id %}" class="btn btn-mini">Create a new source</a>
                             </div>
                         </div>
-                    </fieldset>
+                    </fieldset>-->
                 {% endif %}
                 <div class="form-actions">
                     {% if lifeevent.id %}

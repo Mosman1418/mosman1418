@@ -625,7 +625,7 @@ class UpdatePerson(UpdateView):
                 month = 0
             if getattr(self.object, '{}_day_known'.format(name)) is False:
                 day = 0
-            date = '{}-{}-{}'.format(year, month, day)
+            #date = '{}-{}-{}'.format(year, month, day)
         return date
 
     def get_initial(self):
@@ -794,6 +794,7 @@ class AddEventLocation(CreateView):
 
     def get_initial(self):
         event_id = self.kwargs.get('event_id', None)
+        print('evente i did fadsfsadfasdf',event_id)
         initial = {'lifeevent': event_id}
         return initial
 

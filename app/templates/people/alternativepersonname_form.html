@@ -29,6 +29,7 @@
                 {% with label='Known as (nickname)' field=form.nickname %}
                     {% include '_form_field.html' %}
                 {% endwith %}
+                <!--
                 {% if alternativepersonname.id %}
                     <div class="form-field control-group">
                         <label class="control-label" for="id_sources">Sources</label>
@@ -42,6 +43,7 @@
                         </div>
                     </div>
                 {% endif %}
+                -->
                 <div class="form-actions">
                     {% if alternativepersonname.id %}
                         <input class="btn btn-primary" name="continue" type="submit" value="Save &amp; continue editing">
