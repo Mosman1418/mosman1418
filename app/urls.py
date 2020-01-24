@@ -1,4 +1,4 @@
-from django.urls import include, re_path
+from django.urls import include, re_path, path
 from django.conf.urls import url
 from django.contrib import admin
 from django.conf import settings
@@ -9,6 +9,7 @@ from app.sources.views import *
 from app.places.views import *
 from app.memorials.views import *
 from app.base.views import *
+
 
 admin.autodiscover()
 
@@ -203,6 +204,14 @@ urlpatterns += [
 ]
 
 if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns = [
+        path('__debug__/', include(debug_toolbar.urls)),
+
+        # For django versions before 2.0:
+        # url(r'^__debug__/', include(debug_toolbar.urls)),
+
+    ] + urlpatterns
     urlpatterns = static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + urlpatterns
     # urlpatterns = [
         
