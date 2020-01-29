@@ -794,16 +794,16 @@ class AddEventLocation(CreateView):
 
     def get_initial(self):
         event_id = self.kwargs.get('event_id', None)
-        print('evente i did fadsfsadfasdf',event_id)
+        print(event_id)
         initial = {'lifeevent': event_id}
         return initial
 
     def form_valid(self, form):
-        location = form.save(commit=False)
-        location.added_by = self.request.user
-        location.save()
-        assign('people.change_eventlocation', self.request.user, location)
-        assign('people.delete_eventlocation', self.request.user, location)
+        #location = form.save(commit=False)
+        #location.added_by = self.request.user
+        #location.save()
+        #assign('people.change_eventlocation', self.request.user, location)
+        #assign('people.delete_eventlocation', self.request.user, location)
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):

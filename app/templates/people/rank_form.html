@@ -31,7 +31,7 @@
                         {% include '_form_field.html' %}
                     {% endwith %}
                 </fieldset>
-                {% if rank.id %}
+                <!--{% if rank.id %}
                     <fieldset>
                         <legend>Sources</legend>
                         {% url 'source-add-entity' 'rank' rank.id as addsource %}
@@ -39,7 +39,7 @@
                             {% include '_form_field.html' %}
                         {% endwith %}
                     </fieldset>
-                {% endif %}
+                {% endif %}-->
                 <div class="form-actions">
                     {% if rank.id %}
                         <input class="btn btn-primary" name="continue" type="submit" value="Save &amp; continue editing">

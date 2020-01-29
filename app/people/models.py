@@ -116,7 +116,7 @@ class Person(GenericPerson):
 class Rank(StandardMetadata, ShortDateMixin):
     person = models.ForeignKey('Person', on_delete=models.CASCADE)
     rank = models.CharField(max_length=100)
-    sources = models.ManyToManyField('sources.Source', blank=True)
+    #sources = models.ManyToManyField('sources.Source', blank=True)
     memorials = models.ManyToManyField('memorials.Memorial', blank=True)
 
     def __str__(self):
@@ -153,7 +153,7 @@ class Rank(StandardMetadata, ShortDateMixin):
 class ServiceNumber(StandardMetadata):
     person = models.ForeignKey('Person', on_delete=models.CASCADE)
     service_number = models.CharField(max_length=100)
-    sources = models.ManyToManyField('sources.Source', blank=True)
+    #sources = models.ManyToManyField('sources.Source', blank=True)
 
     def __str__(self):
         return '{} had service number {}'.format(self.person, self.service_number)
@@ -212,7 +212,7 @@ class LifeEvent(Event):
     def __str__(self):
         return '{} {} {}'.format(
             self.person,
-            '{}{}'.format(self.label[0].lower(), self.label[1:]),
+            '{}{}'.format()  if self.label[0] else '',
             '({})'.format(self.date_summary()) if self.date_summary() else ''
         )
 
@@ -326,7 +326,7 @@ class Death(Event):
     location = models.ForeignKey('places.Place', on_delete=models.CASCADE, blank=True, null=True)
     cause_of_death = models.CharField(max_length=200, blank=True, null=True)
     burial_place = models.ForeignKey('places.Place', on_delete=models.CASCADE, blank=True, null=True, related_name='burial_place')
-    sources = models.ManyToManyField('sources.Source', blank=True)
+    #sources = models.ManyToManyField('sources.Source', blank=True)
     memorials = models.ManyToManyField('memorials.Memorial', blank=True)
 
     def __str__(self):
@@ -347,6 +347,7 @@ class Death(Event):
     def summary(self):
         earliest = self.formatted_date('start_earliest')
         latest = self.formatted_date('start_latest')
+        
         if earliest:
             if earliest and latest:
                 summary = 'Between {} and {}'.format(earliest, latest)
@@ -362,7 +363,10 @@ class Death(Event):
             summary = self.cause_of_death
         elif self.label:
             summary = self.label
-        return summary
+        if summary == None:
+            return ''
+        else:
+            return summary
 
     def get_absolute_url(self):
         return reverse('death-view', args=[str(self.id)])
@@ -490,7 +494,7 @@ class PersonAssociatedPerson(StandardMetadata, ShortDateMixin):
     person = models.ForeignKey('Person', on_delete=models.CASCADE)
     associated_person = models.ForeignKey('Person', on_delete=models.CASCADE, related_name='related_person', blank=True, null=True)
     association = models.ForeignKey('PersonAssociation', on_delete=models.CASCADE)
-    sources = models.ManyToManyField('sources.Source', blank=True)
+    #sources = models.ManyToManyField('sources.Source', blank=True)
 
     def __str__(self):
         if self.associated_person:
@@ -513,7 +517,7 @@ class PersonAssociatedOrganisation(StandardMetadata, ShortDateMixin):
     person = models.ForeignKey('Person', on_delete=models.CASCADE)
     organisation = models.ForeignKey('Organisation', on_delete=models.CASCADE)
     association = models.ForeignKey('PersonOrgAssociation', on_delete=models.CASCADE, null=True, blank=True)
-    sources = models.ManyToManyField('sources.Source', blank=True)
+    #sources = models.ManyToManyField('sources.Source', blank=True)
     memorials = models.ManyToManyField('memorials.Memorial', blank=True)
 
     def __str__(self):

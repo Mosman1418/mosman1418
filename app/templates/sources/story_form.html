@@ -41,7 +41,7 @@
                         {% include '_form_field.html' %}
                     {% endwith %}
                 </fieldset>
-                {% if story.id %}
+                <!--{% if story.id %}
                     <fieldset>
                         <legend>Sources</legend>
                         {% url 'source-add-entity' 'story' story.id as addsource %}
@@ -49,7 +49,7 @@
                             {% include '_form_field.html' %}
                         {% endwith %}
                     </fieldset>
-                {% endif %}
+                {% endif %}-->
                 <div class="form-actions">
                     {% if story.id %}
                         <input class="btn btn-primary" name="continue" type="submit" value="Save &amp; continue editing">

@@ -156,7 +156,7 @@
                         {% include '_form_field.html' %}
                     {% endwith %}
                     </fieldset>
-                    <fieldset id="creators">
+                    <!--<fieldset id="creators">
                         <legend>Creators</legend>
                         {% url 'source-creator-add' source_id=source.id creator_type='author' as author_link %}
                         
@@ -167,12 +167,12 @@
                         {% with label='Editors' field=form.editors create_url=editor_link create_type='editor' %}
                             {% include '_form_field.html' %}
                         {% endwith %}
-                    </fieldset>
+                    </fieldset>-->
                     <fieldset id="collection">
                         <legend>Part of</legend>
-                        {% with label='Collection' field=form.collection %}
+                        <!--{% with label='Collection' field=form.collection %}
                             {% include '_form_field.html' %}
-                        {% endwith %}
+                        {% endwith %}-->
                         {% with label='Collection title' field=form.collection_title %}
                             {% include '_form_field.html' %}
                         {% endwith %}

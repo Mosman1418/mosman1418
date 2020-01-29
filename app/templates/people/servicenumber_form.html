@@ -23,9 +23,9 @@
                 {% endwith %}
                 {% if servicenumber.id %}
                     {% url 'source-add-entity' 'servicenumber' servicenumber.id as addsource %}
-                    {% with label='Sources' field=form.sources create_url=addsource create_type='source' %}
+                    <!--{% with label='Sources' field=form.sources create_url=addsource create_type='source' %}
                         {% include '_form_field.html' %}
-                    {% endwith %}
+                    {% endwith %}-->
                 {% endif %}
                 <div class="form-actions">
                     {% if servicenumber.id %}

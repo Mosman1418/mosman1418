@@ -75,7 +75,9 @@ class AddPersonForm(ModelForm, DateSelectMixin):
         widget=forms.Select(attrs={'readonly': 'readonly'})
     )
     creator_type = forms.CharField(required=False, widget=forms.HiddenInput())
-    birth_earliest_date = forms.CharField(required=False)
+    birth_earliest_date = forms.CharField(widget=NewSelectDateWidget(
+        attrs={'class': 'input-small'},
+        years=YEARS), required=False)
     birth_latest_date = forms.CharField(widget=NewSelectDateWidget(
         attrs={'class': 'input-small'},
         years=YEARS), required=False)

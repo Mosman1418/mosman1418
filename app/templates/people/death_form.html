@@ -32,7 +32,7 @@
                             {{ form.location }} <a href="{% url 'place-add-entity' entity_id=death.id entity_type='deaths' %}" class="btn btn-mini">Create a new place</a>
                         </div>
                     </div>
-                    <div class="form-field control-group">
+                    <!--<div class="form-field control-group">
                         <label class="control-label" for="id_sources">Sources</label>
                         {% if form.sources.errors %}
                             <div class="alert alert-error">
@@ -42,7 +42,7 @@
                         <div class="controls">
                             {{ form.sources }} <a href="{% url 'source-add-entity' 'death' death.id %}" class="btn btn-mini">Create a new source</a>
                         </div>
-                    </div>
+                    </div>-->
                 {% endif %}
                 <div class="form-actions">
                     {% if death.id %}

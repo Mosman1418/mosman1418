@@ -65,8 +65,8 @@ class Source(StandardMetadata):
             .filter(association__label='primary topic of')
         ]
         places = list(self.place_set.all())
-        stories = list(self.story_set.all())
-        return people + orgs + places + stories
+        #stories = list(self.story_set.all())
+        return people + orgs + places 
 
     def other_subjects(self):
         people = [relation.person for relation in
@@ -79,15 +79,15 @@ class Source(StandardMetadata):
 
     def evidence_for(self):
         entities = []
-        entities.extend(list(self.alternativepersonname_set.all()))
-        entities.extend(list(self.rank_set.all()))
-        entities.extend(list(self.servicenumber_set.all()))
-        entities.extend(list(self.birth_set.all()))
-        entities.extend(list(self.death_set.all()))
-        entities.extend(list(self.lifeevent_set.all()))
-        entities.extend(list(self.personassociatedperson_set.all()))
-        entities.extend(list(self.personassociatedorganisation_set.all()))
-        entities.extend(list(self.personaddress_set.all()))
+        #entities.extend(list(self.alternativepersonname_set.all()))
+        #entities.extend(list(self.rank_set.all()))
+        #entities.extend(list(self.servicenumber_set.all()))
+        #entities.extend(list(self.birth_set.all()))
+        #entities.extend(list(self.death_set.all()))
+        #entities.extend(list(self.lifeevent_set.all()))
+        #entities.extend(list(self.personassociatedperson_set.all()))
+        #entities.extend(list(self.personassociatedorganisation_set.all()))
+        #entities.extend(list(self.personaddress_set.all()))
         return entities
 
     def formatted_date(self, date_name):
@@ -130,7 +130,7 @@ class Story(StandardMetadata, ShortDateMixin):
     title = models.CharField(max_length=200)
     text = models.TextField()
     credit = models.TextField(blank=True, null=True)
-    sources = models.ManyToManyField('sources.Source', blank=True)
+    #sources = models.ManyToManyField('sources.Source', blank=True)
 
     def subjects(self):
         people = list(self.person_set.all())

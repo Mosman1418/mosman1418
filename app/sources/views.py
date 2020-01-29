@@ -254,6 +254,7 @@ class AddSourceView(CreateView):
             person = Person.objects.get(id=entity_id)
             initial['person_name'] = person.family_name
         initial[entity_type] = entity_id
+
         '''
         event_type = self.kwargs.get('event_type', None)
         event_id = self.kwargs.get('event_id', None)
@@ -322,25 +323,13 @@ class AddSourceView(CreateView):
         assign('sources.change_source', self.request.user, source)
         assign('sources.delete_source', self.request.user, source)
         # Extra processing
-        if source.collection and source.collection.repository_item_id == 'B2455':
-            self.get_moa_page(form)
-        if source.collection:
-            if source.collection.url == 'http://www.awm.gov.au/research/people/roll_of_honour/':
-                self.process_roll_of_honour()
-            elif source.collection.url == 'http://www.awm.gov.au/research/people/nominal_rolls/first_world_war_embarkation/':
-                self.process_embarkation_roll()
-            elif source.collection.url == 'http://www.awm.gov.au/research/people/wounded_and_missing/':
-                self.process_red_cross()
-            elif source.collection.url == 'http://www.awm.gov.au/research/people/honours_and_awards/':
-                self.process_honours()
-            elif source.collection.url == 'http://www.cwgc.org/find-war-dead.aspx':
-                self.process_cwgc()
+        
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
-        #birth = self.form.cleaned_data.get('birth_record', None)
-        #death = self.form.cleaned_data.get('death_record', None)
-        #associated_people = self.form.cleaned_data.get('associated_people', None)
+        birth = self.form.cleaned_data.get('birth_record', None)
+        death = self.form.cleaned_data.get('death_record', None)
+        associated_people = self.form.cleaned_data.get('associated_people', None)
         url = reverse_lazy('source-update', args=[self.object.id])
         return url
 

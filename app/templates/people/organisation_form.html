@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Log in{% endblock %}
 {% block extra_scripts %}
 <script src="{% static 'js/select2.min.js' %}"></script>
@@ -59,7 +60,7 @@
                         {% include '_form_field.html' %}
                     {% endwith %}
                 </fieldset>
-                {% if organisation.id %}
+               <!--{% if organisation.id %}
                     <fieldset>
                         <legend>Sources</legend>
                         {% url 'source-add-entity' 'rank' rank.id as addsource %}
@@ -67,7 +68,7 @@
                             {% include '_form_field.html' %}
                         {% endwith %}
                     </fieldset>
-                {% endif %}
+                {% endif %}-->
                 <div class="form-actions">
                     {% if 'person' in form.initial or 'person_organisation' in form_initial %}
                         <input class="btn btn-primary" name="person_submit" type="submit" value="Next">

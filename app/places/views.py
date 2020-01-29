@@ -38,7 +38,7 @@ class PlaceListView(LinkedDataListView):
     path = '/places/{}results'
     template_name = 'places/places'
     browse_field = 'place_name'
-    queryset = Place.objects.filter(merged_into__isnull=True)
+    queryset = Place.objects.filter(merged_into__isnull=True).exclude(display_name='')
 
     def make_graph(self, entities):
         namespaces = {}
