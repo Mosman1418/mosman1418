@@ -4,5 +4,8 @@
 	bare = false
 	logallrefupdates = true
 [remote "origin"]
-	url = https://github.com/Mosman1418/mosman1418.git
+	url = https://github.com/sachitad/mosman1418.git
 	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "django_update_to_2.x"]
+	remote = origin
+	merge = refs/heads/django_update_to_2.x
