@@ -66,7 +66,7 @@ class AddPersonForm(ModelForm):
         year, month, day = date.split('-')
         if int(month) == 0:
             if type == 'start':
-                month = '1'
+                month = '0'
                 day = '1'
             elif type == 'end':
                 month = '12'

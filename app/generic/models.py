@@ -109,7 +109,7 @@ class Person(StandardMetadata):
         elif date_obj and month:
             date_str = '{} {}'.format(months[date_obj.month], date_obj.year)
         elif date_obj:
-            date_str = str(date_obj.year)
+            date_str = '{} {} {}'.format(date_obj.day, months[date_obj.month], date_obj.year)
         else:
             date_str = None
         return date_str

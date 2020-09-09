@@ -1,45 +1,30 @@
-# -*- coding: utf-8 -*-
+# Django settings for mosman1418 project.
 import os
 gettext = lambda s: s
 PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
-
+SITE_ID = 1
 ADMINS = (
-    # ('Your Name', 'your_email@example.com'),
+    # ('Tim Sherratt', 'tim@discontents.com.au'),
+    ('Sachit Adhikari', 'adhikarisachit@gmail.com'),
 )
 
-MANAGERS = ADMINS
 
-# Local time zone for this installation. Choices can be found here:
-# http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
-# although not all choices may be available on all operating systems.
-# On Unix systems, a value of None will cause Django to use the same
-# timezone as the operating system.
-# If running in a Windows environment this must be set to the same as your
-# system time zone.
-TIME_ZONE = 'America/Chicago'
+ALLOWED_HOSTS = ['*']
 
-# Language code for this installation. All choices can be found here:
-# http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'en-au'
-
-SITE_ID = 1
-
-# If you set this to False, Django will make some optimizations so as not
-# to load the internationalization machinery.
-USE_I18N = True
-
-# If you set this to False, Django will not format dates, numbers and
-# calendars according to the current locale.
-USE_L10N = False
-
-# If you set this to False, Django will not use timezone-aware datetimes.
-USE_TZ = True
-
-DATE_FORMAT = 'j M Y'
-
+DATABASES = {
+     'default': {
+         'ENGINE': 'django.db.backends.mysql',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+         'NAME': 'mosman1914django',                      # Or path to database file if using sqlite3.
+         'USER': 'root',                      # Not used with sqlite3.
+         'PASSWORD': '',                  # Not used with sqlite3.
+         'HOST': '/Applications/XAMPP/xamppfiles/var/mysql/mysql.sock',                      # Set to empty string for localhost. Not used with sqlite3.
+         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+     }
+}
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
@@ -49,16 +34,29 @@ MEDIA_URL = '/media/'
 # Example: "http://media.lawrence.com/static/"
 STATIC_URL = '/static/'
 
-# List of finder classes that know how to find static files in
-# various locations.
-STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+# Absolute filesystem path to the directory that will hold user-uploaded files.
+# Example: "/home/media/media.lawrence.com/media/"
+MEDIA_ROOT = os.path.join(PROJECT_PATH,'media/')
+
+# Absolute path to the directory static files should be collected to.
+# Don't put anything in this directory yourself; store your static files
+# in apps' "static/" subdirectories and in STATICFILES_DIRS.
+# Example: "/home/media/media.lawrence.com/static/"
+STATIC_ROOT = '/home/mosman1914/app/static/'
+# Additional locations of static files
+STATICFILES_DIRS = (
+    # Put strings here, like "/home/html/static" or "C:/www/django/static".
+    # Always use forward slashes, even on Windows.
+    # Don't forget to use absolute paths, not relative paths.
+    os.path.join(PROJECT_PATH, "static"),
+    os.path.join(PROJECT_PATH, "app/static"),
+
 )
+
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '&amp;o^%i4tsp8!2%nf2yj6s#*7o_!a&amp;la=rgcoqk$b-=2g3!(gue*'
+
 
 # List of callables that know how to import templates from various sources.
 TEMPLATES = [
@@ -77,6 +75,8 @@ TEMPLATES = [
     },
 ]
 
+# List of callables that know how to import templates from various sources.
+
 MIDDLEWARE = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -86,6 +86,35 @@ MIDDLEWARE = (
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.contrib.auth.context_processors.auth',
+    'django.core.context_processors.i18n',
+    'django.core.context_processors.request',
+    'django.core.context_processors.media',
+    'django.core.context_processors.static',
+    #'cms.context_processors.media',
+    #'sekizai.context_processors.sekizai',
+)
+
+
+CMS_TEMPLATES = (
+    ('cms_template_1.html', 'Template One'),
+    ('cms_template_2.html', 'Template Two'),
+)
+
+LANGUAGES = [
+    ('en', 'English'),
+]
+
+AUTHENTICATION_BACKENDS = (
+    #'django.contrib.auth.backends.ModelBackend',
+    'guardian.backends.ObjectPermissionBackend',
+)
+
+ANONYMOUS_USER_ID = -1
+
+#LOGIN_REDIRECT_URL = '/'
 
 ROOT_URLCONF = 'app.urls'
 
@@ -100,45 +129,71 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # Uncomment the next line to enable the admin:
-    # 'django.contrib.admin',
+    'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
+    #'cms',
+    #'mptt',
+    #'menus',
+    #'south',
+    #'sekizai',
+    'reversion',
+    'guardian',
+    'django_registration',
+    #'cms.plugins.googlemap',
+    #'cms.plugins.link',
+    #'cms.plugins.text',
+    #'cms.plugins.twitter',
+    #'filer',
+    #'cmsplugin_filer_file',
+    #'cmsplugin_filer_folder',
+    #'cmsplugin_filer_image',
+    #'cmsplugin_filer_teaser',
+    #'cmsplugin_filer_video',
+    'django_select2',
+    'easy_thumbnails',
+    'django_extensions',
+    'ckeditor',
+    'app.templatetags',
+    'app.memorials',
+    'app.people',
+    'app.events',
+    'app.places',
+    'app.objects',
+    'app.sources',
+    'app.linkeddata',
 )
 
-# A sample logging configuration. The only tangible logging
-# performed by this configuration is to send an email to
-# the site admins on every HTTP 500 error when DEBUG=False.
-# See http://docs.djangoproject.com/en/dev/topics/logging for
-# more details on how to customize your logging configuration.
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse'
-        }
+THUMBNAIL_DEBUG = False
+
+ACCOUNT_ACTIVATION_DAYS = 7
+
+AUTO_RENDER_SELECT2_STATICS = False
+ENABLE_SELECT2_MULTI_PROCESS_SUPPORT = True
+SELECT2_BOOTSTRAP = True
+
+#MAIL_HOST = 'smtp.anchor.net.au'
+#EMAIL_PORT = 587
+#EMAIL_USE_TLS = True
+#EMAIL_HOST_USER = ''
+#EMAIL_HOST_PASSWORD = ''
+
+
+DEFAULT_FROM_EMAIL = 'admin@mosman1914-1918.net' 
+
+CKEDITOR_UPLOAD_PATH = '/home/mosman1914/app/media'
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 
+            [
+                { 'name': 'clipboard',   'items' : [ 'Source', 'Cut','Copy','Paste','PasteText','PasteFromWord','-','Undo','Redo' ] },
+                { 'name': 'editing',     'items' : [ 'SelectAll', 'Link', 'Unlink'] },
+                { 'name': 'basicstyles', 'items' : [ 'Bold','Italic','Underline','Strike','Subscript','Superscript','-','RemoveFormat' ] },
+                { 'name': 'paragraph',   'items' : [ 'NumberedList','BulletedList','-','Outdent','Indent','-','Blockquote' ] },
+            ],
+        'width': '50%',
+        'height': 200,
+        'forcePasteAsPlainText': True
     },
-    'handlers': {
-        'mail_admins': {
-            'level': 'ERROR',
-            'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler'
-        }
-    },
-    'loggers': {
-        'django.request': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
-            'propagate': True,
-        },
-    }
 }
 
-try:
-    from settings_prod import *
-except ImportError:
-    pass
-try:
-    from settings_local import *
-except ImportError:
-    pass

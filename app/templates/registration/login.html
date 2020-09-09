@@ -5,6 +5,7 @@
         {% with current='none' %}{% include '_sidenav.html' %}{% endwith %}
         <div class="span10">
             <h2>Log in</h2>
+
             {% if form.errors %}
             <p>Your username and password didn't match. Please try again.</p>
             {% endif %}
@@ -20,7 +21,7 @@
                 <td>{{ form.password }}</td>
             </tr>
             </table>
-            <p><a href="{% url 'password_reset' %}">Forgot</a> your password?  <a href="{% url 'django_registration_register' %}">Need an account</a>?</p>
+            <!--<p><a href="{% url 'password_reset' %}">Forgot</a> your password?  <a href="{% url 'django_registration_register' %}">Need an account</a>?</p>-->
 
             <input type="submit" value="login" />
             <input type="hidden" name="next" value="{{ next }}" />

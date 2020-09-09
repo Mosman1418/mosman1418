@@ -1,7 +1,7 @@
 <ul class="nav nav-pills">
     {% for letter in letters %}
     <li class="{% if active == letter %}active{% endif %}">
-        <a href="{% url 'entity_link' letter %}"><small>{{ letter.upper }}</small></a>
+        <a href="{% url entity_link letter %}"><small>{{ letter.upper }}</small></a>
     </li>
     {% endfor %}
 </ul>

@@ -1,4 +1,5 @@
 <div class="pagination pagination-small">
+    
     {% if letter %}
         {% url 'entity_link' letter as base_url %}
     {% elif entity_id %}
@@ -6,6 +7,7 @@
     {% else %}
         {% url 'entity_link' as base_url %}
     {% endif %}
+ 
     <ul>
         <li>
             <a title="First page" href="{{ base_url }}?{% if queries %}{{ queries.urlencode }}&amp;{% endif %}page=1"><i class="icon-double-angle-left"></i></a>

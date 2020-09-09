@@ -8,7 +8,8 @@ register = template.Library()
 @register.inclusion_tag('_alpha_browse.html')
 def alpha_browse(entity, active):
     entity_link = '{}-alpha-list'.format(entity)
-    return {'letters': str.lower,
+    list_alpha = ('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z')
+    return {'letters': list_alpha,
             'entity_link': entity_link,
             'active': active}
 

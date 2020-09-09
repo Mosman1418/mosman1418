@@ -16,7 +16,7 @@
     <div class="row">
         {% with current='sources' %}{% include '_sidenav.html' %}{% endwith %}
         <div class="span8">
-            
+           
             <h2>{% if link_id %}Edit{% else %}Add{% endif %} a source</h2>
 
             <form action="." method="post" enctype="multipart/form-data" class="form-horizontal">{% csrf_token %}

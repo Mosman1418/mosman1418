@@ -602,7 +602,6 @@ class AddPerson(CreateView):
             url = reverse_lazy('source-update', args=[source.id])
         else:
             url = reverse_lazy('person-update', args=[self.object.id])
-        print (url)
         return url
 
 
@@ -794,7 +793,6 @@ class AddEventLocation(CreateView):
 
     def get_initial(self):
         event_id = self.kwargs.get('event_id', None)
-        print(event_id)
         initial = {'lifeevent': event_id}
         return initial
 
