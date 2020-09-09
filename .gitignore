@@ -18,4 +18,3 @@ media/
 static/
 # Don't ever push settings_prod in git repo
 settings_prod.py
-settings.py
